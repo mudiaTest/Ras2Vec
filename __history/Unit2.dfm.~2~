@@ -13,59 +13,24 @@ object Form2: TForm2
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object sbMain: TScrollBox
-    Left = 520
-    Top = 184
-    Width = 289
+  object Image1: TImage
+    Left = 460
+    Top = 168
+    Width = 349
     Height = 273
-    TabOrder = 4
-    object imgMain: TImage
-      Left = 0
-      Top = 0
-      Width = 41
-      Height = 41
-      AutoSize = True
-    end
-    object PaintBoxMain: TPaintBox
-      Left = 0
-      Top = 0
-      Width = 284
-      Height = 268
-      OnPaint = PaintBoxMainPaint
-    end
   end
-  object tbZoom: TTrackBar
-    Left = 232
-    Top = 512
-    Width = 150
-    Height = 45
-    Min = 1
-    Position = 1
-    TabOrder = 5
-    OnChange = tbZoomChange
-  end
-  object sbZoom: TScrollBox
-    Left = 144
-    Top = 184
-    Width = 281
+  object PaintBoxMain: TPaintBox
+    Left = 36
+    Top = 168
+    Width = 345
     Height = 273
-    TabOrder = 6
-    object imgZoom: TImage
-      Left = 0
-      Top = 0
-      Width = 200
-      Height = 200
-    end
   end
-  object edtZoom: TdxMaskEdit
-    Left = 388
-    Top = 512
-    Width = 25
-    TabOrder = 7
-    EditMask = '0;1;_'
-    IgnoreMaskBlank = False
-    Text = ' '
-    StoredValues = 4
+  object ScrollBox1: TScrollBox
+    Left = 36
+    Top = 484
+    Width = 185
+    Height = 41
+    TabOrder = 0
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -140,7 +105,6 @@ object Form2: TForm2
       Category = 0
       Hint = 'Open'
       Visible = ivAlways
-      OnClick = btnOpenClick
     end
     object btnExit: TdxBarButton
       Caption = 'Exit'
