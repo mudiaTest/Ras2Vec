@@ -6,10 +6,6 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib;
 
-const
-  c_mainImage = 1;
-  c_zoomImage = 2;
-  
 type
   TOnScroll = procedure(Sender: TObject; HorzScroll: Boolean;
   OldPos, CurrentPos: Integer) of object;
@@ -48,10 +44,8 @@ type
     imageName: String;
     bmp, bmp2: TBitMap;
     color: Tcolor;
-    procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+    procedure imageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
-    procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-    procedure setScrollPos(asbDest, asbSrc: TScrollBox);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -101,10 +95,9 @@ var
   x, y: integer;
 begin
   inherited;
-  sbMain.OnScroll := mainImageScroll;
-  sbZoom.OnScroll := zoomImageScroll;
+  sbMain.OnScroll := imageScroll;
 
-  //imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
+  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
@@ -116,7 +109,7 @@ begin
   bmp2.height:=200;
 
   bmp2 := TBitmap.Create;
-  //bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
+  bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   //bmp2.PixelFormat := pf32bit;
 
   tbZoomChange(nil);
@@ -146,26 +139,14 @@ begin
   end;
 end;
 
-procedure TForm2.setScrollPos(asbDest, asbSrc: TScrollBox);
-var
-  src: Integer;
+procedure TForm2.imageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
-  if asbDest.Name = sbZoom then
-    src := c_zoomImage
-  else
-    src := c_mainImage;
-end;
+  //PaintBoxMain.Repaint;
 
-procedure TForm2.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-begin
-  //ustaw zoomImage wg main image
-  setScrollPos(sbZoom, sbMain);
-end;
-
-procedure TForm2.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-begin
-  //ustaw mainImage wg zoomImage
-  //setScrollPos(sbZoom, sbMain);
+  {makeZoom(bmp2, bmp,
+           sbMain.HorzScrollBar.Position,
+           sbMain.VertScrollBar.Position,
+           10);  }
 end;
 
 procedure TForm2.PaintBoxMainPaint(Sender: TObject);
@@ -202,7 +183,7 @@ begin
   end;
   imgZoom.Canvas.Draw(0, 0, bmp2);
 
-  edtZoom.Text := intToStr(Zoom);
+  edtZoom.Text := Zoom;
   //Label1.Caption := 'Zoom: ' +
   //    IntToStr(Round(TrackBar1.Position / FULLSCALE * 100)) + '%';
 end;

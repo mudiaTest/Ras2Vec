@@ -147,13 +147,8 @@ begin
 end;
 
 procedure TForm2.setScrollPos(asbDest, asbSrc: TScrollBox);
-var
-  src: Integer;
 begin
-  if asbDest.Name = sbZoom then
-    src := c_zoomImage
-  else
-    src := c_mainImage;
+
 end;
 
 procedure TForm2.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
