@@ -10,6 +10,7 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
@@ -18,30 +19,36 @@ object Form2: TForm2
     Top = 184
     Width = 289
     Height = 273
-    TabOrder = 4
+    TabOrder = 0
     object imgMain: TImage
       Left = 0
       Top = 0
-      Width = 41
-      Height = 41
+      Width = 105
+      Height = 89
       AutoSize = True
+      OnMouseDown = imgMouseDown
+      OnMouseMove = imgMouseMove
+      OnMouseUp = imgMouseUp
     end
     object PaintBoxMain: TPaintBox
       Left = 0
       Top = 0
-      Width = 284
-      Height = 268
+      Width = 49
+      Height = 49
+      OnMouseDown = imgMouseDown
+      OnMouseMove = imgMouseMove
+      OnMouseUp = imgMouseUp
       OnPaint = PaintBoxMainPaint
     end
   end
   object tbZoom: TTrackBar
-    Left = 232
-    Top = 512
-    Width = 150
-    Height = 45
+    Left = 144
+    Top = 504
+    Width = 281
+    Height = 29
     Min = 1
     Position = 1
-    TabOrder = 5
+    TabOrder = 1
     OnChange = tbZoomChange
   end
   object sbZoom: TScrollBox
@@ -49,23 +56,59 @@ object Form2: TForm2
     Top = 184
     Width = 281
     Height = 273
-    TabOrder = 6
+    TabOrder = 2
     object imgZoom: TImage
       Left = 0
       Top = 0
-      Width = 200
-      Height = 200
+      Width = 105
+      Height = 89
+      OnMouseDown = imgMouseDown
+      OnMouseMove = imgMouseMove
+      OnMouseUp = imgMouseUp
+    end
+    object PaintBoxZoom: TPaintBox
+      Left = 0
+      Top = 0
+      Width = 49
+      Height = 49
+      OnMouseDown = imgMouseDown
+      OnMouseMove = imgMouseMove
+      OnMouseUp = imgMouseUp
+      OnPaint = PaintBoxMainPaint
     end
   end
-  object edtZoom: TdxMaskEdit
-    Left = 388
-    Top = 512
-    Width = 25
+  object Panel1: TPanel
+    Left = 284
+    Top = 168
+    Width = 1
+    Height = 313
+    Caption = 'Panel1'
+    TabOrder = 5
+  end
+  object Panel2: TPanel
+    Left = 120
+    Top = 320
+    Width = 337
+    Height = 1
+    Caption = 'Panel2'
     TabOrder = 7
-    EditMask = '0;1;_'
-    IgnoreMaskBlank = False
+  end
+  object edtZoom: TEdit
+    Left = 431
+    Top = 504
+    Width = 25
+    Height = 21
+    MaxLength = 1
+    TabOrder = 3
     Text = ' '
-    StoredValues = 4
+  end
+  object ToolBar1: TToolBar
+    Left = 0
+    Top = 25
+    Width = 877
+    Height = 29
+    Caption = 'ToolBar1'
+    TabOrder = 10
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804

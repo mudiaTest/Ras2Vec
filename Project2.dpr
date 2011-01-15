@@ -2,13 +2,16 @@ program Project2;
 
 uses
   Forms,
-  Unit2 in 'Unit2.pas' {Form2};
+  Main_Form in 'Main_Form.pas' {MainForm},
+  Form_utl in 'Form_utl.pas',
+  Sys_utl in 'Sys_utl.pas',
+  Main_Obj in 'Main_Obj.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

@@ -1,27 +1,17 @@
-unit Unit2;
+unit mainForm;
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib;
+  Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib,
+  ToolWin, StdCtrls, Form_utl;
 
 const
   c_mainImage = 1;
   c_zoomImage = 2;
-  
-type
-  TOnScroll = procedure(Sender: TObject; HorzScroll: Boolean;
-  OldPos, CurrentPos: Integer) of object;
 
-  TScrollBox = class(Forms.TScrollBox)
-  private
-  FOnScroll: TOnScroll;
-  procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
-  procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
-  public
-  property OnScroll: TOnScroll read FOnScroll write FOnScroll;
-  end;
+type
 
   TForm2 = class(TForm)
     PaintBoxMain: TPaintBox;
@@ -37,20 +27,38 @@ type
     tbZoom: TTrackBar;
     sbZoom: TScrollBox;
     imgZoom: TImage;
-    edtZoom: TdxMaskEdit;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    edtZoom: TEdit;
+    ToolBar1: TToolBar;
+    PaintBoxZoom: TPaintBox;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure tbZoomChange(Sender: TObject);
+    procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure imgMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure imgMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
     { Private declarations }
     imageName: String;
     bmp, bmp2: TBitMap;
     color: Tcolor;
+
+    imgStartPos: TPoint;
+    imgActing: Boolean;
+    imgZoomPos: TPoint;
+    zoom: Integer;
+
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+    procedure setScrollPos(asbDest, asbSrc: TScrollBox);
+    procedure saveZoomPos;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -62,33 +70,6 @@ type
 implementation
 
 {$R *.dfm}
-
-{ TScrollBox }
-
-procedure TScrollBox.WMHScroll(var Message: TWMHScroll);
-var
-OldPos: Integer;
-begin
-OldPos := HorzScrollBar.Position;
-inherited;
-if HorzScrollBar.Position <> OldPos then
-if Assigned(FOnScroll) then
-FOnScroll(Self, True, OldPos, HorzScrollBar.Position);
-end;
-
-procedure TScrollBox.WMVScroll(var Message: TWMVScroll);
-var
-OldPos: Integer;
-begin
-OldPos := VertScrollBar.Position;
-inherited;
-if VertScrollBar.Position <> OldPos then
-if Assigned(FOnScroll) then
-FOnScroll(Self, False, OldPos, VertScrollBar.Position);
-end;
-
-//-- === === ---
-
 
 procedure TForm2.btnOpenClick(Sender: TObject);
 begin
@@ -118,6 +99,7 @@ begin
   bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   //bmp2.PixelFormat := pf32bit;
 
+  zoom := 1;
   tbZoomChange(nil);
   imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
 end;
@@ -145,16 +127,63 @@ begin
   end;
 end;
 
+procedure TForm2.imgMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  imgActing := true;
+  imgStartPos := Point(x, y);
+end;
+
+procedure TForm2.imgMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  imgActing := false;
+  imgStartPos := Point(x, y);
+end;
+
+procedure TForm2.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  gc: TGraphicControl;
+  sb: TScrollBox;
+begin
+  if imgActing then
+  begin
+    gc := sender as TGraphicControl;
+    sb := gc.Parent as TScrollBox;
+    sb.HorzScrollBar.Position := sb.HorzScrollBar.Position + imgStartPos.x - x;
+    sb.VertScrollBar.Position := sb.VertScrollBar.Position + imgStartPos.y - y;
+    //saveZoomPos;
+  end;
+end;
+
+procedure TForm2.saveZoomPos;
+begin
+  imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (zoom-1)*Round(sbZoom.Width/2 ))/zoom),
+                      Round((sbZoom.VertScrollBar.Position - (zoom-1)*Round(sbZoom.Height/2))/zoom));
+end;
+
+
+procedure TForm2.setScrollPos(asbDest, asbSrc: TScrollBox);
+var
+  src: Integer;
+begin
+  if asbDest = sbZoom then
+    src := c_zoomImage
+  else
+    src := c_mainImage;
+end;
+
 procedure TForm2.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw zoomImage wg main image
-  //setScrollPos(sbZoom, sbMain, c_zoomImage);
+  setScrollPos(sbZoom, sbMain);
 end;
 
 procedure TForm2.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw mainImage wg zoomImage
-  //setScrollPos(sbZoom, sbMain, c_mainImage);
+  //setScrollPos(sbZoom, sbMain);
 end;
 
 procedure TForm2.PaintBoxMainPaint(Sender: TObject);
@@ -170,10 +199,10 @@ begin
 end;
 
 procedure TForm2.tbZoomChange(Sender: TObject);
-
-var
-  Zoom: Integer;
 begin
+  if zoom <> tbZoom.Position then
+    saveZoomPos;
+
   Zoom := tbZoom.Position;
   if not (Visible or (Zoom = 100)) or (Zoom = 0) then
     Exit;
@@ -194,6 +223,9 @@ begin
   edtZoom.Text := intToStr(Zoom);
   //Label1.Caption := 'Zoom: ' +
   //    IntToStr(Round(TrackBar1.Position / FULLSCALE * 100)) + '%';
+
+  sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
+  sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);
 end;
 
 

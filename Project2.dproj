@@ -1,4 +1,5 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{74ede994-43b1-4533-bf2a-f18c495bed1b}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -24,68 +25,13 @@
     <DCC_ResourcePath>C:\Program Files (x86)\CodeGear\Dodatkowe\DX;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressBars\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressCommon\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressDBTree\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressEditors Library\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInplaceEditors\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInspector\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressMemData\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressPrinting System\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressQuantumGrid\Sources</DCC_ResourcePath>
     <DCC_ObjPath>C:\Program Files (x86)\CodeGear\Dodatkowe\DX;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressBars\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressCommon\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressDBTree\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressEditors Library\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInplaceEditors\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInspector\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressMemData\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressPrinting System\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressQuantumGrid\Sources</DCC_ObjPath>
     <DCC_IncludePath>C:\Program Files (x86)\CodeGear\Dodatkowe\DX;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressBars\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressCommon\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressDBTree\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressEditors Library\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInplaceEditors\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInspector\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressMemData\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressPrinting System\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressQuantumGrid\Sources</DCC_IncludePath>
+    <DCC_Optimize>False</DCC_Optimize>
   </PropertyGroup>
   <ProjectExtensions>
     <Borland.Personality>Delphi.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">False</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1045</VersionInfo><VersionInfo Name="CodePage">1250</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">True</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1045</VersionInfo><VersionInfo Name="CodePage">1250</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Excluded_Packages>
       
       
       
@@ -105,8 +51,11 @@
     <DelphiCompile Include="Project2.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Unit2.pas">
-      <Form>Form2</Form>
+    <DCCReference Include="Form_utl.pas" />
+    <DCCReference Include="Main_Form.pas">
+      <Form>MainForm</Form>
     </DCCReference>
+    <DCCReference Include="Main_Obj.pas" />
+    <DCCReference Include="Sys_utl.pas" />
   </ItemGroup>
 </Project>

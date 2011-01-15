@@ -4,5 +4,14 @@
     <Transaction>2011-01-11 14:27:44.623.pas,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.pas=C:\Praca\Ras2Vec\Unit2.pas</Transaction>
     <Transaction>2011-01-11 14:27:44.623.dfm,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.dfm=C:\Praca\Ras2Vec\Unit2.dfm</Transaction>
     <Transaction>2011-01-11 14:27:48.436.dproj,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Project2.dproj=C:\Praca\Ras2Vec\Project2.dproj</Transaction>
+    <Transaction>2011-01-15 16:18:09.299.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Form_utl.pas</Transaction>
+    <Transaction>2011-01-15 16:21:59.479.pas,D:\praca\Ras2Vec\Unit2.pas=D:\praca\Ras2Vec\mainForm.pas</Transaction>
+    <Transaction>2011-01-15 16:21:59.479.dfm,D:\praca\Ras2Vec\Unit2.dfm=D:\praca\Ras2Vec\mainForm.dfm</Transaction>
+    <Transaction>2011-01-15 16:24:22.492.pas,D:\praca\Ras2Vec\mainForm.pas=D:\praca\Ras2Vec\Main_Form.pas</Transaction>
+    <Transaction>2011-01-15 16:24:22.492.dfm,D:\praca\Ras2Vec\mainForm.dfm=D:\praca\Ras2Vec\Main_Form.dfm</Transaction>
+    <Transaction>2011-01-15 18:07:38.272.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Sys_utl.pas</Transaction>
+    <Transaction>2011-01-15 18:13:59.088.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Functions.pas</Transaction>
+    <Transaction>2011-01-15 19:06:15.304.pas,D:\praca\Ras2Vec\Functions.pas=D:\praca\Ras2Vec\Obj.pas</Transaction>
+    <Transaction>2011-01-15 20:58:24.080.pas,D:\praca\Ras2Vec\Obj.pas=D:\praca\Ras2Vec\Main_Obj.pas</Transaction>
   </Transactions>
 </BorlandProject>

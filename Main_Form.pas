@@ -1,37 +1,19 @@
-unit Unit2;
+unit Main_Form;
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib,
-  ToolWin, StdCtrls, Form_utl;
+  ToolWin, StdCtrls, Form_utl, Sys_utl, Obj;
 
 const
   c_mainImage = 1;
   c_zoomImage = 2;
-  
-//type
 
 type
- { TOnScroll = procedure(Sender: TObject; HorzScroll: Boolean;
-  OldPos, CurrentPos: Integer) of object;
 
-  TScrollBox = class(Forms.TScrollBox)
-  private
-  FOnScroll: TOnScroll;
-  procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
-  procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
-  public
-  property OnScroll: TOnScroll read FOnScroll write FOnScroll;
-  end;}
-
-
-
-
-
-
-  TForm2 = class(TForm)
+  TMainForm = class(TForm)
     PaintBoxMain: TPaintBox;
     dlgPicture: TOpenPictureDialog;
     dxBarManager1: TdxBarManager;
@@ -50,6 +32,7 @@ type
     edtZoom: TEdit;
     ToolBar1: TToolBar;
     PaintBoxZoom: TPaintBox;
+    btmR2V: TdxBarButton;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
@@ -61,6 +44,9 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure imgMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure sbZoomMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure btmR2VClick(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -71,6 +57,8 @@ type
     imgActing: Boolean;
     imgZoomPos: TPoint;
     zoom: Integer;
+
+    vectorList: vectList;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
@@ -83,49 +71,25 @@ type
   end;
 
   var
-    Form2: TForm2;
+    MainForm: TMainForm;
 
 implementation
 
 {$R *.dfm}
 
-{ TScrollBox }
- {
-procedure TScrollBox.WMHScroll(var Message: TWMHScroll);
-var
-OldPos: Integer;
-begin
-OldPos := HorzScrollBar.Position;
-inherited;
-if HorzScrollBar.Position <> OldPos then
-if Assigned(FOnScroll) then
-FOnScroll(Self, True, OldPos, HorzScrollBar.Position);
-end;
-
-procedure TScrollBox.WMVScroll(var Message: TWMVScroll);
-var
-OldPos: Integer;
-begin
-OldPos := VertScrollBar.Position;
-inherited;
-if VertScrollBar.Position <> OldPos then
-if Assigned(FOnScroll) then
-FOnScroll(Self, False, OldPos, VertScrollBar.Position);
-end; }
-
-//-- === === ---
-
-
-procedure TForm2.btnOpenClick(Sender: TObject);
+procedure TMainForm.btnOpenClick(Sender: TObject);
 begin
   PaintBoxMain.Repaint;
 end;
 
-constructor TForm2.Create(AOwner: TComponent);
+constructor TMainForm.Create(AOwner: TComponent);
 var
   x, y: integer;
+  f: TCanvas;
 begin
   inherited;
+  vectorList := vectList.Create;
+
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
@@ -141,15 +105,14 @@ begin
   bmp2.height:=200;
 
   bmp2 := TBitmap.Create;
-  bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
+  //bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   //bmp2.PixelFormat := pf32bit;
-
+  imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
   zoom := 1;
   tbZoomChange(nil);
-  imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
 end;
 
-procedure TForm2.makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
+procedure TMainForm.makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
 var
   x, y: integer;
   x1, y1: integer;
@@ -163,7 +126,7 @@ begin
     end;
 end;
 
-procedure TForm2.dlgLoadClick(Sender: TObject);
+procedure TMainForm.dlgLoadClick(Sender: TObject);
 begin
   if dlgPicture.Execute then
   begin
@@ -172,21 +135,21 @@ begin
   end;
 end;
 
-procedure TForm2.imgMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TMainForm.imgMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   imgActing := true;
   imgStartPos := Point(x, y);
 end;
 
-procedure TForm2.imgMouseUp(Sender: TObject; Button: TMouseButton;
+procedure TMainForm.imgMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   imgActing := false;
   imgStartPos := Point(x, y);
 end;
 
-procedure TForm2.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
+procedure TMainForm.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 var
   gc: TGraphicControl;
@@ -202,14 +165,21 @@ begin
   end;
 end;
 
-procedure TForm2.saveZoomPos;
+procedure TMainForm.saveZoomPos;
 begin
   imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (zoom-1)*Round(sbZoom.Width/2 ))/zoom),
                       Round((sbZoom.VertScrollBar.Position - (zoom-1)*Round(sbZoom.Height/2))/zoom));
 end;
 
 
-procedure TForm2.setScrollPos(asbDest, asbSrc: TScrollBox);
+procedure TMainForm.sbZoomMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  tbZoomChange(nil);
+  imgZoom.Refresh;
+end;
+
+procedure TMainForm.setScrollPos(asbDest, asbSrc: TScrollBox);
 var
   src: Integer;
 begin
@@ -219,19 +189,19 @@ begin
     src := c_mainImage;
 end;
 
-procedure TForm2.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+procedure TMainForm.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw zoomImage wg main image
   setScrollPos(sbZoom, sbMain);
 end;
 
-procedure TForm2.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+procedure TMainForm.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw mainImage wg zoomImage
   //setScrollPos(sbZoom, sbMain);
 end;
 
-procedure TForm2.PaintBoxMainPaint(Sender: TObject);
+procedure TMainForm.PaintBoxMainPaint(Sender: TObject);
 begin
   with PaintBoxMain.Canvas do begin
     Lock;
@@ -243,7 +213,7 @@ begin
   end;
 end;
 
-procedure TForm2.tbZoomChange(Sender: TObject);
+procedure TMainForm.tbZoomChange(Sender: TObject);
 begin
   if zoom <> tbZoom.Position then
     saveZoomPos;
@@ -274,7 +244,16 @@ begin
 end;
 
 
-procedure TForm2.btnExitClick(Sender: TObject);
+procedure TMainForm.btmR2VClick(Sender: TObject);
+begin
+  vectorList.ReadFromImg(imgMain);
+  imgZoom.Width := imgMain.Width;
+  imgZoom.Height := imgMain.Height;
+  vectorList.FillImage(imgZoom);
+  Beep;
+end;
+
+procedure TMainForm.btnExitClick(Sender: TObject);
 begin
   Close;
 end;
