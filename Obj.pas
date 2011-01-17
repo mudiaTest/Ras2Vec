@@ -11,7 +11,8 @@ type
     flist: TIntList;
   public
     constructor Create;
-    procedure FillFromBmp(aimg: TImage);
+    procedure ReadFromImg(aimg: TImage);
+    procedure FillImage(aimg: TImage);
   published
     property vectList: TIntList read flist write flist;
   end;
@@ -38,7 +39,12 @@ begin
 
 end;
 
-procedure vectList.FillFromBmp(aimg: TImage);
+procedure vectList.FillImage(aimg: TImage);
+begin
+  
+end;
+
+procedure vectList.ReadFromImg(aimg: TImage);
 var
   i, j: integer;
   ile: Integer;

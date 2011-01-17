@@ -84,7 +84,7 @@ object MainForm: TMainForm
     Width = 1
     Height = 313
     Caption = 'Panel1'
-    TabOrder = 5
+    TabOrder = 4
   end
   object Panel2: TPanel
     Left = 120
@@ -92,7 +92,7 @@ object MainForm: TMainForm
     Width = 337
     Height = 1
     Caption = 'Panel2'
-    TabOrder = 7
+    TabOrder = 5
   end
   object edtZoom: TEdit
     Left = 431

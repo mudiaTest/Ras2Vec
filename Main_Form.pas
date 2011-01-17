@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib,
-  ToolWin, StdCtrls, Form_utl, Sys_utl, Obj;
+  ToolWin, StdCtrls, Form_utl, Sys_utl, Main_Obj;
 
 const
   c_mainImage = 1;
@@ -58,7 +58,7 @@ type
     imgZoomPos: TPoint;
     zoom: Integer;
 
-    vectorList: vectList;
+    vectorList: TVectList;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
@@ -88,7 +88,7 @@ var
   f: TCanvas;
 begin
   inherited;
-  vectorList := vectList.Create;
+  vectorList := TVectList.Create;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -249,7 +249,7 @@ begin
   vectorList.ReadFromImg(imgMain);
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;
-  vectorList.FillImage(imgZoom);
+  vectorList.FillImg(imgZoom);
   Beep;
 end;
 

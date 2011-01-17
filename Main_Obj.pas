@@ -6,7 +6,7 @@ uses
   Sys_utl, Windows, Graphics, ExtCtrls, Classes;
 
 type
-  vectList = class(TIntList)
+  TVectList = class(TIntList)
   private
     flist: TIntList;
     fsrcWidth: Integer;
@@ -21,47 +21,50 @@ type
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   end;
 
-  vectorObj = class
-  private
+  TVectorObj = class
+  protected
     fpoints: TIntList;
     fcolor: TColor;
   published
     property color: TColor read fcolor write fcolor;
   end;
 
-  rectVector = class (vectorObj)
+  TRectVector = class (TVectorObj)
   private
-    function getP(lp: Integer): TPoint;
+    function getP(val: Integer): TPoint;
+    function getP1: TPoint;
+    function getP2: TPoint;
   public
     constructor Create(acolor: TColor; p1, p2: TPoint); reintroduce;
-  property p1: TPoint read getP(0);
+    property p1: TPoint read getP1;
+    property p2: TPoint read getP2;
   end;
 
 implementation
 
 { vectList }
 
-constructor vectList.Create;
+constructor TVectList.Create;
 begin
 
 end;
 
-procedure vectList.FillImg(aimg: TImage);
+procedure TVectList.FillImg(aimg: TImage);
 var
   x, y: Integer;
   i: Integer;
-  vectObj: rectVector;
+  vectObj: TRectVector;
 begin
   aimg.Width := srcWidth;
   aimg.Height := srcHeight;
   for i:=0 to vectList.count-1 do
   begin
-    vectObj := vectList.get(Integer);
-    aimg.Canvas.Rectangle(vectObj.);
+    vectObj := vectList.Objects[i] as TRectVector;
+    aimg.Canvas.Rectangle(vectObj.p1.X, vectObj.p1.Y, vectObj.p2.X, vectObj.p2.Y);
   end;
 end;
 
-procedure vectList.ReadFromImg(aimg: TImage);
+procedure TVectList.ReadFromImg(aimg: TImage);
 var
   x, y: integer;
   ile: Integer;
@@ -77,7 +80,7 @@ begin
     for y:=0 to aimg.Height do
       for x:=0 to aimg.Width do
       begin
-        flist.AddObject(ile, rectVector.Create(aimg.Canvas.Pixels[x, y], Point(x, y), Point(x, y)));
+        flist.AddObject(ile, TRectVector.Create(aimg.Canvas.Pixels[x, y], Point(x, y), Point(x, y)));
         inc(ile);
       end;
   end;
@@ -87,14 +90,28 @@ end;
 
 { rectVector }
 
-constructor rectVector.Create(acolor: TColor; p1, p2: TPoint);
+constructor TRectVector.Create(acolor: TColor; p1, p2: TPoint);
 begin
   color := acolor;
+  fpoints.AddObject(0, p1);
+  fpoints.AddObject(1, p2);
 end;
 
-function rectVector.getP(lp: Integer): TPoint;
+function TRectVector.getP(val: Integer): TPoint;
+var
+  r: TPoint
 begin
+  Result := Point((fpoints.ObjByVal[val]) as tPo, 1);
+end;
 
+function TRectVector.getP1: TPoint;
+begin
+  Result := getP(0);
+end;
+
+function TRectVector.getP2: TPoint;
+begin
+  Result := getP(1);
 end;
 
 end.
