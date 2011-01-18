@@ -3,7 +3,7 @@ unit Sys_utl;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Windows;
 
 type
   TIntList = class (TStringList)
@@ -16,6 +16,16 @@ type
   public
     property Integers[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
     property ObjByVal[val: integer]: TObject read GetObjByVal;
+  end;
+
+  TOPoint = class (TObject)
+  private
+    fpoint: TPoint;
+  published
+    property x: integer read fpoint.x write fpoint.x;
+    property y: integer read fpoint.y write fpoint.y;
+  public
+    class function getPoint(point: TPoint): TOPoint;
   end;
 
 
@@ -46,6 +56,15 @@ end;
 procedure TIntList.PutInt(Index: Integer; const S: Integer);
 begin
    Put(Index, IntToStr(s));
+end;
+
+{ TOPoint }
+
+class function TOPoint.getPoint(point: TPoint): TOPoint;
+begin
+  Result := TOPoint.Create;
+  Result.x := point.X;
+  Result.y := point.y;
 end;
 
 end.

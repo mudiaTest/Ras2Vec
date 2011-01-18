@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib,
-  ToolWin, StdCtrls, Form_utl, Sys_utl, Main_Obj;
+  ToolWin, StdCtrls, Form_utl, Sys_utl, Main_Obj, ActnMan, ActnColorMaps,
+  TeCanvas;
 
 const
   c_mainImage = 1;
@@ -33,6 +34,10 @@ type
     ToolBar1: TToolBar;
     PaintBoxZoom: TPaintBox;
     btmR2V: TdxBarButton;
+    chkGrid: TCheckBox;
+    cdGrid: TColorDialog;
+    btnView: TdxBarSubItem;
+    btnGridColor: TdxBarButton;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
@@ -47,6 +52,8 @@ type
     procedure sbZoomMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure btmR2VClick(Sender: TObject);
+    procedure chkGridClick(Sender: TObject);
+    procedure btnGridColorClick(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -59,12 +66,14 @@ type
     zoom: Integer;
 
     vectorList: TVectList;
+    gridColor: TColor;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure setScrollPos(asbDest, asbSrc: TScrollBox);
     procedure saveZoomPos;
+    procedure init;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -80,6 +89,11 @@ implementation
 procedure TMainForm.btnOpenClick(Sender: TObject);
 begin
   PaintBoxMain.Repaint;
+end;
+
+procedure TMainForm.chkGridClick(Sender: TObject);
+begin
+  vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
@@ -103,13 +117,13 @@ begin
   bmp2:=TBitmap.create;
   bmp2.width:=200;(*Assign dimensions*)
   bmp2.height:=200;
-
-  bmp2 := TBitmap.Create;
   //bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   //bmp2.PixelFormat := pf32bit;
   imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
   zoom := 1;
   tbZoomChange(nil);
+
+  btmR2VClick(nil);
 end;
 
 procedure TMainForm.makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
@@ -147,6 +161,11 @@ procedure TMainForm.imgMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   imgActing := false;
   imgStartPos := Point(x, y);
+end;
+
+procedure TMainForm.init;
+begin
+  gridColor := RGB(249, 192, 192);
 end;
 
 procedure TMainForm.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -226,6 +245,9 @@ begin
   SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
   SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
 
+  if vectorList.vectList.count > 0 then
+    vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+
   imgZoom.Width := Round(bmp2.Width * Zoom);
   imgZoom.Height := Round(bmp2.Height * Zoom);
   if Assigned(imgZoom.Picture.Graphic) then
@@ -233,11 +255,13 @@ begin
     imgZoom.Picture.Graphic.Width := imgZoom.Width;
     imgZoom.Picture.Graphic.Height := imgZoom.Height;
   end;
-  imgZoom.Canvas.Draw(0, 0, bmp2);
+  //imgZoom.Canvas.Draw(0, 0, bmp2);
 
   edtZoom.Text := intToStr(Zoom);
   //Label1.Caption := 'Zoom: ' +
   //    IntToStr(Round(TrackBar1.Position / FULLSCALE * 100)) + '%';
+
+
 
   sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
   sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);
@@ -249,13 +273,31 @@ begin
   vectorList.ReadFromImg(imgMain);
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;
-  vectorList.FillImg(imgZoom);
+  vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  //bmp2.Canvas
+  //imgZoom
+
+  {with imgZoom.Canvas do
+  begin
+    Brush.Style := bsSolid;
+    Brush.Color := clRed;
+    imgZoom.Picture.Bitmap.Canvas.Polyline([Point(40, 10), Point(20, 60), Point(70, 30),
+      Point(90, 30), Point(60, 60), Point(40, 10)]);
+  end;}
+
+
   Beep;
 end;
 
 procedure TMainForm.btnExitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TMainForm.btnGridColorClick(Sender: TObject);
+begin
+  if cdGrid.execute then
+    gridColor := cdGrid.Color;
 end;
 
 end.

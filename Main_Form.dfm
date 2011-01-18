@@ -111,6 +111,17 @@ object MainForm: TMainForm
     Caption = 'ToolBar1'
     TabOrder = 10
   end
+  object chkGrid: TCheckBox
+    Left = 16
+    Top = 72
+    Width = 97
+    Height = 17
+    Caption = 'Grid'
+    Color = clGrayText
+    ParentColor = False
+    TabOrder = 11
+    OnClick = chkGridClick
+  end
   object dlgPicture: TOpenPictureDialog
     Left = 804
     Top = 44
@@ -141,6 +152,11 @@ object MainForm: TMainForm
             BeginGroup = True
             Item = sbiImage
             Visible = True
+          end
+          item
+            BeginGroup = True
+            Item = btnView
+            Visible = True
           end>
         Name = 'mainTB'
         OneOnRow = True
@@ -150,15 +166,24 @@ object MainForm: TMainForm
         WholeRow = False
       end>
     Categories.Strings = (
-      'Default')
+      'Default'
+      'File'
+      'Image'
+      'View')
     Categories.ItemsVisibles = (
+      2
+      2
+      2
       2)
     Categories.Visibles = (
+      True
+      True
+      True
       True)
     PopupMenuLinks = <>
     UseSystemFont = True
-    Left = 304
-    Top = 88
+    Left = 760
+    Top = 40
     DockControlHeights = (
       0
       0
@@ -166,7 +191,7 @@ object MainForm: TMainForm
       0)
     object sbiPlik: TdxBarSubItem
       Caption = 'File'
-      Category = 0
+      Category = 1
       Visible = ivAlways
       ItemLinks = <
         item
@@ -181,21 +206,21 @@ object MainForm: TMainForm
     end
     object btnOpen: TdxBarButton
       Caption = 'Open'
-      Category = 0
+      Category = 1
       Hint = 'Open'
       Visible = ivAlways
       OnClick = btnOpenClick
     end
     object btnExit: TdxBarButton
       Caption = 'Exit'
-      Category = 0
+      Category = 1
       Hint = 'Exit'
       Visible = ivAlways
       OnClick = btnExitClick
     end
     object sbiImage: TdxBarSubItem
       Caption = 'Image'
-      Category = 0
+      Category = 2
       Visible = ivAlways
       ItemLinks = <
         item
@@ -209,17 +234,38 @@ object MainForm: TMainForm
     end
     object dlgLoad: TdxBarButton
       Caption = 'Load'
-      Category = 0
+      Category = 2
       Hint = 'Load'
       Visible = ivAlways
       OnClick = dlgLoadClick
     end
     object btmR2V: TdxBarButton
       Caption = 'R2V'
-      Category = 0
+      Category = 2
       Hint = 'R2V'
       Visible = ivAlways
       OnClick = btmR2VClick
     end
+    object btnView: TdxBarSubItem
+      Caption = 'View'
+      Category = 3
+      Visible = ivAlways
+      ItemLinks = <
+        item
+          Item = btnGridColor
+          Visible = True
+        end>
+    end
+    object btnGridColor: TdxBarButton
+      Caption = 'Grid color'
+      Category = 3
+      Hint = 'Grid color'
+      Visible = ivAlways
+      OnClick = btnGridColorClick
+    end
+  end
+  object cdGrid: TColorDialog
+    Left = 800
+    Top = 88
   end
 end
