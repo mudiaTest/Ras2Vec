@@ -66,6 +66,7 @@ type
     zoom: Integer;
 
     vectorList: TVectList;
+    vectorList2: TVectByCoordList;
     gridColor: TColor;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
@@ -94,6 +95,7 @@ end;
 procedure TMainForm.chkGridClick(Sender: TObject);
 begin
   vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
@@ -103,6 +105,7 @@ var
 begin
   inherited;
   vectorList := TVectList.Create;
+  vectorList2 := TVectByCoordList.Create;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -245,8 +248,10 @@ begin
   SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
   SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
 
-  if vectorList.vectList.count > 0 then
-    vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  {if vectorList.count > 0 then
+    vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor); }
+  if vectorList2.count > 0 then
+    vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
 
   imgZoom.Width := Round(bmp2.Width * Zoom);
   imgZoom.Height := Round(bmp2.Height * Zoom);
@@ -271,22 +276,15 @@ end;
 procedure TMainForm.btmR2VClick(Sender: TObject);
 begin
   vectorList.ReadFromImg(imgMain);
+  {imgZoom.Width := imgMain.Width;
+  imgZoom.Height := imgMain.Height;
+  vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);}
+
+  //vectorList2.ReadFromImg(imgMain);
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;
-  vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
-  //bmp2.Canvas
-  //imgZoom
+  vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
 
-  {with imgZoom.Canvas do
-  begin
-    Brush.Style := bsSolid;
-    Brush.Color := clRed;
-    imgZoom.Picture.Bitmap.Canvas.Polyline([Point(40, 10), Point(20, 60), Point(70, 30),
-      Point(90, 30), Point(60, 60), Point(40, 10)]);
-  end;}
-
-
-  Beep;
 end;
 
 procedure TMainForm.btnExitClick(Sender: TObject);
