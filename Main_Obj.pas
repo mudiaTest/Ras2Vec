@@ -34,6 +34,7 @@ type
   //lista obiektów wektorowych
   TVectList = class(TIntList)
   private
+    vectArr: array of array of TVectObj;
     fsrcWidth: Integer;
     fsrcHeight: Integer;
     function getObjById(index: Integer): TVectObj;
@@ -43,8 +44,9 @@ type
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
     procedure ReadFromImg(aimg: TImage);
-    procedure FillImg(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor);
+    function FillImg(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor): TBitmap;
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
+    constructor Create;
   end;
 
   //podstawowy obekt wektorowy
@@ -74,33 +76,64 @@ implementation
 
 { TVectList }
 
-procedure TVectList.FillImg(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor);
+constructor TVectList.Create;
+begin
+  inherited;
+end;
+
+function TVectList.FillImg(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor): TBitmap;
 var
   x, y: Integer;
   i: Integer;
   vectObj: TVectRectangle;
+  p: Pointer;
+  bmp: TBitmap;
 begin
-  aimg.Width := srcWidth;
-  aimg.Height := srcHeight;
-  for i:=0 to count-1 do
+  aimg.Width := srcWidth * azoom;
+  aimg.Height := srcHeight * azoom;
+  bmp := TBitmap.Create;
+  bmp.Width := srcWidth * azoom;
+  bmp.Height := srcHeight * azoom;
+  aimg.Canvas.Lock;
+
+  if agrid then
   begin
-
-    with aimg.Canvas do
+    bmp.Canvas.Pen.Style := psSolid;
+    bmp.Canvas.Pen.Color := agridColor;
+  end
+  else
+    bmp.Canvas.Pen.Style := psClear;
+  for y:=0 to srcHeight-1 do
+    for x:=0 to srcWidth-1 do
     begin
-      vectObj := vObj[i] as TVectRectangle;
-      Pen.Style := psClear;
-      if agrid then
+      with bmp.Canvas do
       begin
-        Pen.Style := psSolid;
-        Pen.Color := agridColor;
+        vectObj := vectArr[x, y] as TVectRectangle;
+        Brush.Color := vectObj.color;
+        Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
+                  (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
       end;
-
-      Brush.Color := vectObj.color;
-      Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
-                (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
-
     end;
+  {
+  if agrid then
+  begin
+    aimg.Canvas.Pen.Style := psSolid;
+    aimg.Canvas.Pen.Color := agridColor;
   end;
+  for y:=0 to srcHeight-1 do
+    for x:=0 to srcWidth-1 do
+    begin
+      with aimg.Canvas do
+      begin
+        vectObj := vectArr[x, y] as TVectRectangle;
+        Brush.Color := vectObj.color;
+        Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
+                  (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
+      end;
+    end;
+  }
+  Result := bmp;
+  aimg.Canvas.Unlock;
 end;
 
 function TVectList.getObjById(index: Integer): TVectObj;
@@ -117,24 +150,25 @@ procedure TVectList.ReadFromImg(aimg: TImage);
 var
   x, y: integer;
   ile: Integer;
+  p: Pointer;
+  rec: TVectRectangle;
+  rec2: TVectRectangle;
 begin
-  ile := 0;
-  if (aimg.Width * aimg.Height = 0) then
-  begin
-    Clear;
-    Exit;
-  end else
-  begin
-    for y:=0 to aimg.Height do
-      for x:=0 to aimg.Width do
-      begin
-        AddObject(ile, TVectRectangle.Create(aimg.Canvas.Pixels[x, y],
-                  TOPoint.getPoint(Point(x, y)), TOpoint.getPoint(Point(x, y))));
-        inc(ile);
-      end;
-  end;
   srcWidth := aimg.Width;
   srcHeight := aimg.Height;
+  SetLength(vectArr, srcWidth, srcHeight);
+  for y:=0 to aimg.Height-1 do
+    for x:=0 to aimg.Width-1 do
+    begin
+      rec := TVectRectangle.Create(
+                  aimg.Canvas.Pixels[x, y],
+                  TOPoint.getPoint(Point(x, y)),
+                  TOpoint.getPoint(Point(x, y))
+               );
+      vectArr[x,y] := rec;
+      //rec2 := @rec;
+      inc(ile);
+    end;
 end;
 
 { TVectRectangle }

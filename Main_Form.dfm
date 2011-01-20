@@ -12,6 +12,8 @@ object MainForm: TMainForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  OnPaint = FormShow
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object sbMain: TScrollBox
@@ -105,11 +107,11 @@ object MainForm: TMainForm
   end
   object ToolBar1: TToolBar
     Left = 0
-    Top = 23
+    Top = 25
     Width = 877
     Height = 29
     Caption = 'ToolBar1'
-    TabOrder = 9
+    TabOrder = 6
   end
   object chkGrid: TCheckBox
     Left = 16
@@ -129,8 +131,8 @@ object MainForm: TMainForm
   object dxBarManager1: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
     Font.Style = []
     Bars = <
       item
@@ -187,7 +189,7 @@ object MainForm: TMainForm
     DockControlHeights = (
       0
       0
-      23
+      25
       0)
     object sbiPlik: TdxBarSubItem
       Caption = 'File'

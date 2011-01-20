@@ -54,6 +54,7 @@ type
     procedure btmR2VClick(Sender: TObject);
     procedure chkGridClick(Sender: TObject);
     procedure btnGridColorClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -70,7 +71,6 @@ type
     gridColor: TColor;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-    procedure makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure setScrollPos(asbDest, asbSrc: TScrollBox);
     procedure saveZoomPos;
@@ -94,8 +94,9 @@ end;
 
 procedure TMainForm.chkGridClick(Sender: TObject);
 begin
-  vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
-  vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  //vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  //vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  tbZoomChange(nil);
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
@@ -123,24 +124,10 @@ begin
   //bmp2.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   //bmp2.PixelFormat := pf32bit;
   imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
-  zoom := 1;
+  zoom := 0;
   tbZoomChange(nil);
 
   btmR2VClick(nil);
-end;
-
-procedure TMainForm.makeZoom(abmpDst, abmpSrc: TBitmap; ax, ay, azoom: integer);
-var
-  x, y: integer;
-  x1, y1: integer;
-begin
-  for y := ax to abmpSrc.Width-1 do
-    for x := ay to abmpSrc.Height-1 do
-    begin
-      for y1 := y*azoom to (y+1)*azoom-1 do
-        for x1 := x*azoom to (x+1)*azoom-1 do
-          abmpDst.canvas.Pixels[x1, y1] := abmpSrc.canvas.Pixels[x, y];
-    end;
 end;
 
 procedure TMainForm.dlgLoadClick(Sender: TObject);
@@ -150,6 +137,11 @@ begin
     //imageName := dlgPicture.FileName;
     //Image1.Picture.LoadFromFile(imageName);
   end;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+  tbZoomChange(nil);
 end;
 
 procedure TMainForm.imgMouseDown(Sender: TObject; Button: TMouseButton;
@@ -188,9 +180,15 @@ begin
 end;
 
 procedure TMainForm.saveZoomPos;
+var
+  tmpZoom: integer;
 begin
-  imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (zoom-1)*Round(sbZoom.Width/2 ))/zoom),
-                      Round((sbZoom.VertScrollBar.Position - (zoom-1)*Round(sbZoom.Height/2))/zoom));
+  if (zoom >0) and (zoom<11) then
+    tmpZoom := zoom
+  else
+    tmpZoom := 1;
+  imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Width/2 ))/tmpZoom),
+                      Round((sbZoom.VertScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Height/2))/tmpZoom));
 end;
 
 
@@ -236,40 +234,34 @@ begin
 end;
 
 procedure TMainForm.tbZoomChange(Sender: TObject);
+var
+  tmpBmp: TBitmap;
 begin
   if zoom <> tbZoom.Position then
-    saveZoomPos;
-
-  Zoom := tbZoom.Position;
-  if not (Visible or (Zoom = 100)) or (Zoom = 0) then
-    Exit;
-
-  SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
-  SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
-  SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
-
-  {if vectorList.count > 0 then
-    vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor); }
-  if vectorList2.count > 0 then
-    vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
-
-  imgZoom.Width := Round(bmp2.Width * Zoom);
-  imgZoom.Height := Round(bmp2.Height * Zoom);
-  if Assigned(imgZoom.Picture.Graphic) then
   begin
-    imgZoom.Picture.Graphic.Width := imgZoom.Width;
-    imgZoom.Picture.Graphic.Height := imgZoom.Height;
+    saveZoomPos;
+    Zoom := tbZoom.Position;
+    //if not (Visible or (Zoom = 100)) or (Zoom < 0) then
+    //  Exit;
+
+    SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
+    SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
+    SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
+    tmpBmp := vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+
+    imgZoom.Width := Round(bmp2.Width * Zoom);
+    imgZoom.Height := Round(bmp2.Height * Zoom);
+    if Assigned(imgZoom.Picture.Graphic) then
+    begin
+      imgZoom.Picture.Graphic.Width := imgZoom.Width;
+      imgZoom.Picture.Graphic.Height := imgZoom.Height;
+    end;
+    imgZoom.Canvas.Draw(0, 0, tmpBmp);
+
+    edtZoom.Text := intToStr(Zoom);
+    sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
+    sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);
   end;
-  //imgZoom.Canvas.Draw(0, 0, bmp2);
-
-  edtZoom.Text := intToStr(Zoom);
-  //Label1.Caption := 'Zoom: ' +
-  //    IntToStr(Round(TrackBar1.Position / FULLSCALE * 100)) + '%';
-
-
-
-  sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
-  sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);
 end;
 
 
