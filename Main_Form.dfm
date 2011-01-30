@@ -121,8 +121,16 @@ object MainForm: TMainForm
     Caption = 'Grid'
     Color = clGrayText
     ParentColor = False
-    TabOrder = 11
+    TabOrder = 8
     OnClick = chkGridClick
+  end
+  object chkTestColor: TCheckBox
+    Left = 16
+    Top = 104
+    Width = 97
+    Height = 17
+    Caption = 'kolor testowy'
+    TabOrder = 12
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804

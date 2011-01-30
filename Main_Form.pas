@@ -38,6 +38,7 @@ type
     cdGrid: TColorDialog;
     btnView: TdxBarSubItem;
     btnGridColor: TdxBarButton;
+    chkTestColor: TCheckBox;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
@@ -247,7 +248,10 @@ begin
     SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
     SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
     SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
-    tmpBmp := vectorList.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+    vectorList.groupRect;
+    vectorList.joinRect;
+//    tmpBmp := vectorList.FillImg(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
+    tmpBmp := vectorList.FillImgWithPolygons(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
 
     imgZoom.Width := Round(bmp2.Width * Zoom);
     imgZoom.Height := Round(bmp2.Height * Zoom);

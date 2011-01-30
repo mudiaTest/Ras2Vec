@@ -3,22 +3,25 @@ unit Sys_utl;
 interface
 
 uses
-  Classes, SysUtils, Windows;
+  Classes, SysUtils, Windows, Math;
 
 type
   TIntList = class (TStringList)
-    function AddObject(key: integer; obj: TObject): Integer; reintroduce;
+    function AddObject(val: integer; obj: TObject): Integer; reintroduce;
     function GetInt(Index: Integer): integer;
     procedure PutInt(Index: Integer; const S: integer);
     function GetObjByVal(val: Integer): TObject;
     function IndexOf(const val: integer): Integer; overload;
-
+  private
+    fnextKey: Integer;
   public
+    function nextKey: Integer;
     property Integers[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
     property ObjByVal[val: integer]: TObject read GetObjByVal;
+    constructor Create; overload;
   end;
 
-  TOPoint = class (TObject)
+  TOPoint = class
   private
     fpoint: TPoint;
   published
@@ -28,14 +31,20 @@ type
     class function getPoint(point: TPoint): TOPoint;
   end;
 
-
 implementation
 
 { TIntList }
 
-function TIntList.AddObject(key: integer; obj: TObject): Integer;
+function TIntList.AddObject(val: integer; obj: TObject): Integer;
 begin
-  Result := inherited AddObject(IntToStr(key), obj);
+  Result := inherited AddObject(IntToStr(val), obj);
+  fnextKey := Math.max(fnextKey, val+1);
+end;
+
+constructor TIntList.Create;
+begin
+  inherited;
+  fnextKey := 0;
 end;
 
 function TIntList.GetInt(Index: Integer): Integer;
@@ -53,9 +62,15 @@ begin
   Result := IndexOf(IntToStr(val));
 end;
 
+function TIntList.nextKey: Integer;
+begin
+  Result := fnextKey;
+end;
+
 procedure TIntList.PutInt(Index: Integer; const S: Integer);
 begin
    Put(Index, IntToStr(s));
+   fnextKey := Math.max(fnextKey, s+1);
 end;
 
 { TOPoint }
