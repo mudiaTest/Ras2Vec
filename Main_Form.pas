@@ -39,6 +39,7 @@ type
     btnView: TdxBarSubItem;
     btnGridColor: TdxBarButton;
     chkTestColor: TCheckBox;
+    btn1: TButton;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
@@ -56,6 +57,7 @@ type
     procedure chkGridClick(Sender: TObject);
     procedure btnGridColorClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btn1Click(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -281,6 +283,50 @@ begin
   imgZoom.Height := imgMain.Height;
   vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
 
+end;
+
+procedure TMainForm.btn1Click(Sender: TObject);
+begin
+imgZoom.Width := 100;
+imgZoom.Height := 100;
+  with imgZoom.Canvas do
+  begin
+    Pen.Style := psSolid;
+    Pen.Color := clblack;
+
+    //bmp.Canvas.Pen.Style := psClear;
+    Brush.Color := clRed;
+
+//    imgZoom.Canvas.
+
+    polygon( [
+      point(1,1),
+      Point(1,2),
+      point(2,2),
+      Point(2,1)
+      ]
+    );
+
+    polygon( [
+      point(2,1),
+      Point(2,2),
+      point(3,2),
+      Point(3,1)
+      ]
+    );
+
+  {  Polyline(
+    [
+      point(1,1),
+      Point(1,1),
+      point(1,1),
+      Point(1,1),
+      point(1,1)
+      ]
+    );  }
+
+    //Rectangle(1,1,2,2);
+  end;
 end;
 
 procedure TMainForm.btnExitClick(Sender: TObject);

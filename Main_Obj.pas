@@ -20,6 +20,9 @@ type
   TVectObj = class;
   TVectRectangle = class;
 
+  TDynamicPointArray = array of array of TVectObj;
+  TDynamicEdgeArray = array of TPoint;
+
   TOColor = class
     color: TColor;
   end;
@@ -56,16 +59,16 @@ type
     property edgeList: TIntList read fedgeList write fedgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
-    property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
+    //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
   public
     constructor Create; overload;
-    procedure makeVectorEdge(vectArr: TVarArray);
+    function makeVectorEdge(vectArr: TDynamicPointArray): TDynamicPointArray;//(vectArr: TVarArray);
   end;
 
   //lista obiektów wektorowych
   TVectList = class(TIntList)
   private
-    vectArr: array of array of TVectObj;
+    vectArr: TDynamicPointArray;
     fsrcWidth: Integer;
     fsrcHeight: Integer;
     function getObjById(index: Integer): TVectObj;
@@ -246,9 +249,9 @@ begin
       {for j:=0 to vectGroup.edgeList.Count-1 do
       begin
         vectObj := vectGroup.edgeList.objects[j] as TVectRectangle;
-        tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y)*azoom);
+        tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
         pointArr[j] := tmpPoint;
-      end;  }
+      end; }
 
       Polygon(pointArr);
     end;
@@ -628,7 +631,7 @@ begin
   frectList := TIntList.Create;
 end;
 
-procedure TVectGroup.makeVectorEdge(vectArr: array of array of TObject);
+function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray): TDynamicPointArray;
 begin
 
 end;
