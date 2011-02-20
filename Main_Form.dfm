@@ -130,7 +130,7 @@ object MainForm: TMainForm
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
-    TabOrder = 12
+    TabOrder = 11
   end
   object btn1: TButton
     Left = 472

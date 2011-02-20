@@ -49,11 +49,16 @@ type
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
   end;
 
+  //grupa obiektów wektorowych; zawiera:
   TVectGroup = class(TObject)
   private
+    //lista krawêdzi punktów-pixeli (kolejnych)
     fedgeList: TIntList;
+    //lista 'kwadratów' nale¿¹cych do grupy
     frectList: TIntList;
+    //kolor testowy - tym kolorem wype³niana jest grupa gdy w³¹czymy opcjê testu
     ftestColor: TColor;
+    //lista krawêdzi punktów-pixeli (kolejnych)
     fedgePolyRawArr: array of TPoint;
   published
     property edgeList: TIntList read fedgeList write fedgeList;
@@ -62,36 +67,35 @@ type
     //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
   public
     constructor Create; overload;
-    function makeVectorEdge(vectArr: TDynamicPointArray): TDynamicPointArray;//(vectArr: TVarArray);
+    function makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;//(vectArr: TVarArray);
   end;
 
   //lista obiektów wektorowych
+  //obiekty wektorowe przechowywane s¹ w Objects
   TVectList = class(TIntList)
   private
     vectArr: TDynamicPointArray;
     fsrcWidth: Integer;
     fsrcHeight: Integer;
-    function getObjById(index: Integer): TVectObj;
-    procedure setObjById(index: Integer; avectObj: TVectObj);
-    procedure mekeEdges(avectGroup: TVectGroup);
-    function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
-    function checkRight(aprevEdge: TVectRectangle): TVectRectangle;
-    function checkTop(aprevEdge: TVectRectangle): TVectRectangle;
-    function checkBottom(aprevEdge: TVectRectangle): TVectRectangle;
-    function checkLeft(aprevEdge: TVectRectangle): TVectRectangle;
-    function checkNextEdge(aprevEdge: TVectRectangle;
-      arrDir: integer): TVectRectangle;
+      function getObjById(index: Integer): TVectObj;
+      procedure setObjById(index: Integer; avectObj: TVectObj);
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
+    //wype³nia self "Rectanglami" - pixelami z obrazka
     procedure ReadFromImg(aimg: TImage);
+    //wype³nia obraz "rectanglami"
     function FillImg(aimg: TImage; azoom: Integer; atestColor: Boolean;
                      agrid: boolean; agridColor: TColor): TBitmap;
+    //wype³nia obraz polygonami"
     function FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor,
                      agrid: boolean; agridColor: TColor): TBitmap;
+    //dostêp do obiektów u¿ywaj¹c getObjById i setObjById
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
+    //tworzy grupy "rectangli" czyli przysz³e polygony
     procedure groupRect;
+    //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure joinRect;
     constructor Create;
   end;
@@ -100,19 +104,26 @@ type
   TVectObj = class
   protected
     fpoints: TIntList;
+    //kolor wype³niaj¹cy obiekt
     fcolor: TColor;
+    //odnoœnik do grupy, która posiada dany obiekt vektorowy
     fvectGroup: TVectGroup;
+    //numer grupy (w liœcie grup), która posiada dany obiekt vektorowy
     fvectGroupId: Integer;
-    fvectArr: array of array of TVectObj;
+    //fvectArr: array of array of TVectObj;
+    //przepisanie (do³¹czenie) obiektów z innej grupy do tej, która posiada obiekt self
     procedure dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
-    function getVectObj(x, y: integer): TVectObj; virtual;
+    //function getVectObj(x, y: integer): TVectObj; virtual;
   published
+    //kolor wype³niaj¹cy obiekt
     property color: TColor read fcolor write fcolor;
+    //odnoœnik do grupy, która posiada dany obiekt vektorowy
     property vectGroup: TVectGroup read fvectGroup write fvectGroup;
+    //numer grupy (w liœcie grup), która posiada dany obiekt vektorowy
     property vectGroupId: Integer read fvectGroupId write fvectGroupId;
   public
     constructor Create; reintroduce;
-    property vectArr[x, y: integer]: TVectObj read getVectObj;
+    //property vectArr[x, y: integer]: TVectObj read getVectObj;
   end;
 
   //obiekt wektorowego Rectangle
@@ -122,7 +133,7 @@ type
     function getP1: TOPoint;
     function getP2: TOPoint;
   protected
-    function getVectObj(x, y: integer): TVectObj; override;
+    //function getVectObj(x, y: integer): TVectObj; override;
   public
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
     property p1: TOPoint read getP1;
@@ -210,7 +221,8 @@ var
   p: Pointer;
   bmp: TBitmap;
   vectGroup: TVectGroup;
-  pointArr: array of TPoint;
+  //lista punktów do przekazania, aby stworzyæ polygon
+  pointArr: TDynamicEdgeArray;
   tmpPoint: TPoint;
 begin
   aimg.Width := srcWidth * azoom;
@@ -251,7 +263,7 @@ begin
         vectObj := vectGroup.edgeList.objects[j] as TVectRectangle;
         tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
         pointArr[j] := tmpPoint;
-      end; }
+      end;}
 
       Polygon(pointArr);
     end;
@@ -296,6 +308,110 @@ for y:=0 to srcHeight-1 do
 end;
 
 procedure TVectList.joinRect;
+  //buduje (wype³nia odpowiednie listy) krawêdz dla podanej grupy
+  procedure mekeEdges(avectGroup: TVectGroup);
+    function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
+      function checkNextEdge(aprevEdge: TVectRectangle; arrDir: integer): TVectRectangle;
+        function checkTop(aprevEdge: TVectRectangle): TVectRectangle;
+        begin
+          if aprevEdge.getP1.y > 0 then
+          begin
+            Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
+            if aprevEdge.vectGroupId = Result.vectGroupId then
+              Exit;
+            Result := nil;
+          end;
+          Result := nil;
+        end;
+        function checkRight(aprevEdge: TVectRectangle): TVectRectangle;
+        begin
+          if aprevEdge.getP1.x < srcWidth-1 then
+          begin
+            Result := vectArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
+            if aprevEdge.vectGroupId = Result.vectGroupId then
+              Exit;
+            Result := nil;
+          end;
+          Result := nil;
+        end;
+        function checkBottom(aprevEdge: TVectRectangle): TVectRectangle;
+        begin
+          if aprevEdge.getP1.y < srcHeight-1 then
+          begin
+            Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
+            if aprevEdge.vectGroupId = Result.vectGroupId then
+              Exit;
+            Result := nil;
+          end;
+          Result := nil;
+        end;
+        function checkLeft(aprevEdge: TVectRectangle): TVectRectangle;
+        begin
+          if aprevEdge.getP1.x > 0 then
+          begin
+            Result := vectArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
+            if aprevEdge.vectGroupId = Result.vectGroupId then
+              Exit;
+            Result := nil;
+          end;
+          Result := nil;
+        end;
+      begin
+        if arrDir = c_fromLeft then
+          Result := checkTop(aprevEdge)
+        else if arrDir = c_fromTop then
+          Result := checkRight(aprevEdge)
+        else if arrDir = c_fromRight then
+          Result := checkBottom(aprevEdge)
+        else if arrDir = c_fromBottom then
+          Result := checkLeft(aprevEdge);
+      end;
+    var
+      i, j: Integer;
+    begin
+      i := 0;
+      j := 0;
+      for i := 0 to 3 do
+      begin
+        if arrDir + j = 4 then
+          j := -arrDir;
+        Result := checkNextEdge(aprevEdge, arrDir+j);
+        if Result <> nil then
+        begin
+          if arrDir + j = c_fromLeft then
+            arrDir := c_fromBottom
+          else if arrDir + j = c_fromBottom then
+            arrDir := c_fromRight
+          else if arrDir + j = c_fromTop then
+            arrDir := c_fromLeft
+          else if arrDir + j = c_fromRight then
+            arrDir:= c_fromTop;
+          Break;
+        end;
+        Inc(j);
+      end;
+    end;
+  var
+    edgeStart, nextEdge, prevEdge: TVectRectangle;
+    arrivDir: integer;
+  begin
+    edgeStart := avectGroup.rectList.Objects[0] as TVectRectangle;
+    prevEdge := edgeStart;
+    arrivDir := c_fromLeft;
+    while nextEdge <> edgeStart do
+    begin
+      nextEdge := getNextEdge(prevEdge, arrivDir);
+      if nextEdge = nil then
+      begin
+        Assert(avectGroup.edgeList.Count = 1, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
+                              ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
+                              IntToStr(avectGroup.edgeList.Count));
+        Break;
+      end;
+      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdge);
+      prevEdge := nextEdge;
+    end;
+  end;
 var
   i: Integer;
   vectGroup: TVectGroup;
@@ -305,117 +421,6 @@ begin
     vectGroup := Objects[i] as TVectGroup;
     mekeEdges(vectGroup);
   end;
-end;
-
-procedure TVectList.mekeEdges(avectGroup: TVectGroup);
-var
-  edgeStart, nextEdge, prevEdge: TVectRectangle;
-  arrivDir: integer;
-begin
-  edgeStart := avectGroup.rectList.Objects[0] as TVectRectangle;
-  prevEdge := edgeStart;
-  arrivDir := c_fromLeft;
-  while nextEdge <> edgeStart do
-  begin
-    nextEdge := getNextEdge(prevEdge, arrivDir);
-    if nextEdge = nil then
-    begin
-      Assert(avectGroup.edgeList.Count = 1, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
-                            ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                            IntToStr(avectGroup.edgeList.Count));
-      Break;
-    end;
-    avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdge);
-    prevEdge := nextEdge;
-  end;
-
-end;
-
-function TVectList.getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
-var
-  i, j: Integer;
-begin
-  i := 0;
-  j := 0;
-  for i := 0 to 3 do
-  begin
-    if arrDir + j = 4 then
-      j := -arrDir;
-    Result := checkNextEdge(aprevEdge, arrDir+j);
-    if Result <> nil then
-    begin
-      if arrDir + j = c_fromLeft then
-        arrDir := c_fromBottom
-      else if arrDir + j = c_fromBottom then
-        arrDir := c_fromRight
-      else if arrDir + j = c_fromTop then
-        arrDir := c_fromLeft
-      else if arrDir + j = c_fromRight then
-        arrDir:= c_fromTop;
-      Break;
-    end;
-    Inc(j);
-  end;
-end;
-
-function TVectList.checkNextEdge(aprevEdge: TVectRectangle; arrDir: integer): TVectRectangle;
-begin
-  if arrDir = c_fromLeft then
-    Result := checkTop(aprevEdge)
-  else if arrDir = c_fromTop then
-    Result := checkRight(aprevEdge)
-  else if arrDir = c_fromRight then
-    Result := checkBottom(aprevEdge)
-  else if arrDir = c_fromBottom then
-    Result := checkLeft(aprevEdge);
-end;
-
-function TVectList.checkTop(aprevEdge: TVectRectangle): TVectRectangle;
-begin
-  if aprevEdge.getP1.y > 0 then
-  begin
-    Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
-    if aprevEdge.vectGroupId = Result.vectGroupId then
-      Exit;
-    Result := nil;
-  end;
-  Result := nil;
-end;
-
-function TVectList.checkRight(aprevEdge: TVectRectangle): TVectRectangle;
-begin
-  if aprevEdge.getP1.x < srcWidth-1 then
-  begin
-    Result := vectArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
-    if aprevEdge.vectGroupId = Result.vectGroupId then
-      Exit;
-    Result := nil;
-  end;
-  Result := nil;
-end;
-
-function TVectList.checkBottom(aprevEdge: TVectRectangle): TVectRectangle;
-begin
-  if aprevEdge.getP1.y < srcHeight-1 then
-  begin
-    Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
-    if aprevEdge.vectGroupId = Result.vectGroupId then
-      Exit;
-    Result := nil;
-  end;
-  Result := nil;
-end;
-
-function TVectList.checkLeft(aprevEdge: TVectRectangle): TVectRectangle;
-begin
-  if aprevEdge.getP1.x > 0 then
-  begin
-    Result := vectArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
-    if aprevEdge.vectGroupId = Result.vectGroupId then
-      Exit;
-    Result := nil;
-  end;
-  Result := nil;
 end;
 
 procedure TVectList.setObjById(index: Integer; avectObj: TVectObj);
@@ -472,10 +477,10 @@ begin
   Result := getP(1);
 end;
 
-function TVectRectangle.getVectObj(x, y: integer): TVectObj;
+{function TVectRectangle.getVectObj(x, y: integer): TVectObj;
 begin
   Result := inherited getVectObj(x, y) as TVectRectangle
-end;
+end;}
 
 procedure TVectRectangle.zintegruj(avectObj: TVectRectangle; avectList: TVectList);
 begin
@@ -617,10 +622,10 @@ begin
   avectList.delete(avectList.indexOf(delIdx));
 end;
 
-function TVectObj.getVectObj(x, y: integer): TVectObj;
+{function TVectObj.getVectObj(x, y: integer): TVectObj;
 begin
   Result := fvectArr[x, y] as TVectObj;
-end;
+end;}
 
 { TVectGroup }
 
@@ -631,7 +636,7 @@ begin
   frectList := TIntList.Create;
 end;
 
-function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray): TDynamicPointArray;
+function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;
 begin
 
 end;
