@@ -12,8 +12,6 @@ object MainForm: TMainForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  OnPaint = FormShow
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object sbMain: TScrollBox
@@ -48,10 +46,11 @@ object MainForm: TMainForm
     Top = 504
     Width = 281
     Height = 29
+    Max = 8
     Min = 1
     Position = 1
     TabOrder = 1
-    OnChange = tbZoomChange
+    OnKeyPress = tbZoomKeyPress
   end
   object sbZoom: TScrollBox
     Left = 144
@@ -107,7 +106,7 @@ object MainForm: TMainForm
   end
   object ToolBar1: TToolBar
     Left = 0
-    Top = 25
+    Top = 23
     Width = 877
     Height = 29
     Caption = 'ToolBar1'
@@ -122,7 +121,6 @@ object MainForm: TMainForm
     Color = clGrayText
     ParentColor = False
     TabOrder = 7
-    OnClick = chkGridClick
   end
   object chkTestColor: TCheckBox
     Left = 16
@@ -130,7 +128,7 @@ object MainForm: TMainForm
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
-    TabOrder = 11
+    TabOrder = 8
   end
   object btn1: TButton
     Left = 472
@@ -138,8 +136,16 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'btn1'
-    TabOrder = 13
+    TabOrder = 12
     OnClick = btn1Click
+  end
+  object chkPolyRect: TCheckBox
+    Left = 16
+    Top = 136
+    Width = 177
+    Height = 17
+    Caption = 'polygons (yes) / rectangles (no)'
+    TabOrder = 14
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -148,8 +154,8 @@ object MainForm: TMainForm
   object dxBarManager1: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
+    Font.Height = -11
+    Font.Name = 'Tahoma'
     Font.Style = []
     Bars = <
       item
@@ -206,7 +212,7 @@ object MainForm: TMainForm
     DockControlHeights = (
       0
       0
-      25
+      23
       0)
     object sbiPlik: TdxBarSubItem
       Caption = 'File'

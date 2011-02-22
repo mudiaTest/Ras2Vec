@@ -60,6 +60,10 @@ type
     ftestColor: TColor;
     //lista krawêdzi punktów-pixeli (kolejnych)
     fedgePolyRawArr: array of TPoint;
+    //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
+    //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
+    function direction(p1, p2: TOpoint): integer;
+    procedure makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
     property rectList: TIntList read frectList write frectList;
@@ -67,7 +71,7 @@ type
     //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
   public
     constructor Create; overload;
-    function makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;//(vectArr: TVarArray);
+    function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
   end;
 
   //lista obiektów wektorowych
@@ -113,6 +117,7 @@ type
     //fvectArr: array of array of TVectObj;
     //przepisanie (do³¹czenie) obiektów z innej grupy do tej, która posiada obiekt self
     procedure dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
+    function getP(lp: Integer): TOPoint;
     //function getVectObj(x, y: integer): TVectObj; virtual;
   published
     //kolor wype³niaj¹cy obiekt
@@ -129,7 +134,6 @@ type
   //obiekt wektorowego Rectangle
   TVectRectangle = class (TVectObj)
   private
-    function getP(lp: Integer): TOPoint;
     function getP1: TOPoint;
     function getP2: TOPoint;
   protected
@@ -248,7 +252,7 @@ begin
     for i:=0 to Count-1 do
     begin
       vectGroup := Objects[i] as TVectGroup;
-      SetLength(pointArr, vectGroup.edgeList.Count);
+      SetLength(pointArr, vectGroup.edgeList.Count*3);
 
       if not atestColor then
         Brush.Color := vectGroup.testColor
@@ -256,7 +260,7 @@ begin
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      pointArr := vectGroup.makeVectorEdge(self.vectArr);
+      pointArr := vectGroup.makeVectorEdge(self.vectArr, azoom);
 
       {for j:=0 to vectGroup.edgeList.Count-1 do
       begin
@@ -285,26 +289,27 @@ var
   vectObj: TVectRectangle;
   key: integer;
 begin
-for y:=0 to srcHeight-1 do
-  for x:=0 to srcWidth-1 do
-  begin
-    vectObj := vectArr[x, y] as TVectRectangle;
-    if vectObj.vectGroup = nil then
+  Clear;
+  for y:=0 to srcHeight-1 do
+    for x:=0 to srcWidth-1 do
     begin
-      vectObj.vectGroup := TVectGroup.Create;
-      //vectObj.vectGroup.testColor := TColo;
-      vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
-      vectObj.vectGroup.rectList.AddObject(0, vectObj);
-      vectObj.vectGroup.edgeList.AddObject(0, vectObj);
-      key := nextKey;
-      addObject(key, vectObj.vectGroup);
-      vectObj.vectGroupId := key;
+      vectObj := vectArr[x, y] as TVectRectangle;
+      if vectObj.vectGroup = nil then
+      begin
+        vectObj.vectGroup := TVectGroup.Create;
+        //vectObj.vectGroup.testColor := TColo;
+        vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
+        vectObj.vectGroup.rectList.AddObject(0, vectObj);
+        vectObj.vectGroup.edgeList.AddObject(0, vectObj);
+        key := nextKey;
+        addObject(key, vectObj.vectGroup);
+        vectObj.vectGroupId := key;
+      end;
+      if x < srcWidth-1 then
+        vectObj.zintegruj(vectArr[x+1, y] as TVectRectangle, self);
+      if y < srcHeight-1 then
+        vectObj.zintegruj(vectArr[x, y+1] as TVectRectangle, self);
     end;
-    if x < srcWidth-1 then
-      vectObj.zintegruj(vectArr[x+1, y] as TVectRectangle, self);
-    if y < srcHeight-1 then
-      vectObj.zintegruj(vectArr[x, y+1] as TVectRectangle, self);
-  end;
 end;
 
 procedure TVectList.joinRect;
@@ -395,19 +400,19 @@ procedure TVectList.joinRect;
     edgeStart, nextEdge, prevEdge: TVectRectangle;
     arrivDir: integer;
   begin
+    avectGroup.edgeList.Clear;
     edgeStart := avectGroup.rectList.Objects[0] as TVectRectangle;
     prevEdge := edgeStart;
-    arrivDir := c_fromLeft;
+    arrivDir := c_fromLeft; //jest to pewne oszustwo, bo przychodzimy z do³u, ale chodzi o to, aby szukaæ na prawo, bo nie ma punktów po³o¿onych wy¿ej
+    nextEdge := getNextEdge(prevEdge, arrivDir);
     while nextEdge <> edgeStart do
     begin
       nextEdge := getNextEdge(prevEdge, arrivDir);
       if nextEdge = nil then
-      begin
-        Assert(avectGroup.edgeList.Count = 1, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
+      Assert(nextEdge <> nil, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
                               ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
                               IntToStr(avectGroup.edgeList.Count));
-        Break;
-      end;
+
       avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdge);
       prevEdge := nextEdge;
     end;
@@ -460,11 +465,6 @@ begin
   color := acolor;
   fpoints.AddObject(0, p1);
   fpoints.AddObject(1, p2);
-end;
-
-function TVectRectangle.getP(lp: Integer): TOPoint;
-begin
-  Result := fpoints.Objects[lp] as TOpoint;
 end;
 
 function TVectRectangle.getP1: TOPoint;
@@ -622,6 +622,11 @@ begin
   avectList.delete(avectList.indexOf(delIdx));
 end;
 
+function TVectObj.getP(lp: Integer): TOPoint;
+begin
+  Result := fpoints.Objects[lp] as TOpoint;
+end;
+
 {function TVectObj.getVectObj(x, y: integer): TVectObj;
 begin
   Result := fvectArr[x, y] as TVectObj;
@@ -636,9 +641,153 @@ begin
   frectList := TIntList.Create;
 end;
 
-function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;
+function TVectGroup.direction(p1, p2: TOpoint): integer;
 begin
+  if p1.X > p2.X then
+    result := c_fromRight
+  else if p1.X < p2.X then
+    result := c_fromLeft
+  else if p1.Y > p2.Y then
+    result := c_fromBottom
+  else
+    result := c_fromTop;
+end;
 
+function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;
+var
+  i: integer;
+  o1, o2, o3: TOPoint;
+  counter: integer;
+begin
+  counter := 0;
+
+  o1 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
+  o2 := (edgeList.Objects[0] as TVectObj).getP(0);
+  o3 := (edgeList.Objects[1] as TVectObj).getP(0);
+  makePartEdge(o1, o2, o3, counter, result, azoom);
+
+  for i:=1 to edgeList.Count-2 do
+  begin
+    o1 := (edgeList.Objects[i-1] as TVectObj).getP(0);
+    o2 := (edgeList.Objects[i] as TVectObj).getP(0);
+    o3 := (edgeList.Objects[i+1] as TVectObj).getP(0);
+    makePartEdge(o1, o2, o3, counter, result, azoom);
+    //zadanie
+  end;
+
+  o1 := (edgeList.Objects[edgeList.Count-2] as TVectObj).getP(0);
+  o2 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
+  o3 := (edgeList.Objects[0] as TVectObj).getP(0);
+  makePartEdge(o1, o2, o3, counter, result, azoom);
+
+  SetLength(result, counter);
+end;
+
+procedure TVectGroup.makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+begin
+  if direction(o1, o2) = c_fromLeft then
+  begin
+    if direction(o2, o3) = c_fromBottom then
+    begin
+      //nic
+    end
+    else if direction(o2, o3) = c_fromTop then
+    begin
+      aarr[counter] := Point(o2.x*azoom, o2.y*azoom);
+      aarr[counter+1] := Point((o2.x+1)*azoom, o2.y*azoom);
+      counter := counter + 2;
+    end
+    else if direction(o2, o3) = c_fromLeft then
+    begin
+      aarr[counter] := Point((o2.x)*azoom, (o2.y)*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((o2.x)*azoom, (o2.y)*azoom);
+      aarr[counter+1] := Point((o2.x+1)*azoom, o2.y*azoom);
+      aarr[counter+2] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else if direction(o1, o2) = c_fromRight then
+  begin
+    if direction(o2, o3) = c_fromBottom then
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
+      aarr[counter+1] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      counter := counter + 2;
+    end
+    else if direction(o2, o3) = c_fromTop then
+    begin
+      //nic
+    end
+    else if direction(o2, o3) = c_fromRight then
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, o2.y*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
+      aarr[counter+1] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      aarr[counter+2] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else if direction(o1, o2) = c_fromTop then
+  begin
+    if direction(o2, o3) = c_fromLeft then
+    begin
+      //nic
+    end
+    else if direction(o2, o3) = c_fromRight then
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, o2.y*azoom);
+      aarr[counter+1] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
+      counter := counter + 2;
+    end
+    else if direction(o2, o3) = c_fromTop then
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, o2.y*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((o2.x+1)*azoom, o2.y*azoom);
+      aarr[counter+1] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
+      aarr[counter+2] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else
+  begin
+    if direction(o2, o3) = c_fromLeft then
+    begin
+      aarr[counter] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      aarr[counter+1] := Point(o2.x*azoom, o2.y*azoom);
+      counter := counter + 2;
+    end
+    else if direction(o2, o3) = c_fromRight then
+    begin
+      //nic
+    end
+    else if direction(o2, o3) = c_fromBottom then
+    begin
+      aarr[counter] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      aarr[counter+1] := Point(o2.x*azoom, o2.y*azoom);
+      aarr[counter+2] := Point((o2.x+1)*azoom, o2.y*azoom);
+      counter := counter + 3;
+    end;
+  end
 end;
 
 end.
