@@ -58,6 +58,8 @@ type
     frectList: TIntList;
     //kolor testowy - tym kolorem wype³niana jest grupa gdy w³¹czymy opcjê testu
     ftestColor: TColor;
+    //kolor oryginalny
+    fcolor: TColor;
     //lista krawêdzi punktów-pixeli (kolejnych)
     fedgePolyRawArr: array of TPoint;
     //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
@@ -68,6 +70,7 @@ type
     property edgeList: TIntList read fedgeList write fedgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
+    property color: TColor read fcolor write fcolor;
     //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
   public
     constructor Create; overload;
@@ -255,7 +258,7 @@ begin
       SetLength(pointArr, vectGroup.edgeList.Count*3);
 
       if not atestColor then
-        Brush.Color := vectGroup.testColor
+        Brush.Color := vectGroup.color
       else
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
@@ -299,6 +302,7 @@ begin
         vectObj.vectGroup := TVectGroup.Create;
         //vectObj.vectGroup.testColor := TColo;
         vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
+        vectObj.vectGroup.color := vectObj.color;
         vectObj.vectGroup.rectList.AddObject(0, vectObj);
         vectObj.vectGroup.edgeList.AddObject(0, vectObj);
         key := nextKey;
@@ -404,14 +408,16 @@ procedure TVectList.joinRect;
     edgeStart := avectGroup.rectList.Objects[0] as TVectRectangle;
     prevEdge := edgeStart;
     arrivDir := c_fromLeft; //jest to pewne oszustwo, bo przychodzimy z do³u, ale chodzi o to, aby szukaæ na prawo, bo nie ma punktów po³o¿onych wy¿ej
-    nextEdge := getNextEdge(prevEdge, arrivDir);
-    while nextEdge <> edgeStart do
+    nextEdge := nil;
+    //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
+    while (nextEdge <> edgeStart) and (prevEdge <> nil) do
     begin
       nextEdge := getNextEdge(prevEdge, arrivDir);
-      if nextEdge = nil then
-      Assert(nextEdge <> nil, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
-                              ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                              IntToStr(avectGroup.edgeList.Count));
+      //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
+      if (nextEdge = nil) and (avectGroup.edgeList.Count <> 0) then
+        Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
+                                ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
+                                IntToStr(avectGroup.edgeList.Count));
 
       avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdge);
       prevEdge := nextEdge;
@@ -725,7 +731,7 @@ begin
     end
     else if direction(o2, o3) = c_fromRight then
     begin
-      aarr[counter] := Point((o2.x+1)*azoom, o2.y*azoom);
+      aarr[counter] := Point((o2.x + 1)*azoom, (o2.y + 1)*azoom);
       counter := counter + 1;
     end
     else
