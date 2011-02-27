@@ -106,11 +106,12 @@ object MainForm: TMainForm
   end
   object ToolBar1: TToolBar
     Left = 0
-    Top = 23
+    Top = 25
     Width = 877
     Height = 29
     Caption = 'ToolBar1'
     TabOrder = 6
+    ExplicitTop = 23
   end
   object chkGrid: TCheckBox
     Left = 16
@@ -136,7 +137,7 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'btn1'
-    TabOrder = 11
+    TabOrder = 10
     OnClick = btn1Click
   end
   object chkPolyRect: TCheckBox
@@ -154,8 +155,8 @@ object MainForm: TMainForm
   object dxBarManager1: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
     Font.Style = []
     Bars = <
       item
@@ -212,7 +213,7 @@ object MainForm: TMainForm
     DockControlHeights = (
       0
       0
-      23
+      25
       0)
     object sbiPlik: TdxBarSubItem
       Caption = 'File'

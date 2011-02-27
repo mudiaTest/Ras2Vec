@@ -54,27 +54,29 @@ type
   private
     //lista krawêdzi punktów-pixeli (kolejnych)
     fedgeList: TIntList;
+    //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
+    fsimpleEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
     frectList: TIntList;
     //kolor testowy - tym kolorem wype³niana jest grupa gdy w³¹czymy opcjê testu
     ftestColor: TColor;
     //kolor oryginalny
     fcolor: TColor;
-    //lista krawêdzi punktów-pixeli (kolejnych)
-    fedgePolyRawArr: array of TPoint;
     //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
     //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
     function direction(p1, p2: TOpoint): integer;
     procedure makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
+    property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
     property color: TColor read fcolor write fcolor;
-    //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
   public
     constructor Create; overload;
+
     function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
+    function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
   end;
 
   //lista obiektów wektorowych
@@ -132,6 +134,8 @@ type
   public
     constructor Create; reintroduce;
     //property vectArr[x, y: integer]: TVectObj read getVectObj;
+    function distance(a, c: Integer; mian: Double): Double;
+    function inDistance(a, c: Integer; mian, dst: Double): Boolean;
   end;
 
   //obiekt wektorowego Rectangle
@@ -609,6 +613,14 @@ begin
   Objects[index] := avectObj;
 end;
 
+function TVectObj.distance(a, c: Integer; mian: Double): Double;
+var
+  p: TOPoint;
+begin
+  p := getP(0);
+  Result := Abs(a*p.x - p.y + c) / mian;
+end;
+
 procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
 var
   I: Integer;
@@ -631,6 +643,13 @@ end;
 function TVectObj.getP(lp: Integer): TOPoint;
 begin
   Result := fpoints.Objects[lp] as TOpoint;
+end;
+
+function TVectObj.inDistance(a, c: Integer; mian, dst: Double): Boolean;
+begin
+  Result := True;
+  if distance(a, c, mian) > dst then
+    Result := False;
 end;
 
 {function TVectObj.getVectObj(x, y: integer): TVectObj;
@@ -689,6 +708,12 @@ begin
   SetLength(result, counter);
 end;
 
+function TVectGroup.simplifyVectorEdge(
+  arr: TDynamicEdgeArray): TDynamicEdgeArray;
+begin
+  //to do
+end;
+
 procedure TVectGroup.makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
 begin
   if direction(o1, o2) = c_fromLeft then
@@ -738,7 +763,7 @@ begin
     begin
       aarr[counter] := Point((o2.x+1)*azoom, (o2.y+1)*azoom);
       aarr[counter+1] := Point(o2.x*azoom, (o2.y+1)*azoom);
-      aarr[counter+2] := Point(o2.x*azoom, (o2.y+1)*azoom);
+      aarr[counter+2] := Point(o2.x*azoom, (o2.y)*azoom);
       counter := counter + 3;
     end;
   end
