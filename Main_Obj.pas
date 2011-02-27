@@ -66,6 +66,7 @@ type
     //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
     function direction(p1, p2: TOpoint): integer;
     procedure makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+    procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
     property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
@@ -676,6 +677,25 @@ begin
     result := c_fromBottom
   else
     result := c_fromTop;
+end;
+
+procedure TVectGroup.getLine(p1, p2: TOPoint; var A, C, mian: Double);
+  function getLineA(p1, p2: TOpoint): Double;
+  begin
+    Result := (p2.y - p1.y) / (p2.x - p1.x);
+  end;
+  function getLineC(p1: TOpoint; A: Double): Double;
+  begin
+    Result := p1.y - A*p1.x;
+  end;
+  function getMianownik(A: Double): Double;
+  begin
+    Result := Sqrt(Sqr(A) + 1);
+  end;
+begin
+  A := getLineA(p1, p2);
+  C := getLineC(p1, A);
+  mian := getMianownik(A);
 end;
 
 function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;

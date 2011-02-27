@@ -137,7 +137,7 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'btn1'
-    TabOrder = 10
+    TabOrder = 9
     OnClick = btn1Click
   end
   object chkPolyRect: TCheckBox
