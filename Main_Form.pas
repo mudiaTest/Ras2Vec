@@ -229,7 +229,6 @@ begin
   Screen.Cursor := crHourGlass;
   saveZoomPos;
   Zoom := round(Math.Power(2.0, tbZoom.Position-1));
-
   SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
   SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
   SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
@@ -237,6 +236,9 @@ begin
     tmpBmp := vectorList.FillImg(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
   else
     tmpBmp := vectorList.FillImgWithPolygons(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
+  //nie rozumiem po co muszê ustawiæ dolowoln¹ wartoœæ sta³¹, ale inaczej obrazy mog¹ siê rozjechaæ
+  imgZoom.Width := 0;
+  imgZoom.Height := 0;
   imgZoom.Width := Round(imgMain.Width * Zoom);
   imgZoom.Height := Round(imgMain.Height * Zoom);
   if Assigned(imgZoom.Picture.Graphic) then
@@ -245,7 +247,6 @@ begin
     imgZoom.Picture.Graphic.Height := imgZoom.Height;
   end;
   imgZoom.Canvas.Draw(0, 0, tmpBmp);
-
   edtZoom.Text := intToStr(Zoom);
   sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
   sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);

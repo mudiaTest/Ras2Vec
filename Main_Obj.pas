@@ -55,7 +55,7 @@ type
     //lista krawêdzi punktów-pixeli (kolejnych)
     fedgeList: TIntList;
     //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
-    fsimpleEdgeList: TIntList;
+    fsimplifiedEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
     frectList: TIntList;
     //kolor testowy - tym kolorem wype³niana jest grupa gdy w³¹czymy opcjê testu
@@ -69,15 +69,18 @@ type
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
-    property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
+    property simplifiedEdgeList: TIntList read fsimplifiedEdgeList write fsimplifiedEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
     property color: TColor read fcolor write fcolor;
   public
     constructor Create; overload;
-
+    //oddaje array punktów z któr¹ przekazujemy do poly. Lista zbudowana z edgeList.
     function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
-    function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
+    //oddaje array punktów z któr¹ przekazujemy do poly. Lista zbudowana z simplifiedEdgeList.
+    function makeSimplifiedVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
+    //wype³nia simplifiedEdgeList na podstawie EdgeList
+    function simplifyVectorList(arr: TDynamicEdgeArray): TDynamicEdgeArray;
   end;
 
   //lista obiektów wektorowych
@@ -174,13 +177,9 @@ var
   p: Pointer;
   bmp: TBitmap;
 begin
-  aimg.Width := srcWidth * azoom;
-  aimg.Height := srcHeight * azoom;
   bmp := TBitmap.Create;
   bmp.Width := srcWidth * azoom;
   bmp.Height := srcHeight * azoom;
-  aimg.Canvas.Lock;
-
   if agrid then
   begin
     bmp.Canvas.Pen.Style := psSolid;
@@ -202,26 +201,7 @@ begin
                   (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
       end;
     end;
-  {
-  if agrid then
-  begin
-    aimg.Canvas.Pen.Style := psSolid;
-    aimg.Canvas.Pen.Color := agridColor;
-  end;
-  for y:=0 to srcHeight-1 do
-    for x:=0 to srcWidth-1 do
-    begin
-      with aimg.Canvas do
-      begin
-        vectObj := vectArr[x, y] as TVectRectangle;
-        Brush.Color := vectObj.color;
-        Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
-                  (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
-      end;
-    end;
-  }
   Result := bmp;
-  aimg.Canvas.Unlock;
 end;
 
 function TVectList.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
@@ -728,10 +708,35 @@ begin
   SetLength(result, counter);
 end;
 
-function TVectGroup.simplifyVectorEdge(
-  arr: TDynamicEdgeArray): TDynamicEdgeArray;
+function TVectGroup.simplifyVectorList(arr: TDynamicEdgeArray): TDynamicEdgeArray;
+var
+  i: integer;
+  vectObj: TVectObj;
+  currPointIndex: integer;
+  destPointIndex: integer;
+  currVectObj: TVectObj;
+  destVectObj: TVectObj;
+  A, C, mian: double;
 begin
-  //to do
+  vectObj := edgeList.Objects[0] as TVectObj;
+  simplifiedEdgeList.add(0, vectObj);
+  currPointIndex := 0;
+  while currPointIndex < edgeList.Count do
+  begin
+    currVectObj := edgeList.Objects[currPointIndex] as TVectObj;
+    destPointIndex := currPointIndex+1;
+    while destPointIndex < edgeList.Count do
+    begin
+      destVectObj := edgeList.Objects[destPointIndex] as TVectObj;
+      getLine(currVectObj.getP(0), destVectObj.getP(0), A, C, mian);
+      for i:=currVectObj+1 to destPointIndex-1 do
+      begin
+        vectObj := edgeList.Objects[edgeList.Count-1] as TVectObj;
+
+      end;
+
+    end;
+  end;
 end;
 
 procedure TVectGroup.makePartEdge(o1, o2, o3: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
@@ -839,6 +844,11 @@ begin
       counter := counter + 3;
     end;
   end
+end;
+
+function TVectGroup.makeSimplifiedVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
+begin
+  //to do
 end;
 
 end.
