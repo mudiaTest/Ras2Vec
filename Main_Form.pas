@@ -41,6 +41,9 @@ type
     chkTestColor: TCheckBox;
     btn1: TButton;
     chkPolyRect: TCheckBox;
+    btnTylkoRead: TdxBarButton;
+    btnZoomIn: TButton;
+    btnZoomOut: TButton;
     procedure btnExitClick(Sender: TObject);
     procedure dlgLoadClick(Sender: TObject);
     procedure btnOpenClick(Sender: TObject);
@@ -57,6 +60,10 @@ type
     procedure btnGridColorClick(Sender: TObject);
     procedure btn1Click(Sender: TObject);
     procedure tbZoomKeyPress(Sender: TObject; var Key: Char);
+    procedure btnTylkoReadClick(Sender: TObject);
+    procedure tbZoomChange(Sender: TObject);
+    procedure btnZoomInClick(Sender: TObject);
+    procedure btnZoomOutClick(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -66,7 +73,8 @@ type
     imgStartPos: TPoint;
     imgActing: Boolean;
     imgZoomPos: TPoint;
-    zoom: Integer;
+    lpZoom: Integer; //poziom zoomu z sówaka - zapamiêtuje poziom powiêkszenia obrazka
+    lpActImgZoom: Integer; //poziom zoomu obrazka = mo¿e byæ inny ni¿ sówaka
 
     vectorList: TVectList;
     gridColor: TColor;
@@ -97,6 +105,34 @@ begin
   PaintBoxMain.Repaint;
 end;
 
+procedure TMainForm.btnTylkoReadClick(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  vectorList.ReadFromImg(imgMain);
+  DoZoom;
+  Screen.Cursor := crDefault;
+end;
+
+procedure TMainForm.btnZoomInClick(Sender: TObject);
+begin
+  if tbZoom.Position < 9 then
+  begin
+    tbZoom.Position := tbZoom.Position + 1;
+    tbZoomChange(nil);
+    DoZoom;
+  end;
+end;
+
+procedure TMainForm.btnZoomOutClick(Sender: TObject);
+begin
+  if tbZoom.Position > 0 then
+  begin
+    tbZoom.Position := tbZoom.Position - 1;
+    tbZoomChange(nil);
+    DoZoom;
+  end;
+end;
+
 constructor TMainForm.Create(AOwner: TComponent);
 var
   x, y: integer;
@@ -119,7 +155,8 @@ begin
   bmp2.width:=200;(*Assign dimensions*)
   bmp2.height:=200;
   imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
-  zoom := 0;
+  lpZoom := 1;
+  lpActImgZoom := 1;
 end;
 
 procedure TMainForm.dlgLoadClick(Sender: TObject);
@@ -165,16 +202,21 @@ begin
   end;
 end;
 
+//zapamiêtuje po³o¿enie obrazka tak, aby powiêszanie nie przesuwa³o go
 procedure TMainForm.saveZoomPos;
 var
   tmpZoom: integer;
 begin
-  if (zoom >0) and (zoom<11) then
-    tmpZoom := zoom
-  else
-    tmpZoom := 1;
-  imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Width/2 ))/tmpZoom),
-                      Round((sbZoom.VertScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Height/2))/tmpZoom));
+  //if (lpActImgZoom >0) and (lpActImgZoom<11) then
+    tmpZoom := lpActImgZoom;
+  //else
+  //  tmpZoom := 1;
+  {imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Width/2 ))/tmpZoom),
+                      Round((sbZoom.VertScrollBar.Position - (tmpZoom-1)*Round(sbZoom.Height/2))/tmpZoom)); }
+  {imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position / tmpZoom),
+                      Round((sbZoom.VertScrollBar.Position / tmpZoom));   }
+  imgZoomPos := Point(Round((sbZoom.HorzScrollBar.Position + (sbZoom.Width-21)/2 )/tmpZoom),
+                      Round((sbZoom.VertScrollBar.Position + (sbZoom.Height-21)/2)/tmpZoom));
 end;
 
 
@@ -217,6 +259,12 @@ begin
   end;
 end;
 
+procedure TMainForm.tbZoomChange(Sender: TObject);
+begin
+  lpZoom := max(1, round(Math.Power(2.0, tbZoom.Position-1)));
+  edtZoom.Text := intToStr(lpZoom);
+end;
+
 procedure TMainForm.tbZoomKeyPress(Sender: TObject; var Key: Char);
 begin
   DoZoom;
@@ -225,32 +273,68 @@ end;
 procedure TMainForm.DoZoom;
 var
   tmpBmp: TBitmap;
+  scrollHorPos, scrollVerPos: double;
+  prvLpZoom: integer;
 begin
+
   Screen.Cursor := crHourGlass;
-  saveZoomPos;
-  Zoom := round(Math.Power(2.0, tbZoom.Position-1));
-  SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
-  SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
-  SetViewportExtEx(imgZoom.Canvas.Handle, Zoom, Zoom, nil);
-  if not chkPolyRect.checked then
-    tmpBmp := vectorList.FillImg(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
-  else
-    tmpBmp := vectorList.FillImgWithPolygons(imgZoom, zoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
-  //nie rozumiem po co muszê ustawiæ dolowoln¹ wartoœæ sta³¹, ale inaczej obrazy mog¹ siê rozjechaæ
-  imgZoom.Width := 0;
-  imgZoom.Height := 0;
-  imgZoom.Width := Round(imgMain.Width * Zoom);
-  imgZoom.Height := Round(imgMain.Height * Zoom);
-  if Assigned(imgZoom.Picture.Graphic) then
-  begin
-    imgZoom.Picture.Graphic.Width := imgZoom.Width;
-    imgZoom.Picture.Graphic.Height := imgZoom.Height;
+  try
+    saveZoomPos;
+    prvLpZoom := lpZoom;
+    scrollHorPos := sbZoom.HorzScrollBar.Position;
+    scrollVerPos := sbZoom.VertScrollBar.Position;
+    //zapisyje do zmiennej glob. nowy poziom zoomu 2^x
+    lpZoom := round(Math.Power(2.0, tbZoom.Position-1));
+    lpActImgZoom := lpZoom;
+
+    //tego nie rozumiem, ale jest potrzebane do wyœwietlania
+    SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
+    SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
+    SetViewportExtEx(imgZoom.Canvas.Handle, lpZoom, lpZoom, nil);
+
+    if not chkPolyRect.checked then
+      //wype³nia bitmapê grafik¹
+      tmpBmp := vectorList.FillImgWithRect(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
+    else
+      //wype³nia bitmapê grafikê
+      tmpBmp := vectorList.FillImgWithPolygons(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
+
+    //ustawia wielkoœæ wszystkich warstw obrazka
+    imgZoom.Width := Round(imgMain.Width * lpZoom);
+    imgZoom.Height := Round(imgMain.Height * lpZoom);
+    if Assigned(imgZoom.Picture.Graphic) then
+    begin
+      imgZoom.Picture.Graphic.Width := imgZoom.Width;
+      imgZoom.Picture.Graphic.Height := imgZoom.Height;
+    end;
+
+    //tego nie rozumiem, ale jest potrzebane do wyœwietlania
+    //SetMapMode(imgZoom.Canvas.Handle, MM_ISOTROPIC);
+    //SetWindowExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
+   // SetViewportExtEx(imgZoom.Canvas.Handle, lpZoom, lpZoom, nil);
+
+    SetViewportExtEx(imgZoom.Canvas.Handle, 1, 1, nil);
+
+    //wyœwiatla obrazek na canwas
+    imgZoom.Canvas.Draw(0, 0, tmpBmp);
+
+    //wyœwiela w kontrolce poziom zoomu
+    edtZoom.Text := intToStr(lpZoom);
+
+    //przesówa powiêkszony obrazek
+    //sbZoom.HorzScrollBar.Position := imgZoomPos.X*lpZoom + (lpZoom-1)*Round(sbZoom.Width/2);
+    //sbZoom.VertScrollBar.Position := imgZoomPos.Y*lpZoom + (lpZoom-1)*Round(sbZoom.Height/2);
+    //sbZoom.HorzScrollBar.Position := Round(scrollHorPos);
+    //sbZoom.VertScrollBar.Position := Round(scrollVerPos);
+    sbZoom.HorzScrollBar.Position := Round(imgZoomPos.X*lpZoom - (sbZoom.Width-21)/2 );
+    sbZoom.VertScrollBar.Position := Round(imgZoomPos.Y*lpZoom - (sbZoom.Height-21)/2);
+    {SetWindowOrgEx (imgZoom.Canvas.Handle,
+    10,
+    100, nil);}
+
+  finally
+    Screen.Cursor := crDefault;
   end;
-  imgZoom.Canvas.Draw(0, 0, tmpBmp);
-  edtZoom.Text := intToStr(Zoom);
-  sbZoom.HorzScrollBar.Position := imgZoomPos.X*zoom + (zoom-1)*Round(sbZoom.Width/2);
-  sbZoom.VertScrollBar.Position := imgZoomPos.Y*zoom + (zoom-1)*Round(sbZoom.Height/2);
-  Screen.Cursor := crDefault;
 end;
 
 procedure TMainForm.btmR2VClick(Sender: TObject);
@@ -259,7 +343,8 @@ begin
   vectorList.ReadFromImg(imgMain);
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;
-  //vectorList2.FillImg(imgZoom, zoom, chkGrid.Checked, gridColor);
+  //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
+
   vectorList.groupRect;
   vectorList.joinRect;
   Screen.Cursor := crDefault;

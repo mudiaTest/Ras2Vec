@@ -50,13 +50,14 @@ object MainForm: TMainForm
     Min = 1
     Position = 1
     TabOrder = 1
+    OnChange = tbZoomChange
     OnKeyPress = tbZoomKeyPress
   end
   object sbZoom: TScrollBox
     Left = 144
     Top = 184
-    Width = 281
-    Height = 273
+    Width = 221
+    Height = 221
     TabOrder = 2
     OnMouseWheel = sbZoomMouseWheel
     object imgZoom: TImage
@@ -80,16 +81,16 @@ object MainForm: TMainForm
     end
   end
   object Panel1: TPanel
-    Left = 284
-    Top = 168
+    Left = 243
+    Top = 164
     Width = 1
     Height = 313
     Caption = 'Panel1'
     TabOrder = 4
   end
   object Panel2: TPanel
-    Left = 120
-    Top = 320
+    Left = 119
+    Top = 284
     Width = 337
     Height = 1
     Caption = 'Panel2'
@@ -106,7 +107,7 @@ object MainForm: TMainForm
   end
   object ToolBar1: TToolBar
     Left = 0
-    Top = 23
+    Top = 25
     Width = 877
     Height = 29
     Caption = 'ToolBar1'
@@ -145,7 +146,37 @@ object MainForm: TMainForm
     Width = 177
     Height = 17
     Caption = 'polygons (yes) / rectangles (no)'
-    TabOrder = 14
+    TabOrder = 10
+  end
+  object btnZoomIn: TButton
+    Left = 104
+    Top = 489
+    Width = 25
+    Height = 25
+    Caption = '+'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 13
+    OnClick = btnZoomInClick
+  end
+  object btnZoomOut: TButton
+    Left = 104
+    Top = 520
+    Width = 25
+    Height = 25
+    Caption = '-'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 16
+    OnClick = btnZoomOutClick
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -154,8 +185,8 @@ object MainForm: TMainForm
   object dxBarManager1: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
     Font.Style = []
     Bars = <
       item
@@ -212,7 +243,7 @@ object MainForm: TMainForm
     DockControlHeights = (
       0
       0
-      23
+      25
       0)
     object sbiPlik: TdxBarSubItem
       Caption = 'File'
@@ -253,6 +284,10 @@ object MainForm: TMainForm
           Visible = True
         end
         item
+          Item = btnTylkoRead
+          Visible = True
+        end
+        item
           Item = btmR2V
           Visible = True
         end>
@@ -287,6 +322,13 @@ object MainForm: TMainForm
       Hint = 'Grid color'
       Visible = ivAlways
       OnClick = btnGridColorClick
+    end
+    object btnTylkoRead: TdxBarButton
+      Caption = 'TylkoRead'
+      Category = 2
+      Hint = 'TylkoRead'
+      Visible = ivAlways
+      OnClick = btnTylkoReadClick
     end
   end
   object cdGrid: TColorDialog
