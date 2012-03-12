@@ -4,9 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, dxBar, ExtDlgs, ExtCtrls, ComCtrls, dxCntner, dxEditor, dxEdLib,
-  ToolWin, StdCtrls, Form_utl, Sys_utl, Main_Obj, ActnMan, ActnColorMaps,
-  TeCanvas;
+  Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl, Sys_utl,
+  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Vcl.Menus;
 
 const
   c_mainImage = 1;
@@ -17,12 +16,6 @@ type
   TMainForm = class(TForm)
     PaintBoxMain: TPaintBox;
     dlgPicture: TOpenPictureDialog;
-    dxBarManager1: TdxBarManager;
-    sbiPlik: TdxBarSubItem;
-    btnOpen: TdxBarButton;
-    btnExit: TdxBarButton;
-    sbiImage: TdxBarSubItem;
-    dlgLoad: TdxBarButton;
     sbMain: TScrollBox;
     imgMain: TImage;
     tbZoom: TTrackBar;
@@ -31,22 +24,26 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     edtZoom: TEdit;
-    ToolBar1: TToolBar;
     PaintBoxZoom: TPaintBox;
-    btmR2V: TdxBarButton;
     chkGrid: TCheckBox;
     cdGrid: TColorDialog;
-    btnView: TdxBarSubItem;
-    btnGridColor: TdxBarButton;
     chkTestColor: TCheckBox;
     btn1: TButton;
     chkPolyRect: TCheckBox;
-    btnTylkoRead: TdxBarButton;
     btnZoomIn: TButton;
     btnZoomOut: TButton;
-    procedure btnExitClick(Sender: TObject);
-    procedure dlgLoadClick(Sender: TObject);
-    procedure btnOpenClick(Sender: TObject);
+    Button1: TButton;
+    Button2: TButton;
+    mmToolBar1: TMainMenu;
+    N1: TMenuItem;
+    Main1: TMenuItem;
+    Other1: TMenuItem;
+    Open1: TMenuItem;
+    Load1: TMenuItem;
+    Tylkoread1: TMenuItem;
+    R2V1: TMenuItem;
+    Exit1: TMenuItem;
+    GridColor1: TMenuItem;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -56,14 +53,18 @@ type
       Y: Integer);
     procedure sbZoomMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure btmR2VClick(Sender: TObject);
-    procedure btnGridColorClick(Sender: TObject);
     procedure btn1Click(Sender: TObject);
     procedure tbZoomKeyPress(Sender: TObject; var Key: Char);
-    procedure btnTylkoReadClick(Sender: TObject);
     procedure tbZoomChange(Sender: TObject);
     procedure btnZoomInClick(Sender: TObject);
     procedure btnZoomOutClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Open1Click(Sender: TObject);
+    procedure Load1Click(Sender: TObject);
+    procedure Tylkoread1Click(Sender: TObject);
+    procedure R2V1Click(Sender: TObject);
+    procedure Exit1Click(Sender: TObject);
+    procedure GridColor1Click(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -76,7 +77,8 @@ type
     lpZoom: Integer; //poziom zoomu z sówaka - zapamiêtuje poziom powiêkszenia obrazka
     lpActImgZoom: Integer; //poziom zoomu obrazka = mo¿e byæ inny ni¿ sówaka
 
-    vectorList: TVectList;
+    vectorGroupList: TVectList; //lista grup obiektów wektorowych - ka¿da grupa
+                                //bedzie potem polygonem
     gridColor: TColor;
 
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
@@ -100,19 +102,6 @@ Uses
 
 {$R *.dfm}
 
-procedure TMainForm.btnOpenClick(Sender: TObject);
-begin
-  PaintBoxMain.Repaint;
-end;
-
-procedure TMainForm.btnTylkoReadClick(Sender: TObject);
-begin
-  Screen.Cursor := crHourGlass;
-  vectorList.ReadFromImg(imgMain);
-  DoZoom;
-  Screen.Cursor := crDefault;
-end;
-
 procedure TMainForm.btnZoomInClick(Sender: TObject);
 begin
   if tbZoom.Position < 9 then
@@ -133,13 +122,18 @@ begin
   end;
 end;
 
+procedure TMainForm.Button1Click(Sender: TObject);
+begin
+  DoZoom;
+end;
+
 constructor TMainForm.Create(AOwner: TComponent);
 var
   x, y: integer;
   f: TCanvas;
 begin
   inherited;
-  vectorList := TVectList.Create;
+  vectorGroupList := TVectList.Create;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -159,15 +153,6 @@ begin
   lpActImgZoom := 1;
 end;
 
-procedure TMainForm.dlgLoadClick(Sender: TObject);
-begin
-  if dlgPicture.Execute then
-  begin
-    imageName := dlgPicture.FileName;
-    imgMain.Picture.LoadFromFile(imageName);
-  end;
-end;
-
 procedure TMainForm.imgMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -185,6 +170,15 @@ end;
 procedure TMainForm.init;
 begin
   gridColor := RGB(249, 192, 192);
+end;
+
+procedure TMainForm.Load1Click(Sender: TObject);
+begin
+  if dlgPicture.Execute then
+  begin
+    imageName := dlgPicture.FileName;
+    imgMain.Picture.LoadFromFile(imageName);
+  end;
 end;
 
 procedure TMainForm.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -243,6 +237,11 @@ begin
   setScrollPos(sbZoom, sbMain);
 end;
 
+procedure TMainForm.Open1Click(Sender: TObject);
+begin
+  PaintBoxMain.Repaint;
+end;
+
 procedure TMainForm.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
 end;
@@ -259,6 +258,19 @@ begin
   end;
 end;
 
+procedure TMainForm.R2V1Click(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  vectorGroupList.ReadFromImg(imgMain);
+  imgZoom.Width := imgMain.Width;
+  imgZoom.Height := imgMain.Height;
+  //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
+
+  vectorGroupList.groupRect;
+  vectorGroupList.makeEdgesForRect;
+  Screen.Cursor := crDefault;
+end;
+
 procedure TMainForm.tbZoomChange(Sender: TObject);
 begin
   lpZoom := max(1, round(Math.Power(2.0, tbZoom.Position-1)));
@@ -268,6 +280,14 @@ end;
 procedure TMainForm.tbZoomKeyPress(Sender: TObject; var Key: Char);
 begin
   DoZoom;
+end;
+
+procedure TMainForm.Tylkoread1Click(Sender: TObject);
+begin
+  Screen.Cursor := crHourGlass;
+  vectorGroupList.ReadFromImg(imgMain);
+  DoZoom;
+  Screen.Cursor := crDefault;
 end;
 
 procedure TMainForm.DoZoom;
@@ -294,10 +314,10 @@ begin
 
     if not chkPolyRect.checked then
       //wype³nia bitmapê grafik¹
-      tmpBmp := vectorList.FillImgWithRect(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
+      tmpBmp := vectorGroupList.FillImgWithRect(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
     else
       //wype³nia bitmapê grafikê
-      tmpBmp := vectorList.FillImgWithPolygons(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
+      tmpBmp := vectorGroupList.FillImgWithPolygons(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
 
     //ustawia wielkoœæ wszystkich warstw obrazka
     imgZoom.Width := Round(imgMain.Width * lpZoom);
@@ -337,17 +357,15 @@ begin
   end;
 end;
 
-procedure TMainForm.btmR2VClick(Sender: TObject);
+procedure TMainForm.Exit1Click(Sender: TObject);
 begin
-  Screen.Cursor := crHourGlass;
-  vectorList.ReadFromImg(imgMain);
-  imgZoom.Width := imgMain.Width;
-  imgZoom.Height := imgMain.Height;
-  //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
+  Close;
+end;
 
-  vectorList.groupRect;
-  vectorList.joinRect;
-  Screen.Cursor := crDefault;
+procedure TMainForm.GridColor1Click(Sender: TObject);
+begin
+  if cdGrid.execute then
+    gridColor := cdGrid.Color;
 end;
 
 procedure TMainForm.btn1Click(Sender: TObject);
@@ -376,17 +394,6 @@ imgZoom.Height := 100;
       ]
     );
   end;
-end;
-
-procedure TMainForm.btnExitClick(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TMainForm.btnGridColorClick(Sender: TObject);
-begin
-  if cdGrid.execute then
-    gridColor := cdGrid.Color;
 end;
 
 end.

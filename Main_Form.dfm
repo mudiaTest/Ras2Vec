@@ -11,6 +11,7 @@ object MainForm: TMainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
+  Menu = mmToolBar1
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
@@ -105,23 +106,15 @@ object MainForm: TMainForm
     TabOrder = 3
     Text = ' '
   end
-  object ToolBar1: TToolBar
-    Left = 0
-    Top = 25
-    Width = 877
-    Height = 29
-    Caption = 'ToolBar1'
-    TabOrder = 6
-  end
   object chkGrid: TCheckBox
     Left = 16
     Top = 72
     Width = 97
     Height = 17
-    Caption = 'Grid'
+    Caption = 'Grid / Edge'
     Color = clGrayText
     ParentColor = False
-    TabOrder = 7
+    TabOrder = 6
   end
   object chkTestColor: TCheckBox
     Left = 16
@@ -129,7 +122,7 @@ object MainForm: TMainForm
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
-    TabOrder = 8
+    TabOrder = 7
   end
   object btn1: TButton
     Left = 472
@@ -137,7 +130,7 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'btn1'
-    TabOrder = 9
+    TabOrder = 8
     OnClick = btn1Click
   end
   object chkPolyRect: TCheckBox
@@ -146,7 +139,7 @@ object MainForm: TMainForm
     Width = 177
     Height = 17
     Caption = 'polygons (yes) / rectangles (no)'
-    TabOrder = 10
+    TabOrder = 9
   end
   object btnZoomIn: TButton
     Left = 104
@@ -160,7 +153,7 @@ object MainForm: TMainForm
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 13
+    TabOrder = 11
     OnClick = btnZoomInClick
   end
   object btnZoomOut: TButton
@@ -175,164 +168,70 @@ object MainForm: TMainForm
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 16
+    TabOrder = 10
     OnClick = btnZoomOutClick
+  end
+  object Button1: TButton
+    Left = 208
+    Top = 68
+    Width = 75
+    Height = 25
+    Caption = 'DoZoom'
+    TabOrder = 12
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 584
+    Top = 80
+    Width = 75
+    Height = 25
+    Caption = 'btn1'
+    TabOrder = 13
+    OnClick = btn1Click
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
     Top = 44
   end
-  object dxBarManager1: TdxBarManager
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    Bars = <
-      item
-        Caption = 'main'
-        DockedDockingStyle = dsTop
-        DockedLeft = 0
-        DockedTop = 0
-        DockingStyle = dsTop
-        FloatLeft = 347
-        FloatTop = 173
-        FloatClientWidth = 23
-        FloatClientHeight = 22
-        ItemLinks = <
-          item
-            Item = sbiPlik
-            Visible = True
-          end
-          item
-            BeginGroup = True
-            Item = sbiImage
-            Visible = True
-          end
-          item
-            BeginGroup = True
-            Item = btnView
-            Visible = True
-          end>
-        Name = 'mainTB'
-        OneOnRow = True
-        Row = 0
-        UseOwnFont = False
-        Visible = True
-        WholeRow = False
-      end>
-    Categories.Strings = (
-      'Default'
-      'File'
-      'Image'
-      'View')
-    Categories.ItemsVisibles = (
-      2
-      2
-      2
-      2)
-    Categories.Visibles = (
-      True
-      True
-      True
-      True)
-    PopupMenuLinks = <>
-    UseSystemFont = True
-    Left = 760
-    Top = 40
-    DockControlHeights = (
-      0
-      0
-      25
-      0)
-    object sbiPlik: TdxBarSubItem
-      Caption = 'File'
-      Category = 1
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = btnOpen
-          Visible = True
-        end
-        item
-          BeginGroup = True
-          Item = btnExit
-          Visible = True
-        end>
-    end
-    object btnOpen: TdxBarButton
-      Caption = 'Open'
-      Category = 1
-      Hint = 'Open'
-      Visible = ivAlways
-      OnClick = btnOpenClick
-    end
-    object btnExit: TdxBarButton
-      Caption = 'Exit'
-      Category = 1
-      Hint = 'Exit'
-      Visible = ivAlways
-      OnClick = btnExitClick
-    end
-    object sbiImage: TdxBarSubItem
-      Caption = 'Image'
-      Category = 2
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = dlgLoad
-          Visible = True
-        end
-        item
-          Item = btnTylkoRead
-          Visible = True
-        end
-        item
-          Item = btmR2V
-          Visible = True
-        end>
-    end
-    object dlgLoad: TdxBarButton
-      Caption = 'Load'
-      Category = 2
-      Hint = 'Load'
-      Visible = ivAlways
-      OnClick = dlgLoadClick
-    end
-    object btmR2V: TdxBarButton
-      Caption = 'R2V'
-      Category = 2
-      Hint = 'R2V'
-      Visible = ivAlways
-      OnClick = btmR2VClick
-    end
-    object btnView: TdxBarSubItem
-      Caption = 'View'
-      Category = 3
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = btnGridColor
-          Visible = True
-        end>
-    end
-    object btnGridColor: TdxBarButton
-      Caption = 'Grid color'
-      Category = 3
-      Hint = 'Grid color'
-      Visible = ivAlways
-      OnClick = btnGridColorClick
-    end
-    object btnTylkoRead: TdxBarButton
-      Caption = 'TylkoRead'
-      Category = 2
-      Hint = 'TylkoRead'
-      Visible = ivAlways
-      OnClick = btnTylkoReadClick
-    end
-  end
   object cdGrid: TColorDialog
     Left = 800
     Top = 88
+  end
+  object mmToolBar1: TMainMenu
+    Left = 120
+    Top = 32
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Main1: TMenuItem
+      Caption = 'Main'
+    end
+    object Other1: TMenuItem
+      Caption = 'Other'
+      object Open1: TMenuItem
+        Caption = 'Open'
+        OnClick = Open1Click
+      end
+      object Load1: TMenuItem
+        Caption = 'Load'
+        OnClick = Load1Click
+      end
+      object Tylkoread1: TMenuItem
+        Caption = 'Tylko read'
+        OnClick = Tylkoread1Click
+      end
+      object R2V1: TMenuItem
+        Caption = 'R2V'
+        OnClick = R2V1Click
+      end
+      object GridColor1: TMenuItem
+        Caption = 'Grid Color'
+        OnClick = GridColor1Click
+      end
+    end
+    object Exit1: TMenuItem
+      Caption = 'Exit'
+      OnClick = Exit1Click
+    end
   end
 end
