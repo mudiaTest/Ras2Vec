@@ -69,6 +69,10 @@ type
     function direction(p1, p2: TOpoint): integer;
     //tworzy krawêdŸ z 3 kolejnych punktów
     procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+    //tworzy krawêdzie dla pojedynczego punktu
+    procedure makePartEdge4OnePoint(aPoint: TOPoint;
+                                    aarr: TDynamicEdgeArray;
+                                    azoom: integer);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
@@ -430,23 +434,32 @@ procedure TVectList.makeEdgesForRect;
     arrivDir: integer;
   begin
     avectGroup.edgeList.Clear;
+    //startEdgePoint to pierwszy ponkt na liœcie, bo idziemy ol lewej strony
+    //w najwy¿szym wierszu
     startEdgePoint := avectGroup.rectList.Objects[0] as TVectRectangle;
     prevEdgePoint := startEdgePoint;
-    arrivDir := c_fromLeft; //jest to pewne oszustwo, bo przychodzimy z do³u, ale chodzi o to, aby szukaæ na prawo, bo nie ma punktów po³o¿onych wy¿ej
+    arrivDir := c_fromLeft; //jest to pewne oszustwo, bo przychodzimy z
+                            //do³u, ale chodzi o to, aby szukaæ na prawo, bo
+                            //nie ma punktów po³o¿onych wy¿ej
     nextEdgePoint := nil;
-    //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
-    while (nextEdgePoint <> startEdgePoint) and (prevEdgePoint <> nil) do
-    begin
-      nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
-      //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
-      if (nextEdgePoint = nil) and (avectGroup.edgeList.Count <> 0) then
-        Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
-                                ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                                IntToStr(avectGroup.edgeList.Count));
+    //1-pixelowwy obiekt traktujemy inaczej
+    if avectGroup.rectList.count <> 1 then
+      //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
+      while (nextEdgePoint <> startEdgePoint) and (prevEdgePoint <> nil) do
+      begin
+        nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
+        //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
+        if (nextEdgePoint = nil) and (avectGroup.edgeList.Count <> 0) then
+          Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
+                                  ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
+                                  IntToStr(avectGroup.edgeList.Count));
 
-      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdgePoint);
-      prevEdgePoint := nextEdgePoint;
-    end;
+        avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdgePoint);
+        prevEdgePoint := nextEdgePoint;
+      end
+    //dla obiektu 1-pixelowego
+    else
+      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, startEdgePoint);
   end;
 var
   i: Integer;
@@ -764,7 +777,9 @@ begin
     makePartEdge(o1, o2, o3, counter, result, azoom);
   end else
   begin
-
+    makePartEdge4OnePoint((edgeList.Objects[0] as TVectObj).getP(0),
+                          result, azoom);
+    counter := 4;
   end;
 
   SetLength(result, counter);
@@ -881,6 +896,16 @@ begin
       counter := counter + 3;
     end;
   end
+end;
+
+procedure TVectGroup.makePartEdge4OnePoint(aPoint: TOPoint;
+                                           aarr: TDynamicEdgeArray;
+                                           azoom: integer);
+begin
+  aarr[0] := Point((aPoint.x)*azoom, (aPoint.y)*azoom);
+  aarr[1] := Point((aPoint.x+1)*azoom, aPoint.y*azoom);
+  aarr[2] := Point((aPoint.x+1)*azoom, (aPoint.y+1)*azoom);
+  aarr[3] := Point((aPoint.x)*azoom, (aPoint.y+1)*azoom);
 end;
 
 end.
