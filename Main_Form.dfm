@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'Ras2Vec'
-  ClientHeight = 635
+  ClientHeight = 655
   ClientWidth = 877
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl, Sys_utl,
-  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Vcl.Menus;
+  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus;
 
 const
   c_mainImage = 1;
@@ -261,6 +261,7 @@ end;
 procedure TMainForm.R2V1Click(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
+  vectorGroupList.Clear;
   vectorGroupList.ReadFromImg(imgMain);
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;

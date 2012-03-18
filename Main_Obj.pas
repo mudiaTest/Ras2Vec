@@ -62,6 +62,8 @@ type
     ftestColor: TColor;
     //kolor oryginalny
     fcolor: TColor;
+    //lp utworzonej grupy. PóŸniej utworzona ma wy¿szy numer
+    lpGrupa: integer;
     //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
     //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
     function direction(p1, p2: TOpoint): integer;
@@ -155,7 +157,7 @@ type
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
     property p1: TOPoint read getP1;
     property p2: TOPoint read getP2;
-    procedure zintegruj(aneigbour: TVectRectangle; avectList: TVectList);
+    class procedure zintegruj(aobj1, aobj2: TVectRectangle; avectList: TVectList);
   end;
 
 implementation
@@ -236,6 +238,7 @@ var
   vectGroup: TVectGroup;
   pointArr: TDynamicEdgeArray; //lista punktów do przekazania, aby stworzyæ polygon
   tmpPoint: TPoint;
+  doit: boolean;
 begin
   //ustalamy wielkoœæ obrazu do wype³nienia bior¹c pod uwagê, ¿e jest zoom
   //obrazek bêdzie sk³ada³ siê z grup pixeli u³o¿onych w kwadraty udaj¹cych
@@ -286,7 +289,8 @@ begin
         tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
         pointArr[j] := tmpPoint;
       end;}
-
+      doit := true;
+      if doit then
       Polygon(pointArr);
     end;
 
@@ -306,8 +310,10 @@ var
   x, y: Integer;
   vectObj: TVectRectangle;
   key: integer;
+  lpGrupa: integer;
 begin
   Clear;
+  lpGrupa := 0;
   for y:=0 to srcHeight-1 do
     for x:=0 to srcWidth-1 do
     begin
@@ -317,6 +323,8 @@ begin
       if vectObj.vectGroup = nil then
       begin
         vectObj.vectGroup := TVectGroup.Create;
+        vectObj.vectGroup.lpGrupa := lpGrupa;
+        inc(lpGrupa);
         //vectObj.vectGroup.testColor := TColo;
         vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
         vectObj.vectGroup.color := vectObj.color;
@@ -327,9 +335,9 @@ begin
         vectObj.vectGroupId := key;
       end;
       if x < srcWidth-1 then
-        vectObj.zintegruj(vectArr[x+1, y] as TVectRectangle, self);
+        TVectRectangle.zintegruj(vectObj, vectArr[x+1, y] as TVectRectangle, self);
       if y < srcHeight-1 then
-        vectObj.zintegruj(vectArr[x, y+1] as TVectRectangle, self);
+        TVectRectangle.zintegruj(vectObj, vectArr[x, y+1] as TVectRectangle, self);
     end;
 end;
 
@@ -505,19 +513,33 @@ begin
   Result := inherited getVectObj(x, y) as TVectRectangle
 end;}
 
-procedure TVectRectangle.zintegruj(aneigbour: TVectRectangle; avectList: TVectList);
+class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle; avectList: TVectList);
+var
+  obj1, obj2: TVectRectangle;
 begin
+  if (aobj2.vectGroup = nil) or (aobj1.vectGroup.lpGrupa < aobj2.vectGroup.lpGrupa) then
+  begin
+    obj1 := aobj1;
+    obj2 := aobj2;
+  end
+  else
+  begin
+    obj1 := aobj2;
+    obj2 := aobj1;
+  end;
+
   //jeœli s¹siad jest niezintegrowany i ma taki sam kolor
-  if (aneigbour.vectGroup = nil) and (aneigbour.color = color) then
+  if (obj2.vectGroup = nil) and (obj2.color = obj1.color) then
   //dodajemy do grupy obj na którym jesteœmy
   begin
-    aneigbour.vectGroup := vectGroup;
-    aneigbour.vectGroupId := vectGroupId;
-    vectGroup.rectList.AddObject(vectGroup.rectList.Count, aneigbour);
+    obj2.vectGroup := obj1.vectGroup;
+    obj2.vectGroupId := obj1.vectGroupId;
+    obj2.vectGroup.lpGrupa := obj1.vectGroup.lpGrupa;
+    obj1.vectGroup.rectList.AddObject(obj1.vectGroup.rectList.Count, obj2);
   //jeœli s¹siad jest ma grupê, ale ta grupa ma takisam kolor, to
   end else
-  if (aneigbour.vectGroup <> vectGroup) and (aneigbour.color = color) then
-    dopiszGrupe(aneigbour.vectGroup, avectList);
+  if (obj2.vectGroup <> obj1.vectGroup) and (obj2.color = obj1.color) then
+    obj1.dopiszGrupe(obj2.vectGroup, avectList);
 end;
 
 { TVectorObj }
