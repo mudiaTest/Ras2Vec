@@ -373,9 +373,10 @@ procedure TVectList.makeEdgesForRect;
     var
       bottomVectorRectangle: TVectObj;
     begin
+      if astartEdgePoint.p1.y < srcHeight-1 then
       try
-      bottomVectorRectangle := vectArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
-      result := (bottomVectorRectangle <> nil) and (bottomVectorRectangle.vectGroupId = astartEdgePoint.vectGroupId);
+        bottomVectorRectangle := vectArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
+        result := (bottomVectorRectangle <> nil) and (bottomVectorRectangle.vectGroupId = astartEdgePoint.vectGroupId);
       except
         raise;
       end;
