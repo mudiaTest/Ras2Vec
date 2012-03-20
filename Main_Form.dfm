@@ -15,6 +15,13 @@ object MainForm: TMainForm
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object lblAkcja: TLabel
+    Left = 16
+    Top = 576
+    Width = 36
+    Height = 13
+    Caption = 'lblAkcja'
+  end
   object sbMain: TScrollBox
     Left = 520
     Top = 184

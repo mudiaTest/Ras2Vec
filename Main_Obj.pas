@@ -3,7 +3,7 @@ unit Main_Obj;
 interface
 
 uses
-  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math;
+  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls;
 
 const
     c_fromLeft = 0;
@@ -99,10 +99,12 @@ type
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
+    procedure InfoAkcja(aStr: String);
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
+    lblAkcja: TLabel;
     //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
     //pixele obrazka
     procedure ReadFromImg(aimg: TImage);
@@ -319,6 +321,8 @@ begin
   Clear;
   lpGrupa := 0;
   for y:=0 to srcHeight-1 do
+  begin
+    InfoAkcja('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
     for x:=0 to srcWidth-1 do
     begin
 
@@ -343,6 +347,13 @@ begin
       if y < srcHeight-1 then
         TVectRectangle.zintegruj(vectObj, vectArr[x, y+1] as TVectRectangle, self);
     end;
+  end;
+end;
+
+procedure TVectList.InfoAkcja(aStr: String);
+begin
+  lblAkcja.Caption := aStr;
+  lblAkcja.Repaint;
 end;
 
 procedure TVectList.makeEdgesForRect;
@@ -362,8 +373,12 @@ procedure TVectList.makeEdgesForRect;
     var
       bottomVectorRectangle: TVectObj;
     begin
+      try
       bottomVectorRectangle := vectArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
       result := (bottomVectorRectangle <> nil) and (bottomVectorRectangle.vectGroupId = astartEdgePoint.vectGroupId);
+      except
+        raise;
+      end;
     end;
 
     function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
@@ -490,10 +505,14 @@ procedure TVectList.makeEdgesForRect;
 var
   i: Integer;
   vectGroup: TVectGroup;
+  wrRes, wrDiv: Word;
 begin
   for i:=0 to Count-1 do
   begin
     vectGroup := Objects[i] as TVectGroup;
+    DivMod(i, 10, wrRes, wrDiv);
+    if wrDiv = 0 then
+      InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
     mekeEdges(vectGroup);
   end;
 end;

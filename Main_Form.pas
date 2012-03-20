@@ -44,6 +44,7 @@ type
     R2V1: TMenuItem;
     Exit1: TMenuItem;
     GridColor1: TMenuItem;
+    lblAkcja: TLabel;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -90,6 +91,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    procedure InfoAkcja(aStr: String);
   end;
 
   var
@@ -134,6 +136,7 @@ var
 begin
   inherited;
   vectorGroupList := TVectList.Create;
+  vectorGroupList.lblAkcja := lblAkcja;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -165,6 +168,11 @@ procedure TMainForm.imgMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   imgActing := false;
   imgStartPos := Point(x, y);
+end;
+
+procedure TMainForm.InfoAkcja(aStr: String);
+begin
+  lblAkcja.Caption := aStr;
 end;
 
 procedure TMainForm.init;
@@ -260,6 +268,7 @@ end;
 
 procedure TMainForm.R2V1Click(Sender: TObject);
 begin
+  InfoAkcja('Wczytywanie obrazka.');
   Screen.Cursor := crHourGlass;
   vectorGroupList.Clear;
   vectorGroupList.ReadFromImg(imgMain);
