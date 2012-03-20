@@ -57,8 +57,8 @@ object MainForm: TMainForm
   object sbZoom: TScrollBox
     Left = 144
     Top = 184
-    Width = 221
-    Height = 221
+    Width = 281
+    Height = 273
     TabOrder = 2
     OnMouseWheel = sbZoomMouseWheel
     object imgZoom: TImage

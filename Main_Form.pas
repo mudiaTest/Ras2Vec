@@ -138,7 +138,7 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t2.bmp');
+  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t3.bmp');
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
