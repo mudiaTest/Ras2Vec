@@ -45,6 +45,7 @@ type
     Exit1: TMenuItem;
     GridColor1: TMenuItem;
     lblAkcja: TLabel;
+    lblTime: TLabel;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -137,6 +138,7 @@ begin
   inherited;
   vectorGroupList := TVectList.Create;
   vectorGroupList.lblAkcja := lblAkcja;
+  vectorGroupList.lblTime := lblTime;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;

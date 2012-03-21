@@ -6,6 +6,14 @@ uses
   Classes, SysUtils, Windows, Math;
 
 type
+  TTimeInterval = class (TObject)
+    dtStart, dtStop: TDateTime;
+    procedure Start;
+    procedure Stop;
+    function InterSt: String;
+    function InterDp: Double;
+  end;
+
   TIntList = class (TStringList)
     function AddObject(val: integer; obj: TObject): Integer; reintroduce;
     function GetInt(Index: Integer): integer;
@@ -80,6 +88,28 @@ begin
   Result := TOPoint.Create;
   Result.x := point.X;
   Result.y := point.y;
+end;
+
+{ TTimeInterval }
+
+function TTimeInterval.InterDp: Double;
+begin
+  result := dtStop - dtStart;
+end;
+
+function TTimeInterval.InterSt: String;
+begin
+  result := FloatToStr(InterDp);
+end;
+
+procedure TTimeInterval.Start;
+begin
+  dtStart := getTime;
+end;
+
+procedure TTimeInterval.Stop;
+begin
+  dtStop := getTime;
 end;
 
 end.

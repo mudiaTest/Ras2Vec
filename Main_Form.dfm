@@ -22,6 +22,13 @@ object MainForm: TMainForm
     Height = 13
     Caption = 'lblAkcja'
   end
+  object lblTime: TLabel
+    Left = 16
+    Top = 595
+    Width = 32
+    Height = 13
+    Caption = 'lblTime'
+  end
   object sbMain: TScrollBox
     Left = 520
     Top = 184

@@ -100,11 +100,13 @@ type
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
     procedure InfoAkcja(aStr: String);
+    procedure InfoTime(aStr: String);
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
     lblAkcja: TLabel;
+    lblTime: TLabel;
     //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
     //pixele obrazka
     procedure ReadFromImg(aimg: TImage);
@@ -317,12 +319,14 @@ var
   vectObj: TVectRectangle;
   key: integer;
   lpGrupa: integer;
+  perf: TTimeInterval;
 begin
+  perf := TTimeInterval.Create;
   Clear;
   lpGrupa := 0;
   for y:=0 to srcHeight-1 do
   begin
-    InfoAkcja('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
+    perf.Start;
     for x:=0 to srcWidth-1 do
     begin
 
@@ -347,6 +351,9 @@ begin
       if y < srcHeight-1 then
         TVectRectangle.zintegruj(vectObj, vectArr[x, y+1] as TVectRectangle, self);
     end;
+    perf.Stop;
+    InfoAkcja('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
+    InfoTime('Time: ' + perf.InterSt);
   end;
 end;
 
@@ -354,6 +361,12 @@ procedure TVectList.InfoAkcja(aStr: String);
 begin
   lblAkcja.Caption := aStr;
   lblAkcja.Repaint;
+end;
+
+procedure TVectList.InfoTime(aStr: String);
+begin
+  lblTime.Caption := aStr;
+  lblTime.Repaint;
 end;
 
 procedure TVectList.makeEdgesForRect;
