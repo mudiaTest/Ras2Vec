@@ -137,6 +137,7 @@ var
 begin
   inherited;
   vectorGroupList := TVectList.Create;
+  vectorGroupList.OwnsObjects := true;
   vectorGroupList.lblAkcja := lblAkcja;
   vectorGroupList.lblTime := lblTime;
 
@@ -269,6 +270,8 @@ begin
 end;
 
 procedure TMainForm.R2V1Click(Sender: TObject);
+var
+  perf: TTimeInterval;
 begin
   InfoAkcja('Wczytywanie obrazka.');
   Screen.Cursor := crHourGlass;
@@ -277,10 +280,13 @@ begin
   imgZoom.Width := imgMain.Width;
   imgZoom.Height := imgMain.Height;
   //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
-
+  perf := TTimeInterval.Create;
+  perf.Start;
   vectorGroupList.groupRect;
   vectorGroupList.makeEdgesForRect;
   Screen.Cursor := crDefault;
+  perf.Stop;
+  lblAkcja.Caption := perf.InterSt;
 end;
 
 procedure TMainForm.tbZoomChange(Sender: TObject);

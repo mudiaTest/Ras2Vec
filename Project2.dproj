@@ -36,6 +36,12 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+			<Cfg_2_Win32>true</Cfg_2_Win32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;VCLTee;$(DCC_Namespace)</DCC_Namespace>
@@ -73,6 +79,10 @@
 			<DCC_ObjPath>C:\Program Files (x86)\CodeGear\Dodatkowe\DX;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressBars\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressCommon\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressDBTree\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressEditors Library\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInplaceEditors\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInspector\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressMemData\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressPrinting System\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressQuantumGrid\Sources;$(DCC_ObjPath)</DCC_ObjPath>
 			<DCC_IncludePath>C:\Program Files (x86)\CodeGear\Dodatkowe\DX;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressBars\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressCommon\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressDBTree\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressEditors Library\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInplaceEditors\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressInspector\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressMemData\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressPrinting System\Sources;C:\Program Files (x86)\CodeGear\Dodatkowe\DX\ExpressQuantumGrid\Sources;$(DCC_IncludePath)</DCC_IncludePath>
 			<DCC_Optimize>False</DCC_Optimize>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<VerInfo_DLL>true</VerInfo_DLL>
+			<VerInfo_Locale>1033</VerInfo_Locale>
 		</PropertyGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
@@ -112,8 +122,8 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
-						<Excluded_Packages Name="V:\xbpl\dcldxExRw_D2007.bpl">ExpressInspector Extended Rows</Excluded_Packages>
-						<Excluded_Packages Name="$(BDSBIN)\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 					</Excluded_Packages>
 					<Source>
 						<Source Name="MainSource">Project2.dpr</Source>

@@ -3,7 +3,14 @@ unit Main_Obj;
 interface
 
 uses
-  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls;
+  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls,
+  OtlCommon,
+  OtlComm,
+  OtlSync,
+  OtlTask,
+  OtlTaskControl,
+  OtlCollections,
+  OtlParallel;
 
 const
     c_fromLeft = 0;
@@ -82,6 +89,7 @@ type
     property color: TColor read fcolor write fcolor;
   public
     constructor Create; overload;
+    destructor Destroy; override;
     //tworzy tablicê punktów z ponktów zawartych w EdgeList
     function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
     function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
@@ -320,8 +328,11 @@ var
   key: integer;
   lpGrupa: integer;
   perf: TTimeInterval;
+  perf2, perf3: TTimeInterval;
 begin
   perf := TTimeInterval.Create;
+  perf2 := TTimeInterval.Create;
+  perf3 := TTimeInterval.Create;
   Clear;
   lpGrupa := 0;
   for y:=0 to srcHeight-1 do
@@ -331,7 +342,7 @@ begin
     begin
 
       vectObj := vectArr[x, y] as TVectRectangle;
-
+      perf2.Start(false);
       if vectObj.vectGroup = nil then
       begin
         vectObj.vectGroup := TVectGroup.Create;
@@ -346,14 +357,19 @@ begin
         addObject(key, vectObj.vectGroup);
         vectObj.vectGroupId := key;
       end;
+      perf2.Stop;
+      perf3.Start(false);
       if x < srcWidth-1 then
         TVectRectangle.zintegruj(vectObj, vectArr[x+1, y] as TVectRectangle, self);
       if y < srcHeight-1 then
         TVectRectangle.zintegruj(vectObj, vectArr[x, y+1] as TVectRectangle, self);
+      perf3.Stop;
     end;
     perf.Stop;
     InfoAkcja('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
-    InfoTime('Time: ' + perf.InterSt);
+    InfoTime('Time: ' + perf.InterSt + ' / ' + perf2.InterSt + ' / ' + perf3.InterSt);
+    perf2.Reset;
+    perf3.Reset;
   end;
 end;
 
@@ -386,6 +402,7 @@ procedure TVectList.makeEdgesForRect;
     var
       bottomVectorRectangle: TVectObj;
     begin
+      result := false;
       if astartEdgePoint.p1.y < srcHeight-1 then
       try
         bottomVectorRectangle := vectArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
@@ -497,11 +514,17 @@ procedure TVectList.makeEdgesForRect;
         if nextEdgePoint = startEdgePoint then
         begin
           if CheckBottomPX(startEdgePoint) and (arrivDir = c_fromRight) then
+          begin
             arrivDir := c_goBottom
+          end
           else
+          begin
+            //arrivDir := -1;
             Exit;
-        end;
+          end;
 
+        end;
+        //try
         nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
         //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
         if (nextEdgePoint = nil) and (avectGroup.edgeList.Count <> 0) then
@@ -511,6 +534,13 @@ procedure TVectList.makeEdgesForRect;
 
         avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdgePoint);
         prevEdgePoint := nextEdgePoint;
+
+        //except
+        //  on E: Exception do
+        //    raise;
+        //end;
+
+
       end
     //dla obiektu 1-pixelowego
     else
@@ -588,6 +618,7 @@ end;}
 class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle; avectList: TVectList);
 var
   obj1, obj2: TVectRectangle;
+  delIdx: Integer;
 begin
   if (aobj2.vectGroup = nil) or (aobj1.vectGroup.lpGrupa < aobj2.vectGroup.lpGrupa) then
   begin
@@ -610,8 +641,22 @@ begin
     obj1.vectGroup.rectList.AddObject(obj1.vectGroup.rectList.Count, obj2);
   //jeœli s¹siad jest ma grupê, ale ta grupa ma takisam kolor, to
   end else
-  if (obj2.vectGroup <> obj1.vectGroup) and (obj2.color = obj1.color) then
-    obj1.dopiszGrupe(obj2.vectGroup, avectList);
+  if (obj2.vectGroup <> obj1.vectGroup) and (obj2.color = obj1.color) {and (obj2.vectGroup.rectList.Count < 1000)} then
+  begin
+    if obj1.vectGroup.rectList.Count > obj2.vectGroup.rectList.Count then
+    begin
+      delIdx := obj2.vectGroupId;
+      obj1.dopiszGrupe(obj2.vectGroup, avectList);
+    end
+    else
+    begin
+      delIdx := obj1.vectGroupId;
+      obj2.dopiszGrupe(obj1.vectGroup, avectList);
+    end;
+    //usuniêcie przepisanej grupy z listy grup
+    assert(avectList.indexOf(delIdx) >= 0, 'Brak grupy do usuniêcia: ' + intToStr(delIdx) + '.');
+    avectList.delete(avectList.indexOf(delIdx));
+  end;
 end;
 
 { TVectorObj }
@@ -732,10 +777,8 @@ end;
 procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
 var
   I: Integer;
-  delIdx: Integer;
   vectObj: TVectObj;
 begin
-  delIdx := (agroupList.rectList.Objects[0] as TVectObj).vectGroupId;
   for i:=0 to agroupList.rectList.Count-1 do
   begin
     vectObj := agroupList.rectList.Objects[i] as TVectObj;
@@ -743,9 +786,6 @@ begin
     vectObj.vectGroupId := vectGroupId;
     vectGroup.rectList.AddObject(vectGroup.rectList.nextKey, vectObj);
   end;
-  agroupList.Free;
-  assert(avectList.indexOf(delIdx) >= 0, 'Brak grupy do usuniêcia.');
-  avectList.delete(avectList.indexOf(delIdx));
 end;
 
 function TVectObj.getP(lp: Integer): TOPoint;
@@ -772,6 +812,12 @@ begin
   inherited;
   fedgeList := TIntList.Create;
   frectList := TIntList.Create;
+end;
+
+destructor TVectGroup.Destroy;
+begin
+  beep;
+  inherited;
 end;
 
 function TVectGroup.direction(p1, p2: TOpoint): integer;

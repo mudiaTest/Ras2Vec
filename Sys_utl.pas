@@ -8,8 +8,11 @@ uses
 type
   TTimeInterval = class (TObject)
     dtStart, dtStop: TDateTime;
-    procedure Start;
+    interval: Double;
+    procedure Start(blReset: boolean = true);
     procedure Stop;
+    procedure Reset;
+    procedure ZeroInterval;
     function InterSt: String;
     function InterDp: Double;
   end;
@@ -19,7 +22,7 @@ type
     function GetInt(Index: Integer): integer;
     procedure PutInt(Index: Integer; const S: integer);
     function GetObjByVal(val: Integer): TObject;
-    function IndexOf(const val: integer): Integer; overload;
+    function IndexOf(const val: integer): Integer; reintroduce; overload;
   private
     fnextKey: Integer;
   public
@@ -94,22 +97,38 @@ end;
 
 function TTimeInterval.InterDp: Double;
 begin
-  result := dtStop - dtStart;
+  result := interval;
 end;
 
 function TTimeInterval.InterSt: String;
 begin
-  result := FloatToStr(InterDp);
+  result := FormatFloat('0.0000000000', interval);
+
 end;
 
-procedure TTimeInterval.Start;
+procedure TTimeInterval.Reset;
 begin
+  dtStart := 0;
+  dtStop := 0;
+  interval := 0;
+end;
+
+procedure TTimeInterval.Start(blReset: boolean);
+begin
+  if blReset then
+    Reset;
   dtStart := getTime;
 end;
 
 procedure TTimeInterval.Stop;
 begin
   dtStop := getTime;
+  interval := interval + (dtStop - dtStart);
+end;
+
+procedure TTimeInterval.ZeroInterval;
+begin
+  interval := 0;
 end;
 
 end.
