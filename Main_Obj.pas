@@ -105,6 +105,7 @@ type
     vectArr: TDynamicPointArray; //tablica z obektami wektorowymi
     fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
+    fotWorker: TOmniWorker;
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
     procedure InfoAkcja(aStr: String);
@@ -112,9 +113,12 @@ type
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
+    property otWorker: TOmniWorker read fotWorker write fotWorker;
   public
-    lblAkcja: TLabel;
-    lblTime: TLabel;
+    //lblAkcja: TLabel;
+    //lblTime: TLabel;
+    stMessage: String;
+    stTime: String;
     //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
     //pixele obrazka
     procedure ReadFromImg(aimg: TImage);
@@ -131,6 +135,8 @@ type
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForRect;
     constructor Create;
+
+    procedure ThreadTest;
   end;
 
   //podstawowy obekt wektorowy
@@ -179,13 +185,14 @@ type
 implementation
 
 uses
-  SysUtils;
+  SysUtils, Main_Thread;
 
 { TVectList }
 
 constructor TVectList.Create;
 begin
   inherited;
+  otWorker := nil;
 end;
 
 function TVectList.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
@@ -375,14 +382,17 @@ end;
 
 procedure TVectList.InfoAkcja(aStr: String);
 begin
-  lblAkcja.Caption := aStr;
-  lblAkcja.Repaint;
+  //lblAkcja.Caption := aStr;
+  //lblAkcja.Repaint;
+  stMessage := aStr;
+  //(otWorker as TR2VOmniWorker).OMSendMessage(aStr);
 end;
 
 procedure TVectList.InfoTime(aStr: String);
 begin
-  lblTime.Caption := aStr;
-  lblTime.Repaint;
+  //lblTime.Caption := aStr;
+  //lblTime.Repaint;
+  stTime := aStr;
 end;
 
 procedure TVectList.makeEdgesForRect;
@@ -564,6 +574,18 @@ end;
 procedure TVectList.setObjById(index: Integer; avectObj: TVectObj);
 begin
   Objects[index] := avectObj;
+end;
+
+procedure TVectList.ThreadTest;
+var
+  i: integer;
+begin
+  i := 0;
+  while true do
+  begin
+    inc(i);
+    //InfoAkcja(intToStr(i));
+  end;
 end;
 
 procedure TVectList.ReadFromImg(aimg: TImage);
@@ -776,7 +798,7 @@ end;
 
 procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
 var
-  I: Integer;
+  i: Integer;
   vectObj: TVectObj;
 begin
   for i:=0 to agroupList.rectList.Count-1 do

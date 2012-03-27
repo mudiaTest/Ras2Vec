@@ -203,6 +203,15 @@ object MainForm: TMainForm
     TabOrder = 13
     OnClick = btn1Click
   end
+  object btnStopR2V: TButton
+    Left = 304
+    Top = 68
+    Width = 75
+    Height = 25
+    Action = actR2VBtnStop
+    TabOrder = 14
+    OnClick = btnStopR2VClick
+  end
   object dlgPicture: TOpenPictureDialog
     Left = 804
     Top = 44
@@ -217,10 +226,12 @@ object MainForm: TMainForm
     object N1: TMenuItem
       Caption = '-'
     end
-    object Main1: TMenuItem
+    object MainMG: TMenuItem
+      Action = actR2VMenu
       Caption = 'Main'
     end
-    object Other1: TMenuItem
+    object OtherMG: TMenuItem
+      Action = actR2VMenu
       Caption = 'Other'
       object Open1: TMenuItem
         Caption = 'Open'
@@ -246,6 +257,24 @@ object MainForm: TMainForm
     object Exit1: TMenuItem
       Caption = 'Exit'
       OnClick = Exit1Click
+    end
+  end
+  object oemR3V: TOmniEventMonitor
+    OnTaskMessage = oemR3VTaskMessage
+    OnTaskTerminated = oemR3VTaskTerminated
+    Left = 680
+    Top = 504
+  end
+  object MainActionList: TActionList
+    Left = 8
+    Top = 248
+    object actR2VBtnStop: TAction
+      Caption = 'R2V Stop'
+      OnUpdate = actR2VBtnStopExecute
+    end
+    object actR2VMenu: TAction
+      Caption = 'actR2VMenu'
+      OnUpdate = actR2VMenuExecute
     end
   end
 end

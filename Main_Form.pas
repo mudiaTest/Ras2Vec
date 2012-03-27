@@ -4,8 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl, Sys_utl,
-  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus;
+  Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl,
+  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus,
+  OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
+  Main_Thread, Sys_utl, Vcl.ActnList
+  ;
 
 const
   c_mainImage = 1;
@@ -36,8 +39,8 @@ type
     Button2: TButton;
     mmToolBar1: TMainMenu;
     N1: TMenuItem;
-    Main1: TMenuItem;
-    Other1: TMenuItem;
+    MainMG: TMenuItem;
+    OtherMG: TMenuItem;
     Open1: TMenuItem;
     Load1: TMenuItem;
     Tylkoread1: TMenuItem;
@@ -46,6 +49,11 @@ type
     GridColor1: TMenuItem;
     lblAkcja: TLabel;
     lblTime: TLabel;
+    oemR3V: TOmniEventMonitor;
+    btnStopR2V: TButton;
+    MainActionList: TActionList;
+    actR2VBtnStop: TAction;
+    actR2VMenu: TAction;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -67,6 +75,12 @@ type
     procedure R2V1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure GridColor1Click(Sender: TObject);
+    procedure oemR3VTaskTerminated(const task: IOmniTaskControl);
+    procedure oemR3VTaskMessage(const task: IOmniTaskControl;
+      const msg: TOmniMessage);
+    procedure btnStopR2VClick(Sender: TObject);
+    procedure actR2VBtnStopExecute(Sender: TObject);
+    procedure actR2VMenuExecute(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -83,12 +97,17 @@ type
                                 //bedzie potem polygonem
     gridColor: TColor;
 
+    taskR2V: IOmniTaskControl; //omni task grupowania pixeli i wyznaczania granic dla rectangli
+
+    perf: TTimeInterval; //perf dla ca³ego R2V
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure setScrollPos(asbDest, asbSrc: TScrollBox);
     procedure saveZoomPos;
     procedure init;
     procedure DoZoom;
+    procedure SetControls(atask: integer);
+    procedure DoOnR2VTerminate;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -104,6 +123,21 @@ Uses
   Math;
 
 {$R *.dfm}
+
+procedure TMainForm.btnStopR2VClick(Sender: TObject);
+begin
+  try
+    if assigned(taskR2V) then
+    begin
+      taskR2V.Terminate(0);
+      taskR2V := nil;
+    end else
+      Assert(false, 'taskR2V = nil');
+  finally
+    actR2VBtnStopExecute(nil);
+    DoOnR2VTerminate;
+  end;
+end;
 
 procedure TMainForm.btnZoomInClick(Sender: TObject);
 begin
@@ -136,10 +170,11 @@ var
   f: TCanvas;
 begin
   inherited;
+
   vectorGroupList := TVectList.Create;
   vectorGroupList.OwnsObjects := true;
-  vectorGroupList.lblAkcja := lblAkcja;
-  vectorGroupList.lblTime := lblTime;
+  //vectorGroupList.lblAkcja := lblAkcja;
+  //vectorGroupList.lblTime := lblTime;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -248,6 +283,29 @@ begin
   setScrollPos(sbZoom, sbMain);
 end;
 
+procedure TMainForm.oemR3VTaskMessage(const task: IOmniTaskControl;
+  const msg: TOmniMessage);
+begin
+  lblAkcja.Caption := msg.MsgData;
+  //lblAkcja.Repaint;
+end;
+
+procedure TMainForm.DoOnR2VTerminate;
+begin
+  //w³¹czyæ przyciski
+  taskR2V := nil;//prawdopodobnie na samoczynna zakoñczenie pracy trzeba to wynilowaæ
+  SetControls(OW_DO_R2V);
+  Screen.Cursor := crDefault;
+  perf.Stop;
+  lblAkcja.Caption := perf.InterSt;
+  perf.Free;
+end;
+
+procedure TMainForm.oemR3VTaskTerminated(const task: IOmniTaskControl);
+begin
+  DoOnR2VTerminate;
+end;
+
 procedure TMainForm.Open1Click(Sender: TObject);
 begin
   PaintBoxMain.Repaint;
@@ -269,9 +327,19 @@ begin
   end;
 end;
 
+procedure TMainForm.SetControls(atask: integer);
+begin
+  if atask = OW_DO_R2V then
+  begin
+    OtherMG.Enabled := not assigned(taskR2V);
+    MainMG.Enabled := not assigned(taskR2V);
+    btnStopR2V.Enabled := assigned(taskR2V);
+  end;
+end;
+
 procedure TMainForm.R2V1Click(Sender: TObject);
 var
-  perf: TTimeInterval;
+  workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
 begin
   InfoAkcja('Wczytywanie obrazka.');
   Screen.Cursor := crHourGlass;
@@ -282,11 +350,16 @@ begin
   //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
   perf := TTimeInterval.Create;
   perf.Start;
+
+
+ { workerR2V := TR2VOmniWorker.Create;
+  workerR2V.vectorGroupList := vectorGroupList;
+  taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
+    .SetTimer(1, 1, OW_DO_R2V)
+    .Run;  }
+
   vectorGroupList.groupRect;
   vectorGroupList.makeEdgesForRect;
-  Screen.Cursor := crDefault;
-  perf.Stop;
-  lblAkcja.Caption := perf.InterSt;
 end;
 
 procedure TMainForm.tbZoomChange(Sender: TObject);
@@ -384,6 +457,17 @@ procedure TMainForm.GridColor1Click(Sender: TObject);
 begin
   if cdGrid.execute then
     gridColor := cdGrid.Color;
+end;
+
+procedure TMainForm.actR2VMenuExecute(Sender: TObject);
+begin
+  OtherMG.Enabled := not assigned(taskR2V);
+  MainMG.Enabled := not assigned(taskR2V);
+end;
+
+procedure TMainForm.actR2VBtnStopExecute(Sender: TObject);
+begin
+  btnStopR2V.Enabled := assigned(taskR2V);
 end;
 
 procedure TMainForm.btn1Click(Sender: TObject);
