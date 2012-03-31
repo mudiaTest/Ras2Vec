@@ -4,6 +4,7 @@ interface
 
 uses
   Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls,
+
   OtlCommon,
   OtlComm,
   OtlSync,
@@ -105,18 +106,16 @@ type
     vectArr: TDynamicPointArray; //tablica z obektami wektorowymi
     fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
-    fotWorker: TOmniWorker;
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
-    procedure InfoAkcja(aStr: String);
-    procedure InfoTime(aStr: String);
+    procedure InfoAkcja(aStr: String); virtual;
+    procedure InfoTime(aStr: String); virtual;
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
-    property otWorker: TOmniWorker read fotWorker write fotWorker;
+  protected
+    inMod: Integer;
   public
-    //lblAkcja: TLabel;
-    //lblTime: TLabel;
     stMessage: String;
     stTime: String;
     //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
@@ -134,9 +133,30 @@ type
     procedure groupRect;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForRect;
-    constructor Create;
 
-    procedure ThreadTest;
+    procedure MPFileHead(aLineList: TStringList);
+    function MPFileCreate(aPath, aName: String): THandle;
+  end;
+
+  TSeparateThreadVectList = class(TVectList)
+  private
+    fotWorker: TOmniWorker;
+    procedure InfoAkcja(aStr: String); override;
+    procedure InfoTime(aStr: String); override;
+  published
+    property otWorker: TOmniWorker read fotWorker write fotWorker;
+  public
+    constructor Create; override;
+  end;
+
+  TMainThreadVectList = class(TVectList)
+  private
+    procedure InfoAkcja(aStr: String); override;
+    procedure InfoTime(aStr: String); override;
+  public
+    lblAkcja: TLabel;
+    lblTime: TLabel;
+    constructor Create; override;
   end;
 
   //podstawowy obekt wektorowy
@@ -188,12 +208,6 @@ uses
   SysUtils, Main_Thread;
 
 { TVectList }
-
-constructor TVectList.Create;
-begin
-  inherited;
-  otWorker := nil;
-end;
 
 function TVectList.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
@@ -382,16 +396,11 @@ end;
 
 procedure TVectList.InfoAkcja(aStr: String);
 begin
-  //lblAkcja.Caption := aStr;
-  //lblAkcja.Repaint;
   stMessage := aStr;
-  //(otWorker as TR2VOmniWorker).OMSendMessage(aStr);
 end;
 
 procedure TVectList.InfoTime(aStr: String);
 begin
-  //lblTime.Caption := aStr;
-  //lblTime.Repaint;
   stTime := aStr;
 end;
 
@@ -564,28 +573,61 @@ begin
   for i:=0 to Count-1 do
   begin
     vectGroup := Objects[i] as TVectGroup;
-    DivMod(i, 10, wrRes, wrDiv);
+    DivMod(i, inMod, wrRes, wrDiv);
     if wrDiv = 0 then
       InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
     mekeEdges(vectGroup);
   end;
 end;
 
+function TVectList.MPFileCreate(aPath, aName: String): THandle;
+begin
+  FileCreate(JoinPaths(aPath, aName));
+end;
+
+procedure TVectList.MPFileHead(aLineList: TStringList);
+begin
+  with aLineList do
+  begin
+    Add(')[IMG ID]');
+    Add('CodePage=1252');
+    Add('LblCoding=9');
+    Add('ID=70040001');
+    Add('Name=Test');
+    Add('Elevation=M');
+    Add('Preprocess=F');
+    Add('TreSize=511');
+    Add('TreMargin=0.00000');
+    Add('RgnLimit=127');
+    Add('POIIndex=Y');
+    Add('Copyright=Annonymus');
+    Add('Levels=8');
+    Add('Level0=24');
+    Add('Level1=23');
+    Add('Level2=22');
+    Add('Level3=21');
+    Add('Level4=19');
+    Add('Level5=15');
+    Add('Level6=14');
+    Add('Level7=13');
+    Add('Zoom0=0');
+    Add('Zoom1=1');
+    Add('Zoom2=2');
+    Add('Zoom3=3');
+    Add('Zoom4=4');
+    Add('Zoom5=5');
+    Add('Zoom6=6');
+    Add('Zoom7=7');
+    Add('[END-IMG ID]');
+    Add('[Countries]');
+    Add('Country1=POLSKA~[0x1d]PL');
+    Add('[END-Countries]');
+  end;
+end;
+
 procedure TVectList.setObjById(index: Integer; avectObj: TVectObj);
 begin
   Objects[index] := avectObj;
-end;
-
-procedure TVectList.ThreadTest;
-var
-  i: integer;
-begin
-  i := 0;
-  while true do
-  begin
-    inc(i);
-    //InfoAkcja(intToStr(i));
-  end;
 end;
 
 procedure TVectList.ReadFromImg(aimg: TImage);
@@ -1140,6 +1182,48 @@ begin
   aarr[1] := Point((aPoint.x+1)*azoom, aPoint.y*azoom);
   aarr[2] := Point((aPoint.x+1)*azoom, (aPoint.y+1)*azoom);
   aarr[3] := Point((aPoint.x)*azoom, (aPoint.y+1)*azoom);
+end;
+
+{ TSeparateThreadVectList }
+
+constructor TSeparateThreadVectList.Create;
+begin
+  otWorker := nil;
+  inMod := 10;
+end;
+
+procedure TSeparateThreadVectList.InfoAkcja(aStr: String);
+begin
+  inherited;
+  (otWorker as TR2VOmniWorker).OMSendMessage(aStr);
+end;
+
+procedure TSeparateThreadVectList.InfoTime(aStr: String);
+begin
+  //separate tread
+  //(otWorker as TR2VOmniWorker).OMSendMessage(aStr);
+end;
+
+{ TMainThreadVectList }
+
+constructor TMainThreadVectList.Create;
+begin
+  inherited;
+  inMod := 1;
+end;
+
+procedure TMainThreadVectList.InfoAkcja(aStr: String);
+begin
+  lblAkcja.Caption := aStr;
+  lblAkcja.Repaint;
+  stMessage := aStr;
+end;
+
+procedure TMainThreadVectList.InfoTime(aStr: String);
+begin
+  lblTime.Caption := aStr;
+  lblTime.Repaint;
+  stTime := aStr;
 end;
 
 end.

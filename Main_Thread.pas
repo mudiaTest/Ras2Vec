@@ -16,7 +16,7 @@ type
   TR2VOmniWorker = class (TOmniWorker)
   public
     //zawiera
-    vectorGroupList: TVectList;
+    vectorGroupList: TSeparateThreadVectList;
     procedure OMSendMessage(msg: String); {message MSG_DO_SEND_MESSAGE;}
     procedure OMDoWork(var msg: TOmniMessage); message OW_DO_R2V;
     function Initialize: boolean; override;

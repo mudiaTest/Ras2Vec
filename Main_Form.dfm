@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'Ras2Vec'
-  ClientHeight = 695
+  ClientHeight = 558
   ClientWidth = 877
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,22 +16,22 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 13
   object lblAkcja: TLabel
-    Left = 16
-    Top = 576
+    Left = 40
+    Top = 504
     Width = 36
     Height = 13
     Caption = 'lblAkcja'
   end
   object lblTime: TLabel
-    Left = 16
-    Top = 595
+    Left = 40
+    Top = 523
     Width = 32
     Height = 13
     Caption = 'lblTime'
   end
   object sbMain: TScrollBox
     Left = 520
-    Top = 184
+    Top = 144
     Width = 289
     Height = 273
     TabOrder = 0
@@ -58,7 +58,7 @@ object MainForm: TMainForm
   end
   object tbZoom: TTrackBar
     Left = 144
-    Top = 504
+    Top = 464
     Width = 281
     Height = 29
     Max = 8
@@ -70,7 +70,7 @@ object MainForm: TMainForm
   end
   object sbZoom: TScrollBox
     Left = 144
-    Top = 184
+    Top = 144
     Width = 281
     Height = 273
     TabOrder = 2
@@ -97,7 +97,7 @@ object MainForm: TMainForm
   end
   object Panel1: TPanel
     Left = 243
-    Top = 164
+    Top = 124
     Width = 1
     Height = 313
     Caption = 'Panel1'
@@ -105,7 +105,7 @@ object MainForm: TMainForm
   end
   object Panel2: TPanel
     Left = 119
-    Top = 284
+    Top = 244
     Width = 337
     Height = 1
     Caption = 'Panel2'
@@ -113,7 +113,7 @@ object MainForm: TMainForm
   end
   object edtZoom: TEdit
     Left = 431
-    Top = 504
+    Top = 464
     Width = 25
     Height = 21
     MaxLength = 1
@@ -122,7 +122,7 @@ object MainForm: TMainForm
   end
   object chkGrid: TCheckBox
     Left = 16
-    Top = 72
+    Top = 32
     Width = 97
     Height = 17
     Caption = 'Grid / Edge'
@@ -132,24 +132,24 @@ object MainForm: TMainForm
   end
   object chkTestColor: TCheckBox
     Left = 16
-    Top = 104
+    Top = 64
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
     TabOrder = 7
   end
   object btn1: TButton
-    Left = 472
-    Top = 104
-    Width = 75
+    Left = 296
+    Top = 40
+    Width = 102
     Height = 25
-    Caption = 'btn1'
+    Caption = 'MainThread'
     TabOrder = 8
     OnClick = btn1Click
   end
   object chkPolyRect: TCheckBox
     Left = 16
-    Top = 136
+    Top = 96
     Width = 177
     Height = 17
     Caption = 'polygons (yes) / rectangles (no)'
@@ -157,7 +157,7 @@ object MainForm: TMainForm
   end
   object btnZoomIn: TButton
     Left = 104
-    Top = 489
+    Top = 449
     Width = 25
     Height = 25
     Caption = '+'
@@ -172,7 +172,7 @@ object MainForm: TMainForm
   end
   object btnZoomOut: TButton
     Left = 104
-    Top = 520
+    Top = 480
     Width = 25
     Height = 25
     Caption = '-'
@@ -186,8 +186,8 @@ object MainForm: TMainForm
     OnClick = btnZoomOutClick
   end
   object Button1: TButton
-    Left = 208
-    Top = 68
+    Left = 536
+    Top = 40
     Width = 75
     Height = 25
     Caption = 'DoZoom'
@@ -195,22 +195,32 @@ object MainForm: TMainForm
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 584
-    Top = 80
-    Width = 75
+    Left = 296
+    Top = 71
+    Width = 102
     Height = 25
-    Caption = 'btn1'
+    Caption = 'SeparateThread'
     TabOrder = 13
-    OnClick = btn1Click
+    OnClick = Button2Click
   end
   object btnStopR2V: TButton
-    Left = 304
-    Top = 68
+    Left = 431
+    Top = 71
     Width = 75
     Height = 25
     Action = actR2VBtnStop
     TabOrder = 14
     OnClick = btnStopR2VClick
+  end
+  object Button3: TButton
+    Left = 431
+    Top = 40
+    Width = 75
+    Height = 25
+    Action = actR2VBtnStop
+    Caption = 'R2V'
+    TabOrder = 15
+    OnClick = Button3Click
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -221,8 +231,8 @@ object MainForm: TMainForm
     Top = 88
   end
   object mmToolBar1: TMainMenu
-    Left = 120
-    Top = 32
+    Left = 128
+    Top = 24
     object N1: TMenuItem
       Caption = '-'
     end
@@ -263,11 +273,11 @@ object MainForm: TMainForm
     OnTaskMessage = oemR3VTaskMessage
     OnTaskTerminated = oemR3VTaskTerminated
     Left = 680
-    Top = 504
+    Top = 464
   end
   object MainActionList: TActionList
     Left = 8
-    Top = 248
+    Top = 208
     object actR2VBtnStop: TAction
       Caption = 'R2V Stop'
       OnUpdate = actR2VBtnStopExecute

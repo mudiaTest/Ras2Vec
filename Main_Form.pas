@@ -54,6 +54,7 @@ type
     MainActionList: TActionList;
     actR2VBtnStop: TAction;
     actR2VMenu: TAction;
+    Button3: TButton;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -63,7 +64,6 @@ type
       Y: Integer);
     procedure sbZoomMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure btn1Click(Sender: TObject);
     procedure tbZoomKeyPress(Sender: TObject; var Key: Char);
     procedure tbZoomChange(Sender: TObject);
     procedure btnZoomInClick(Sender: TObject);
@@ -81,6 +81,9 @@ type
     procedure btnStopR2VClick(Sender: TObject);
     procedure actR2VBtnStopExecute(Sender: TObject);
     procedure actR2VMenuExecute(Sender: TObject);
+    procedure btn1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -108,6 +111,8 @@ type
     procedure DoZoom;
     procedure SetControls(atask: integer);
     procedure DoOnR2VTerminate;
+    procedure CreateMainThreadVectorGroupList;
+    procedure CreateSeperateThreadVectorGroupList;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -124,12 +129,17 @@ Uses
 
 {$R *.dfm}
 
+procedure TMainForm.btn1Click(Sender: TObject);
+begin
+  CreateMainThreadVectorGroupList;
+end;
+
 procedure TMainForm.btnStopR2VClick(Sender: TObject);
 begin
   try
     if assigned(taskR2V) then
     begin
-      taskR2V.Terminate(0);
+      taskR2V.Terminate(10);
       taskR2V := nil;
     end else
       Assert(false, 'taskR2V = nil');
@@ -164,17 +174,42 @@ begin
   DoZoom;
 end;
 
+procedure TMainForm.Button2Click(Sender: TObject);
+begin
+  CreateSeperateThreadVectorGroupList;
+end;
+
+procedure TMainForm.Button3Click(Sender: TObject);
+begin
+  R2V1Click(nil);
+end;
+
+procedure TMainForm.CreateMainThreadVectorGroupList;
+begin
+  if vectorGroupList <> nil then
+    vectorGroupList.Free;
+  vectorGroupList := TMainThreadVectList.Create;
+  vectorGroupList.OwnsObjects := true;
+  (vectorGroupList as TMainThreadVectList).lblAkcja := lblAkcja;
+  (vectorGroupList as TMainThreadVectList).lblTime := lblTime;
+end;
+
+procedure TMainForm.CreateSeperateThreadVectorGroupList;
+begin
+  if vectorGroupList <> nil then
+    vectorGroupList.Free;
+  vectorGroupList := TSeparateThreadVectList.Create;
+  vectorGroupList.OwnsObjects := true;
+end;
+
 constructor TMainForm.Create(AOwner: TComponent);
 var
   x, y: integer;
   f: TCanvas;
 begin
   inherited;
-
-  vectorGroupList := TVectList.Create;
-  vectorGroupList.OwnsObjects := true;
-  //vectorGroupList.lblAkcja := lblAkcja;
-  //vectorGroupList.lblTime := lblTime;
+  vectorGroupList := nil;
+  CreateSeperateThreadVectorGroupList;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
@@ -341,25 +376,35 @@ procedure TMainForm.R2V1Click(Sender: TObject);
 var
   workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
 begin
-  InfoAkcja('Wczytywanie obrazka.');
-  Screen.Cursor := crHourGlass;
-  vectorGroupList.Clear;
-  vectorGroupList.ReadFromImg(imgMain);
-  imgZoom.Width := imgMain.Width;
-  imgZoom.Height := imgMain.Height;
-  //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
-  perf := TTimeInterval.Create;
-  perf.Start;
+  try
+    InfoAkcja('Wczytywanie obrazka.');
+    Screen.Cursor := crHourGlass;
+    vectorGroupList.Clear;
+    vectorGroupList.ReadFromImg(imgMain);
+    imgZoom.Width := imgMain.Width;
+    imgZoom.Height := imgMain.Height;
+    //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
+    perf := TTimeInterval.Create;
+    perf.Start;
 
+    if vectorGroupList is TSeparateThreadVectList then
+    begin
+      workerR2V := TR2VOmniWorker.Create;
+      workerR2V.vectorGroupList := vectorGroupList as TSeparateThreadVectList;
+      taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
+        .SetTimer(1, 1, OW_DO_R2V)
+        .Run;
+    end
+    else if vectorGroupList is TMainThreadVectList then
+    begin
+      vectorGroupList.groupRect;
+      vectorGroupList.makeEdgesForRect;
+    end else
+      Assert(False, 'Klasa vectorGroupList rózna od TSeparateThreadVectList i TMainThreadVectList');
 
- { workerR2V := TR2VOmniWorker.Create;
-  workerR2V.vectorGroupList := vectorGroupList;
-  taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
-    .SetTimer(1, 1, OW_DO_R2V)
-    .Run;  }
-
-  vectorGroupList.groupRect;
-  vectorGroupList.makeEdgesForRect;
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 procedure TMainForm.tbZoomChange(Sender: TObject);
@@ -468,34 +513,6 @@ end;
 procedure TMainForm.actR2VBtnStopExecute(Sender: TObject);
 begin
   btnStopR2V.Enabled := assigned(taskR2V);
-end;
-
-procedure TMainForm.btn1Click(Sender: TObject);
-begin
-imgZoom.Width := 100;
-imgZoom.Height := 100;
-  with imgZoom.Canvas do
-  begin
-    Pen.Style := psSolid;
-    Pen.Color := clblack;
-
-    Brush.Color := clRed;
-    polygon( [
-      point(1,1),
-      Point(1,2),
-      point(2,2),
-      Point(2,1)
-      ]
-    );
-
-    polygon( [
-      point(2,1),
-      Point(2,2),
-      point(3,2),
-      Point(3,1)
-      ]
-    );
-  end;
 end;
 
 end.

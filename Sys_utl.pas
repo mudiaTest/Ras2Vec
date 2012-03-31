@@ -29,7 +29,7 @@ type
     function nextKey: Integer;
     property Integers[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
     property ObjByVal[val: integer]: TObject read GetObjByVal;
-    constructor Create; overload;
+    constructor Create; overload; virtual;
   end;
 
   TOPoint = class
@@ -42,8 +42,15 @@ type
     class function getPoint(point: TPoint): TOPoint;
   end;
 
+  function JoinPaths(aPath1, aPath2: String): string;
 implementation
 
+  function JoinPaths(aPath1, aPath2: String): string;
+  begin
+    if StrEnd(aPath1) = '/' then
+      aPath1 := StrCopy(aPath1, StrLen(aPath1)-1);
+    Result := aPath1 + aPath2;
+  end;
 { TIntList }
 
 function TIntList.AddObject(val: integer; obj: TObject): Integer;
