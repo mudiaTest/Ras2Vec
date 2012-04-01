@@ -4,7 +4,7 @@ interface
 
 uses
   Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls,
-
+  Registry,
   OtlCommon,
   OtlComm,
   OtlSync,
@@ -23,6 +23,8 @@ const
     c_goRight = 1;
     c_goBottom = 2;
     c_goLeft = 3;
+
+    progName = 'Ras2Vec';
 type
 
   TVectObj = class;
@@ -30,6 +32,21 @@ type
 
   TDynamicPointArray = array of array of TVectObj;
   TDynamicEdgeArray = array of TPoint;
+
+  TMPFile = class
+  private
+    reg: TRegistry;
+    lineList: TStringList;
+    procedure MPFileHead;
+  public
+    mpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
+    procedure SavePathToReg(aPath: String);
+    procedure LoadPathFromReg;
+    function MPFileCreate(aPath, aName: String): THandle;
+    constructor Create; reintroduce; virtual;
+    procedure MPFileSave;
+  end;
+
 
   TOColor = class
     color: TColor;
@@ -133,9 +150,6 @@ type
     procedure groupRect;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForRect;
-
-    procedure MPFileHead(aLineList: TStringList);
-    function MPFileCreate(aPath, aName: String): THandle;
   end;
 
   TSeparateThreadVectList = class(TVectList)
@@ -205,7 +219,7 @@ type
 implementation
 
 uses
-  SysUtils, Main_Thread;
+  SysUtils, Main_Thread, Sys_Const;
 
 { TVectList }
 
@@ -577,51 +591,6 @@ begin
     if wrDiv = 0 then
       InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
     mekeEdges(vectGroup);
-  end;
-end;
-
-function TVectList.MPFileCreate(aPath, aName: String): THandle;
-begin
-  FileCreate(JoinPaths(aPath, aName));
-end;
-
-procedure TVectList.MPFileHead(aLineList: TStringList);
-begin
-  with aLineList do
-  begin
-    Add(')[IMG ID]');
-    Add('CodePage=1252');
-    Add('LblCoding=9');
-    Add('ID=70040001');
-    Add('Name=Test');
-    Add('Elevation=M');
-    Add('Preprocess=F');
-    Add('TreSize=511');
-    Add('TreMargin=0.00000');
-    Add('RgnLimit=127');
-    Add('POIIndex=Y');
-    Add('Copyright=Annonymus');
-    Add('Levels=8');
-    Add('Level0=24');
-    Add('Level1=23');
-    Add('Level2=22');
-    Add('Level3=21');
-    Add('Level4=19');
-    Add('Level5=15');
-    Add('Level6=14');
-    Add('Level7=13');
-    Add('Zoom0=0');
-    Add('Zoom1=1');
-    Add('Zoom2=2');
-    Add('Zoom3=3');
-    Add('Zoom4=4');
-    Add('Zoom5=5');
-    Add('Zoom6=6');
-    Add('Zoom7=7');
-    Add('[END-IMG ID]');
-    Add('[Countries]');
-    Add('Country1=POLSKA~[0x1d]PL');
-    Add('[END-Countries]');
   end;
 end;
 
@@ -1224,6 +1193,75 @@ begin
   lblTime.Caption := aStr;
   lblTime.Repaint;
   stTime := aStr;
+end;
+
+{ TMPFile }
+
+constructor TMPFile.Create;
+begin
+  reg := TRegistry.Create;
+  mpFileName := '';
+  lineList := TStringList.Create;
+end;
+
+function TMPFile.MPFileCreate(aPath, aName: String): THandle;
+begin
+  FileCreate(JoinPaths(aPath, aName));
+end;
+
+procedure TMPFile.MPFileHead;
+begin
+  with LineList do
+  begin
+    Add(')[IMG ID]');
+    Add('CodePage=1252');
+    Add('LblCoding=9');
+    Add('ID=70040001');
+    Add('Name=Test');
+    Add('Elevation=M');
+    Add('Preprocess=F');
+    Add('TreSize=511');
+    Add('TreMargin=0.00000');
+    Add('RgnLimit=127');
+    Add('POIIndex=Y');
+    Add('Copyright=Annonymus');
+    Add('Levels=8');
+    Add('Level0=24');
+    Add('Level1=23');
+    Add('Level2=22');
+    Add('Level3=21');
+    Add('Level4=19');
+    Add('Level5=15');
+    Add('Level6=14');
+    Add('Level7=13');
+    Add('Zoom0=0');
+    Add('Zoom1=1');
+    Add('Zoom2=2');
+    Add('Zoom3=3');
+    Add('Zoom4=4');
+    Add('Zoom5=5');
+    Add('Zoom6=6');
+    Add('Zoom7=7');
+    Add('[END-IMG ID]');
+    Add('[Countries]');
+    Add('Country1=POLSKA~[0x1d]PL');
+    Add('[END-Countries]');
+  end;
+end;
+
+procedure TMPFile.SavePathToReg(aPath: String);
+begin
+  mpFileName := aPath;
+  reg.OpenKey(REGSOFT + progName, true);
+  reg.WriteString('MPFilePathName', mpFileName);
+  reg.CloseKey;
+end;
+
+procedure TMPFile.LoadPathFromReg;
+begin
+  reg.OpenKey(REGSOFT + progName, true);
+  mpFileName := reg.ReadString('MPFilePathName');
+  reg.CloseKey;
 end;
 
 end.

@@ -6,7 +6,8 @@ uses
   Form_utl in 'Form_utl.pas',
   Sys_utl in 'Sys_utl.pas',
   Main_Obj in 'Main_Obj.pas',
-  Main_Thread in 'Main_Thread.pas';
+  Main_Thread in 'Main_Thread.pas',
+  Sys_Const in 'Sys_Const.pas';
 
 {$R *.res}
 

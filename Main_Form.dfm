@@ -139,8 +139,8 @@ object MainForm: TMainForm
     TabOrder = 7
   end
   object btn1: TButton
-    Left = 296
-    Top = 40
+    Left = 224
+    Top = 8
     Width = 102
     Height = 25
     Caption = 'MainThread'
@@ -186,8 +186,8 @@ object MainForm: TMainForm
     OnClick = btnZoomOutClick
   end
   object Button1: TButton
-    Left = 536
-    Top = 40
+    Left = 431
+    Top = 8
     Width = 75
     Height = 25
     Caption = 'DoZoom'
@@ -195,8 +195,8 @@ object MainForm: TMainForm
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 296
-    Top = 71
+    Left = 224
+    Top = 39
     Width = 102
     Height = 25
     Caption = 'SeparateThread'
@@ -204,23 +204,30 @@ object MainForm: TMainForm
     OnClick = Button2Click
   end
   object btnStopR2V: TButton
-    Left = 431
-    Top = 71
+    Left = 343
+    Top = 39
     Width = 75
     Height = 25
     Action = actR2VBtnStop
     TabOrder = 14
-    OnClick = btnStopR2VClick
   end
   object Button3: TButton
-    Left = 431
-    Top = 40
+    Left = 343
+    Top = 8
     Width = 75
     Height = 25
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
-    OnClick = Button3Click
+  end
+  object btnSave: TButton
+    Left = 590
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Save'
+    TabOrder = 16
+    OnClick = btnSaveClick
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -286,5 +293,9 @@ object MainForm: TMainForm
       Caption = 'actR2VMenu'
       OnUpdate = actR2VMenuExecute
     end
+  end
+  object SaveDialog: TSaveDialog
+    Left = 608
+    Top = 48
   end
 end

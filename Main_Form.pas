@@ -55,6 +55,8 @@ type
     actR2VBtnStop: TAction;
     actR2VMenu: TAction;
     Button3: TButton;
+    btnSave: TButton;
+    SaveDialog: TSaveDialog;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -84,6 +86,7 @@ type
     procedure btn1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -98,7 +101,9 @@ type
 
     vectorGroupList: TVectList; //lista grup obiektów wektorowych - ka¿da grupa
                                 //bedzie potem polygonem
-    gridColor: TColor;
+    MPFile: TMPFile; //obiekt do kompleksowej obs³ugi plików MP
+
+    gridColor: TColor; //kolor siatki/otoczki polygonów
 
     taskR2V: IOmniTaskControl; //omni task grupowania pixeli i wyznaczania granic dla rectangli
 
@@ -132,6 +137,15 @@ Uses
 procedure TMainForm.btn1Click(Sender: TObject);
 begin
   CreateMainThreadVectorGroupList;
+end;
+
+procedure TMainForm.btnSaveClick(Sender: TObject);
+begin
+  SaveDialog.FileName := MPFile.mpFileName;
+  SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
+  SaveDialog.Execute;
+  MPFile.SavePathToReg(SaveDialog.FileName);
+  MPFile.MPFileSave;
 end;
 
 procedure TMainForm.btnStopR2VClick(Sender: TObject);
@@ -210,6 +224,8 @@ begin
   inherited;
   vectorGroupList := nil;
   CreateSeperateThreadVectorGroupList;
+  MPFile := TMPFile.Create;
+  MPFile.LoadPathFromReg;
 
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;

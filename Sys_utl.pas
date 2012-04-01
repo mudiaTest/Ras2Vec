@@ -47,8 +47,8 @@ implementation
 
   function JoinPaths(aPath1, aPath2: String): string;
   begin
-    if StrEnd(aPath1) = '/' then
-      aPath1 := StrCopy(aPath1, StrLen(aPath1)-1);
+    if Copy(aPath1, Length(aPath1)-1, Length(aPath1)) = '/' then
+      aPath1 := Copy(aPath1, 1, Length(aPath1)-1);
     Result := aPath1 + aPath2;
   end;
 { TIntList }
