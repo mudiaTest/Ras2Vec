@@ -17,19 +17,34 @@ type
     function InterDp: Double;
   end;
 
-  TIntList = class (TStringList)
+  TAdvList = class (TStringList)
+  protected
+    fnextKey: Integer;
+  public
+    function nextKey: Integer;
+    constructor Create; overload; virtual;
+  end;
+
+  TIntList = class (TAdvList)
     function AddObject(val: integer; obj: TObject): Integer; reintroduce;
     function GetInt(Index: Integer): integer;
     procedure PutInt(Index: Integer; const S: integer);
     function GetObjByVal(val: Integer): TObject;
     function IndexOf(const val: integer): Integer; reintroduce; overload;
-  private
-    fnextKey: Integer;
   public
-    function nextKey: Integer;
-    property Integers[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
+    property Value[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
     property ObjByVal[val: integer]: TObject read GetObjByVal;
-    constructor Create; overload; virtual;
+  end;
+
+  TDoubleList = class (TAdvList)
+    function AddObject(val: double; obj: TObject): Integer; reintroduce;
+    function GetDouble(Index: integer): double;
+    procedure PutDouble(Index: integer; const S: double);
+    function GetObjByVal(val: Double): TObject;
+    function IndexOf(const val: double): Integer; reintroduce; overload;
+  public
+    property Value[Index: Integer]: Double read GetDouble write PutDouble; default; //reintroduce; default;
+    property ObjByVal[val: Double]: TObject read GetObjByVal;
   end;
 
   TOPoint = class
@@ -42,13 +57,32 @@ type
     class function getPoint(point: TPoint): TOPoint;
   end;
 
+  function TrimSlash(aStr: String): String;
   function JoinPaths(aPath1, aPath2: String): string;
+
+  function StrConcat(separator, left, right: String): String;
+
 implementation
+
+  function StrConcat(separator, left, right: String): String;
+  begin
+    if left = '' then
+      result := right
+    else if right = '' then
+      result := left
+    else
+      result := left + separator + right;
+  end;
+
+  function TrimSlash(aStr: String): String;
+  begin
+    if Copy(aStr, Length(aStr)-1, Length(aStr)) = '/' then
+      result :=  Copy(aStr, 1, Length(aStr));
+  end;
 
   function JoinPaths(aPath1, aPath2: String): string;
   begin
-    if Copy(aPath1, Length(aPath1)-1, Length(aPath1)) = '/' then
-      aPath1 := Copy(aPath1, 1, Length(aPath1)-1);
+    aPath1 := TrimSlash(aPath1);
     Result := aPath1 + aPath2;
   end;
 { TIntList }
@@ -57,12 +91,6 @@ function TIntList.AddObject(val: integer; obj: TObject): Integer;
 begin
   Result := inherited AddObject(IntToStr(val), obj);
   fnextKey := Math.max(fnextKey, val+1);
-end;
-
-constructor TIntList.Create;
-begin
-  inherited;
-  fnextKey := 0;
 end;
 
 function TIntList.GetInt(Index: Integer): Integer;
@@ -78,11 +106,6 @@ end;
 function TIntList.IndexOf(const val: integer): Integer;
 begin
   Result := IndexOf(IntToStr(val));
-end;
-
-function TIntList.nextKey: Integer;
-begin
-  Result := fnextKey;
 end;
 
 procedure TIntList.PutInt(Index: Integer; const S: Integer);
@@ -136,6 +159,48 @@ end;
 procedure TTimeInterval.ZeroInterval;
 begin
   interval := 0;
+end;
+
+{ TAdvList }
+
+constructor TAdvList.Create;
+begin
+  inherited;
+  fnextKey := 0;
+end;
+
+function TAdvList.nextKey: Integer;
+begin
+  Result := fnextKey;
+end;
+
+{ TDoubleList }
+
+function TDoubleList.AddObject(val: double; obj: TObject): Integer;
+begin
+  Result := inherited AddObject(FloatToStr(val), obj);
+  fnextKey := Math.max(fnextKey, Math.Ceil(val+1));
+end;
+
+function TDoubleList.GetDouble(Index: integer): double;
+begin
+  result := strToFloat(Get(Index));
+end;
+
+function TDoubleList.GetObjByVal(val: Double): TObject;
+begin
+  Objects[IndexOf(val)];
+end;
+
+function TDoubleList.IndexOf(const val: double): Integer;
+begin
+  Result := IndexOf(FloatToStr(val));
+end;
+
+procedure TDoubleList.PutDouble(Index: integer; const S: double);
+begin
+  Put(Index, FloatToStr(s));
+  fnextKey := Math.max(fnextKey, Math.Ceil(s+1));
 end;
 
 end.

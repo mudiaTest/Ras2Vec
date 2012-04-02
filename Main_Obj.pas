@@ -36,15 +36,23 @@ type
   TMPFile = class
   private
     reg: TRegistry;
-    lineList: TStringList;
-    procedure MPFileHead;
+    mpFile: TextFile;
+    procedure AddMPFileHead;
+    procedure AddLevels;
+    procedure AddZoom;
+    procedure AddPolygonFromIntList(aEdgeList: TIntList; aLevel: integer);
   public
+    lineList: TStringList;
+    path: String;
+    name: String;
     mpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
     procedure SavePathToReg(aPath: String);
     procedure LoadPathFromReg;
-    function MPFileCreate(aPath, aName: String): THandle;
+    procedure MPFileOpen;
+    procedure MPFileClose;
     constructor Create; reintroduce; virtual;
     procedure MPFileSave;
+    procedure ClearList;
   end;
 
 
@@ -66,7 +74,7 @@ type
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
-    constructor Create;
+    constructor Create; override;
     procedure put(x, y: Integer; o: TVectObj); reintroduce;
     function get(x, y: Integer): TVectObj; reintroduce;
     procedure ReadFromImg(aimg: TImage);
@@ -77,8 +85,12 @@ type
   //grupa obiektów wektorowych; zawiera:
   TVectGroup = class(TObject)
   private
+    //cztery punkty geograficzne okreœlan¹ce rogi obrazka
+    leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
     //lista krawêdzi punktów-pixeli (kolejnych)
-    fedgeList: TIntList;
+    fedgePxList: TIntList;
+    //lista krawêdzi punktówGeograficznych (kolejnych)
+    fedgeGeoList: TDoubleList;
     //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
     fsimpleEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
@@ -99,8 +111,10 @@ type
                                     aarr: TDynamicEdgeArray;
                                     azoom: integer);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
+    procedure PxListToGeoList;
   published
-    property edgeList: TIntList read fedgeList write fedgeList;
+    property edgePxList: TIntList read fedgePxList write fedgePxList;
+    property edgeGeoList: TDoubleList read fedgeGeoList write fedgeGeoList;
     property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
@@ -108,16 +122,13 @@ type
   public
     constructor Create; overload;
     destructor Destroy; override;
-    //tworzy tablicê punktów z ponktów zawartych w EdgeList
+    //tworzy tablicê punktów z ponktów zawartych w edgePxList
     function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
     function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
   end;
 
   //lista obiektów wektorowych
   //obiekty wektorowe przechowywane s¹ w Objects
-
-  {
-  }
   TVectList = class(TIntList)
   private
     vectArr: TDynamicPointArray; //tablica z obektami wektorowymi
@@ -324,7 +335,7 @@ begin
     for i:=0 to Count-1 do
     begin
       vectGroup := Objects[i] as TVectGroup;
-      SetLength(pointArr, vectGroup.edgeList.Count*3);
+      SetLength(pointArr, vectGroup.edgePxList.Count*3);
 
       if not atestColor then
         Brush.Color := vectGroup.color
@@ -334,9 +345,9 @@ begin
 
       pointArr := vectGroup.makeVectorEdge(self.vectArr, azoom);
 
-      {for j:=0 to vectGroup.edgeList.Count-1 do
+      {for j:=0 to vectGroup.edgePxList.Count-1 do
       begin
-        vectObj := vectGroup.edgeList.objects[j] as TVectRectangle;
+        vectObj := vectGroup.edgePxList.objects[j] as TVectRectangle;
         tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
         pointArr[j] := tmpPoint;
       end;}
@@ -387,7 +398,7 @@ begin
         vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
         vectObj.vectGroup.color := vectObj.color;
         vectObj.vectGroup.rectList.AddObject(0, vectObj);
-        vectObj.vectGroup.edgeList.AddObject(0, vectObj);
+        vectObj.vectGroup.edgePxList.AddObject(0, vectObj);
         key := nextKey;
         addObject(key, vectObj.vectGroup);
         vectObj.vectGroupId := key;
@@ -530,7 +541,7 @@ procedure TVectList.makeEdgesForRect;
     startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
     arrivDir: integer;
   begin
-    avectGroup.edgeList.Clear;
+    avectGroup.edgePxList.Clear;
     //startEdgePoint to pierwszy ponkt na liœcie, bo idziemy ol lewej strony
     //w najwy¿szym wierszu
     startEdgePoint := avectGroup.rectList.Objects[0] as TVectRectangle;
@@ -560,12 +571,12 @@ procedure TVectList.makeEdgesForRect;
         //try
         nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
         //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
-        if (nextEdgePoint = nil) and (avectGroup.edgeList.Count <> 0) then
+        if (nextEdgePoint = nil) and (avectGroup.edgePxList.Count <> 0) then
           Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
                                   ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                                  IntToStr(avectGroup.edgeList.Count));
+                                  IntToStr(avectGroup.edgePxList.Count));
 
-        avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdgePoint);
+        avectGroup.edgePxList.AddObject(avectGroup.edgePxList.nextKey, nextEdgePoint);
         prevEdgePoint := nextEdgePoint;
 
         //except
@@ -577,7 +588,7 @@ procedure TVectList.makeEdgesForRect;
       end
     //dla obiektu 1-pixelowego
     else
-      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, startEdgePoint);
+      avectGroup.edgePxList.AddObject(avectGroup.edgePxList.nextKey, startEdgePoint);
   end;
 var
   i: Integer;
@@ -704,7 +715,7 @@ end;
 
 constructor TVectByCoordList.Create;
 begin
-  
+  inherited;
 end;
 
 procedure TVectByCoordList.FillImgWithRect(aimg: TImage; azoom: Integer; agrid: boolean;
@@ -843,7 +854,7 @@ end;}
 constructor TVectGroup.Create;
 begin
   inherited;
-  fedgeList := TIntList.Create;
+  fedgePXList := TIntList.Create;
   frectList := TIntList.Create;
 end;
 
@@ -892,35 +903,40 @@ var
 begin
   counter := 0;
 
-  if edgeList.Count > 1 then
+  if edgePxList.Count > 1 then
   begin
     //SetLength(result, self.rectList.Count+30);
-    o1 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
-    o2 := (edgeList.Objects[0] as TVectObj).getP(0);
-    o3 := (edgeList.Objects[1] as TVectObj).getP(0);
+    o1 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
+    o2 := (edgePxList.Objects[0] as TVectObj).getP(0);
+    o3 := (edgePxList.Objects[1] as TVectObj).getP(0);
     makePartEdge(o1, o2, o3, counter, result, azoom);
 
-    for i:=1 to edgeList.Count-2 do
+    for i:=1 to edgePxList.Count-2 do
     begin
-      o1 := (edgeList.Objects[i-1] as TVectObj).getP(0);
-      o2 := (edgeList.Objects[i] as TVectObj).getP(0);
-      o3 := (edgeList.Objects[i+1] as TVectObj).getP(0);
+      o1 := (edgePxList.Objects[i-1] as TVectObj).getP(0);
+      o2 := (edgePxList.Objects[i] as TVectObj).getP(0);
+      o3 := (edgePxList.Objects[i+1] as TVectObj).getP(0);
       makePartEdge(o1, o2, o3, counter, result, azoom);
     end;
 
-    o1 := (edgeList.Objects[edgeList.Count-2] as TVectObj).getP(0);
-    o2 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
-    o3 := (edgeList.Objects[0] as TVectObj).getP(0);
+    o1 := (edgePxList.Objects[edgePxList.Count-2] as TVectObj).getP(0);
+    o2 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
+    o3 := (edgePxList.Objects[0] as TVectObj).getP(0);
     makePartEdge(o1, o2, o3, counter, result, azoom);
     //SetLength(result, Min(counter,10));
     SetLength(result, counter);
   end else
   begin
     SetLength(result, 4);
-    makePartEdge4OnePoint((edgeList.Objects[0] as TVectObj).getP(0),
+    makePartEdge4OnePoint((edgePxList.Objects[0] as TVectObj).getP(0),
                           result, azoom);
     counter := 4;
   end;
+end;
+
+procedure TVectGroup.PxListToGeoList;
+begin
+  {!!}
 end;
 
 function TVectGroup.simplifyVectorEdge(
@@ -1197,6 +1213,11 @@ end;
 
 { TMPFile }
 
+procedure TMPFile.ClearList;
+begin
+  lineList.Clear;
+end;
+
 constructor TMPFile.Create;
 begin
   reg := TRegistry.Create;
@@ -1204,16 +1225,47 @@ begin
   lineList := TStringList.Create;
 end;
 
-function TMPFile.MPFileCreate(aPath, aName: String): THandle;
+procedure TMPFile.MPFileClose;
 begin
-  FileCreate(JoinPaths(aPath, aName));
+  CloseFile(mpFile);
 end;
 
-procedure TMPFile.MPFileHead;
+procedure TMPFile.AddLevels;
 begin
   with LineList do
   begin
-    Add(')[IMG ID]');
+    Add('Levels=8');
+    Add('Level0=24');
+    Add('Level1=23');
+    Add('Level2=22');
+    Add('Level3=21');
+    Add('Level4=19');
+    Add('Level5=15');
+    Add('Level6=14');
+    Add('Level7=13');
+  end;
+end;
+
+procedure TMPFile.AddZoom;
+begin
+  with LineList do
+  begin
+    Add('Zoom0=0');
+    Add('Zoom1=1');
+    Add('Zoom2=2');
+    Add('Zoom3=3');
+    Add('Zoom4=4');
+    Add('Zoom5=5');
+    Add('Zoom6=6');
+    Add('Zoom7=7');
+  end;
+end;
+
+procedure TMPFile.AddMPFileHead;
+begin
+  with LineList do
+  begin
+    Add('[IMG ID]');
     Add('CodePage=1252');
     Add('LblCoding=9');
     Add('ID=70040001');
@@ -1225,28 +1277,58 @@ begin
     Add('RgnLimit=127');
     Add('POIIndex=Y');
     Add('Copyright=Annonymus');
-    Add('Levels=8');
-    Add('Level0=24');
-    Add('Level1=23');
-    Add('Level2=22');
-    Add('Level3=21');
-    Add('Level4=19');
-    Add('Level5=15');
-    Add('Level6=14');
-    Add('Level7=13');
-    Add('Zoom0=0');
-    Add('Zoom1=1');
-    Add('Zoom2=2');
-    Add('Zoom3=3');
-    Add('Zoom4=4');
-    Add('Zoom5=5');
-    Add('Zoom6=6');
-    Add('Zoom7=7');
+    AddLevels;
+    AddZoom;
     Add('[END-IMG ID]');
     Add('[Countries]');
     Add('Country1=POLSKA~[0x1d]PL');
     Add('[END-Countries]');
+
+    Add('[POLYLINE]');
+    Add('Type=0x15');
+    Add('Label=P czarny');
+    Add('Data0=(54.59917,18.29001),(54.59999,18.29112),(54.60059,18.29421)');
+    Add('[END]');
   end;
+end;
+
+procedure TMPFile.AddPolygonFromIntList(aEdgeList: TIntList; aLevel: integer);
+
+  function getGdgeStr(aEdgeList: TIntList): String;
+  var
+    i: integer;
+
+  begin
+    result := '';
+    {!!}
+   // for i := 0 to aEdgeList.Count-1 do
+   //   result := StrConcat(',', result, '('++','++')');
+  end;
+
+begin
+  with lineList do
+  begin
+    Add('[POLYGON]');
+    Add('Type=0x9');
+    Add('Label=eee');
+    Add('Data' + intToStr(aLevel) + getGdgeStr(aEdgeList));//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    Add('[END]');
+  end;
+end;
+
+procedure TMPFile.MPFileOpen;
+begin
+  AssignFile(mpFile, mpFileName);
+  ReWrite(mpFile);
+end;
+
+procedure TMPFile.MPFileSave;
+begin
+  //MPFileOpen;
+  ClearList;
+  AddMPFileHead;
+  lineList.SaveToFile(mpFileName);
+ // MPFileClose;
 end;
 
 procedure TMPFile.SavePathToReg(aPath: String);
