@@ -99,7 +99,7 @@ type
     lpZoom: Integer; //poziom zoomu z sówaka - zapamiêtuje poziom powiêkszenia obrazka
     lpActImgZoom: Integer; //poziom zoomu obrazka = mo¿e byæ inny ni¿ sówaka
 
-    vectorGroupList: TVectList; //lista grup obiektów wektorowych - ka¿da grupa
+    mapFactory: TMapFactory; //lista grup obiektów wektorowych - ka¿da grupa
                                 //bedzie potem polygonem
     MPFile: TMPFile; //obiekt do kompleksowej obs³ugi plików MP
 
@@ -145,7 +145,7 @@ begin
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
   MPFile.SavePathToReg(SaveDialog.FileName);
-  MPFile.MPFileSave;
+  MPFile.MPFileSave(mapFactory);
 end;
 
 procedure TMainForm.btnStopR2VClick(Sender: TObject);
@@ -200,20 +200,20 @@ end;
 
 procedure TMainForm.CreateMainThreadVectorGroupList;
 begin
-  if vectorGroupList <> nil then
-    vectorGroupList.Free;
-  vectorGroupList := TMainThreadVectList.Create;
-  vectorGroupList.OwnsObjects := true;
-  (vectorGroupList as TMainThreadVectList).lblAkcja := lblAkcja;
-  (vectorGroupList as TMainThreadVectList).lblTime := lblTime;
+  if mapFactory <> nil then
+    mapFactory.Free;
+  mapFactory := TMainThreadVectList.Create;
+  mapFactory.OwnsObjects := true;
+  (mapFactory as TMainThreadVectList).lblAkcja := lblAkcja;
+  (mapFactory as TMainThreadVectList).lblTime := lblTime;
 end;
 
 procedure TMainForm.CreateSeperateThreadVectorGroupList;
 begin
-  if vectorGroupList <> nil then
-    vectorGroupList.Free;
-  vectorGroupList := TSeparateThreadVectList.Create;
-  vectorGroupList.OwnsObjects := true;
+  if mapFactory <> nil then
+    mapFactory.Free;
+  mapFactory := TSeparateThreadVectList.Create;
+  mapFactory.OwnsObjects := true;
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
@@ -222,7 +222,7 @@ var
   f: TCanvas;
 begin
   inherited;
-  vectorGroupList := nil;
+  mapFactory := nil;
   CreateSeperateThreadVectorGroupList;
   MPFile := TMPFile.Create;
   MPFile.LoadPathFromReg;
@@ -395,28 +395,28 @@ begin
   try
     InfoAkcja('Wczytywanie obrazka.');
     Screen.Cursor := crHourGlass;
-    vectorGroupList.Clear;
-    vectorGroupList.ReadFromImg(imgMain);
+    mapFactory.Clear;
+    mapFactory.ReadFromImg(imgMain);
     imgZoom.Width := imgMain.Width;
     imgZoom.Height := imgMain.Height;
     //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
     perf := TTimeInterval.Create;
     perf.Start;
 
-    if vectorGroupList is TSeparateThreadVectList then
+    if mapFactory is TSeparateThreadVectList then
     begin
       workerR2V := TR2VOmniWorker.Create;
-      workerR2V.vectorGroupList := vectorGroupList as TSeparateThreadVectList;
+      workerR2V.mapFactory := mapFactory as TSeparateThreadVectList;
       taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
         .SetTimer(1, 1, OW_DO_R2V)
         .Run;
     end
-    else if vectorGroupList is TMainThreadVectList then
+    else if mapFactory is TMainThreadVectList then
     begin
-      vectorGroupList.groupRect;
-      vectorGroupList.makeEdgesForRect;
+      mapFactory.groupRect;
+      mapFactory.makeEdgesForGroups;
     end else
-      Assert(False, 'Klasa vectorGroupList rózna od TSeparateThreadVectList i TMainThreadVectList');
+      Assert(False, 'Klasa mapFactory rózna od TSeparateThreadVectList i TMainThreadVectList');
 
   finally
     Screen.Cursor := crDefault;
@@ -437,7 +437,7 @@ end;
 procedure TMainForm.Tylkoread1Click(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
-  vectorGroupList.ReadFromImg(imgMain);
+  mapFactory.ReadFromImg(imgMain);
   DoZoom;
   Screen.Cursor := crDefault;
 end;
@@ -466,10 +466,10 @@ begin
 
     if not chkPolyRect.checked then
       //wype³nia bitmapê grafik¹
-      tmpBmp := vectorGroupList.FillImgWithRect(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
+      tmpBmp := mapFactory.FillImgWithRect(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor)
     else
       //wype³nia bitmapê grafikê
-      tmpBmp := vectorGroupList.FillImgWithPolygons(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
+      tmpBmp := mapFactory.FillImgWithPolygons(imgZoom, lpZoom, chkTestColor.Checked, chkGrid.Checked, gridColor);
 
     //ustawia wielkoœæ wszystkich warstw obrazka
     imgZoom.Width := Round(imgMain.Width * lpZoom);

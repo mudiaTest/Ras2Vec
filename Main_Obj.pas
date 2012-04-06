@@ -29,9 +29,12 @@ type
 
   TVectObj = class;
   TVectRectangle = class;
+  TGeoPoint = class;
+  TMapFactory = class;
 
   TDynamicPointArray = array of array of TVectObj;
-  TDynamicEdgeArray = array of TPoint;
+  TDynamicGeoPointArray = array of TGeoPoint;
+  TDynamicPxPointArray = array of TPoint;
 
   TMPFile = class
   private
@@ -40,7 +43,8 @@ type
     procedure AddMPFileHead;
     procedure AddLevels;
     procedure AddZoom;
-    procedure AddPolygonFromIntList(aEdgeList: TIntList; aLevel: integer);
+    procedure AddPolygonsFromIntList(aGeoEdge: TIntList; aLevel: integer);
+    procedure AddPolygon;
   public
     lineList: TStringList;
     path: String;
@@ -51,7 +55,7 @@ type
     procedure MPFileOpen;
     procedure MPFileClose;
     constructor Create; reintroduce; virtual;
-    procedure MPFileSave;
+    procedure MPFileSave(aMapFactory: TMapFactory);
     procedure ClearList;
   end;
 
@@ -82,15 +86,15 @@ type
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
   end;
 
-  //grupa obiektów wektorowych; zawiera:
+  //grupa obiektów wektorowych;
   TVectGroup = class(TObject)
   private
     //cztery punkty geograficzne okreœlan¹ce rogi obrazka
     leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
-    //lista krawêdzi punktów-pixeli (kolejnych)
+    //lista krawêdzi punktów Integer (pixeli) (kolejnych)
     fedgePxList: TIntList;
-    //lista krawêdzi punktówGeograficznych (kolejnych)
-    fedgeGeoList: TDoubleList;
+    //lista krawêdzi punktów Double
+    fedgeGeoList: TIntList;
     //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
     fsimpleEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
@@ -101,37 +105,50 @@ type
     fcolor: TColor;
     //lp utworzonej grupy. PóŸniej utworzona ma wy¿szy numer
     lpGrupa: integer;
+
+    fMapFactory: TMapFactory; //rodzic
     //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
     //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
     function direction(p1, p2: TOpoint): integer;
     //tworzy krawêdŸ z 3 kolejnych punktów
-    procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+    //  multi = mno¿nik: dla grafiki bedzie to zoom, dla geo bêdzie to szerokoœc
+    //          geograficzna jednego px
+    procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
+                           var counter: integer; aGeoArr: TDynamicGeoPointArray;
+                           multi: Double; displaceX, displaceY: Double);
     //tworzy krawêdzie dla pojedynczego punktu
-    procedure makePartEdge4OnePoint(aPoint: TOPoint;
-                                    aarr: TDynamicEdgeArray;
-                                    azoom: integer);
+    procedure makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
+                                    multi: Double; displaceX, displaceY: Double);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
     procedure PxListToGeoList;
+    function SrcHeight: Integer;
+    function SrcWidth: Integer;
+    function vectObjArr: TDynamicPointArray;
   published
     property edgePxList: TIntList read fedgePxList write fedgePxList;
-    property edgeGeoList: TDoubleList read fedgeGeoList write fedgeGeoList;
+    property edgeGeoList: TIntList read fedgeGeoList write fedgeGeoList;
     property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
     property color: TColor read fcolor write fcolor;
+    property mapFactory: TMapFactory read fMapFactory write fMapFactory;
   public
     constructor Create; overload;
     destructor Destroy; override;
     //tworzy tablicê punktów z ponktów zawartych w edgePxList
-    function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
-    function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
+    function makeVectorEdge(vectArr: TDynamicPointArray; Amulti: Double;
+                            adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;//(vectArr: TVarArray);
+    function simplifyVectorEdge(arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
+    function GeoArray2PxArray(aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
+    //buduje krawêdŸ
+    procedure makeEdges;
   end;
 
   //lista obiektów wektorowych
   //obiekty wektorowe przechowywane s¹ w Objects
-  TVectList = class(TIntList)
+  TMapFactory = class(TIntList)
   private
-    vectArr: TDynamicPointArray; //tablica z obektami wektorowymi
+    fvectArr: TDynamicPointArray; //tablica z obektami wektorowymi
     fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
     function getObjById(index: Integer): TVectObj;
@@ -141,6 +158,7 @@ type
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
+    property vectArr: TDynamicPointArray read fvectArr write fvectArr;
   protected
     inMod: Integer;
   public
@@ -160,10 +178,10 @@ type
     //tworzy grupy obiektów TVectRectangle czyli przysz³e polygony
     procedure groupRect;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
-    procedure makeEdgesForRect;
+    procedure makeEdgesForGroups;
   end;
 
-  TSeparateThreadVectList = class(TVectList)
+  TSeparateThreadVectList = class(TMapFactory)
   private
     fotWorker: TOmniWorker;
     procedure InfoAkcja(aStr: String); override;
@@ -174,7 +192,7 @@ type
     constructor Create; override;
   end;
 
-  TMainThreadVectList = class(TVectList)
+  TMainThreadVectList = class(TMapFactory)
   private
     procedure InfoAkcja(aStr: String); override;
     procedure InfoTime(aStr: String); override;
@@ -196,7 +214,7 @@ type
     fvectGroupId: Integer;
     //fvectArr: array of array of TVectObj;
     //przepisanie (do³¹czenie) obiektów z innej grupy do tej, która posiada obiekt self
-    procedure dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
+    procedure dopiszGrupe(agroupList: TVectGroup; avectList: TMapFactory);
     function getP(lp: Integer): TOPoint;
     //function getVectObj(x, y: integer): TVectObj; virtual;
   published
@@ -224,7 +242,14 @@ type
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
     property p1: TOPoint read getP1;
     property p2: TOPoint read getP2;
-    class procedure zintegruj(aobj1, aobj2: TVectRectangle; avectList: TVectList);
+    class procedure zintegruj(aobj1, aobj2: TVectRectangle; avectList: TMapFactory);
+  end;
+
+  TGeoPoint = class
+  public
+    x: Double;
+    y: Double;
+    constructor Create(ax, ay: Double); overload;
   end;
 
 implementation
@@ -232,9 +257,9 @@ implementation
 uses
   SysUtils, Main_Thread, Sys_Const;
 
-{ TVectList }
+{ TMapFactory }
 
-function TVectList.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
+function TMapFactory.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
   x, y: Integer;
@@ -289,7 +314,7 @@ begin
   aimg.Canvas.Unlock;
 end;
 
-function TVectList.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
+function TMapFactory.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
   x, y: Integer;
@@ -298,7 +323,8 @@ var
   p: Pointer;
   bmp: TBitmap;
   vectGroup: TVectGroup;
-  pointArr: TDynamicEdgeArray; //lista punktów do przekazania, aby stworzyæ polygon
+  geoPointArr: TDynamicGeoPointArray; //lista punktów do przekazania, aby stworzyæ polygon
+  pxPointArray: TDynamicPxPointArray;
   tmpPoint: TPoint;
   doit: boolean;
 begin
@@ -335,7 +361,7 @@ begin
     for i:=0 to Count-1 do
     begin
       vectGroup := Objects[i] as TVectGroup;
-      SetLength(pointArr, vectGroup.edgePxList.Count*3);
+      SetLength(geoPointArr, vectGroup.edgePxList.Count*3);
 
       if not atestColor then
         Brush.Color := vectGroup.color
@@ -343,17 +369,18 @@ begin
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      pointArr := vectGroup.makeVectorEdge(self.vectArr, azoom);
+      geoPointArr := vectGroup.makeVectorEdge(self.vectArr, azoom, 0 ,0);
+      pxPointArray := vectGroup.GeoArray2PxArray(geoPointArr);
 
       {for j:=0 to vectGroup.edgePxList.Count-1 do
       begin
         vectObj := vectGroup.edgePxList.objects[j] as TVectRectangle;
-        tmpPoint := Point((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
+        tmpPoint := TGeoPoint.Create((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
         pointArr[j] := tmpPoint;
       end;}
       doit := true;
       if doit then
-      Polygon(pointArr);
+      Polygon(pxPointArray);
     end;
 
   end;
@@ -362,12 +389,12 @@ begin
   aimg.Canvas.Unlock;
 end;
 
-function TVectList.getObjById(index: Integer): TVectObj;
+function TMapFactory.getObjById(index: Integer): TVectObj;
 begin
   result := Objects[index] as TVectObj;
 end;
 
-procedure TVectList.groupRect;
+procedure TMapFactory.groupRect;
 var
   x, y: Integer;
   vectObj: TVectRectangle;
@@ -392,6 +419,7 @@ begin
       if vectObj.vectGroup = nil then
       begin
         vectObj.vectGroup := TVectGroup.Create;
+        vectObj.vectGroup.mapFactory := Self;
         vectObj.vectGroup.lpGrupa := lpGrupa;
         inc(lpGrupa);
         //vectObj.vectGroup.testColor := TColo;
@@ -419,177 +447,17 @@ begin
   end;
 end;
 
-procedure TVectList.InfoAkcja(aStr: String);
+procedure TMapFactory.InfoAkcja(aStr: String);
 begin
   stMessage := aStr;
 end;
 
-procedure TVectList.InfoTime(aStr: String);
+procedure TMapFactory.InfoTime(aStr: String);
 begin
   stTime := aStr;
 end;
 
-procedure TVectList.makeEdgesForRect;
-  //buduje (wype³nia odpowiednie listy) krawêdz dla podanej grupy
-  procedure mekeEdges(avectGroup: TVectGroup);
-
-    function nextDirection(aDirection: Integer): Integer;
-    var
-      res, reminder: Word;
-    begin
-      inc(aDirection);
-      DivMod(aDirection, 4, res, reminder);
-      result := reminder;
-    end;
-
-    function CheckBottomPX(astartEdgePoint: TVectRectangle): boolean;
-    var
-      bottomVectorRectangle: TVectObj;
-    begin
-      result := false;
-      if astartEdgePoint.p1.y < srcHeight-1 then
-      try
-        bottomVectorRectangle := vectArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
-        result := (bottomVectorRectangle <> nil) and (bottomVectorRectangle.vectGroupId = astartEdgePoint.vectGroupId);
-      except
-        raise;
-      end;
-    end;
-
-    function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
-      function checkNextEdge(aprevEdge: TVectRectangle; arrDir: integer): TVectRectangle;
-        function checkTop(aprevEdge: TVectRectangle): TVectRectangle;
-        begin
-          if aprevEdge.getP1.y > 0 then
-          begin
-            Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
-            if aprevEdge.vectGroupId = Result.vectGroupId then
-              Exit;
-            Result := nil;
-          end;
-          Result := nil;
-        end;
-        function checkRight(aprevEdge: TVectRectangle): TVectRectangle;
-        begin
-          if aprevEdge.getP1.x < srcWidth-1 then
-          begin
-            Result := vectArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
-            if aprevEdge.vectGroupId = Result.vectGroupId then
-              Exit;
-            Result := nil;
-          end;
-          Result := nil;
-        end;
-        function checkBottom(aprevEdge: TVectRectangle): TVectRectangle;
-        begin
-          if aprevEdge.getP1.y < srcHeight-1 then
-          begin
-            Result := vectArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
-            if aprevEdge.vectGroupId = Result.vectGroupId then
-              Exit;
-            Result := nil;
-          end;
-          Result := nil;
-        end;
-        function checkLeft(aprevEdge: TVectRectangle): TVectRectangle;
-        begin
-          if aprevEdge.getP1.x > 0 then
-          begin
-            Result := vectArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
-            if aprevEdge.vectGroupId = Result.vectGroupId then
-              Exit;
-            Result := nil;
-          end;
-          Result := nil;
-        end;
-      begin
-        if arrDir = c_goTop then
-          Result := checkTop(aprevEdge)
-        else if arrDir = c_goRight then
-          Result := checkRight(aprevEdge)
-        else if arrDir = c_goBottom then
-          Result := checkBottom(aprevEdge)
-        else if arrDir = c_goLeft then
-          Result := checkLeft(aprevEdge);
-      end;
-    var
-      i, j: Integer;
-    begin
-      i := 0;
-      j := 0;
-      for i := 0 to 3 do
-      begin
-        if arrDir + j = 4 then
-          j := -arrDir;
-        Result := checkNextEdge(aprevEdge, arrDir+j);
-        if Result <> nil then
-        begin
-          if arrDir + j = c_fromLeft then
-            arrDir := c_fromBottom
-          else if arrDir + j = c_fromBottom then
-            arrDir := c_fromRight
-          else if arrDir + j = c_fromTop then
-            arrDir := c_fromLeft
-          else if arrDir + j = c_fromRight then
-            arrDir:= c_fromTop;
-          Break;
-        end;
-        Inc(j);
-      end;
-    end;
-  var
-    startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
-    arrivDir: integer;
-  begin
-    avectGroup.edgePxList.Clear;
-    //startEdgePoint to pierwszy ponkt na liœcie, bo idziemy ol lewej strony
-    //w najwy¿szym wierszu
-    startEdgePoint := avectGroup.rectList.Objects[0] as TVectRectangle;
-    prevEdgePoint := startEdgePoint;
-    arrivDir := c_goRight; //zaczynamy od max lewego ponktu na górnej linji
-                           //Ka¿emy zacz¹æ szukanie od prawej
-    nextEdgePoint := nil;
-    //1-pixelowwy obiekt traktujemy inaczej
-    if avectGroup.rectList.count <> 1 then
-      //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
-      //while (nextEdgePoint <> startEdgePoint) and (prevEdgePoint <> nil) do
-      while true do
-      begin
-        if nextEdgePoint = startEdgePoint then
-        begin
-          if CheckBottomPX(startEdgePoint) and (arrivDir = c_fromRight) then
-          begin
-            arrivDir := c_goBottom
-          end
-          else
-          begin
-            //arrivDir := -1;
-            Exit;
-          end;
-
-        end;
-        //try
-        nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
-        //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
-        if (nextEdgePoint = nil) and (avectGroup.edgePxList.Count <> 0) then
-          Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
-                                  ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                                  IntToStr(avectGroup.edgePxList.Count));
-
-        avectGroup.edgePxList.AddObject(avectGroup.edgePxList.nextKey, nextEdgePoint);
-        prevEdgePoint := nextEdgePoint;
-
-        //except
-        //  on E: Exception do
-        //    raise;
-        //end;
-
-
-      end
-    //dla obiektu 1-pixelowego
-    else
-      avectGroup.edgePxList.AddObject(avectGroup.edgePxList.nextKey, startEdgePoint);
-  end;
+procedure TMapFactory.makeEdgesForGroups;
 var
   i: Integer;
   vectGroup: TVectGroup;
@@ -601,16 +469,16 @@ begin
     DivMod(i, inMod, wrRes, wrDiv);
     if wrDiv = 0 then
       InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
-    mekeEdges(vectGroup);
+    vectGroup.makeEdges;
   end;
 end;
 
-procedure TVectList.setObjById(index: Integer; avectObj: TVectObj);
+procedure TMapFactory.setObjById(index: Integer; avectObj: TVectObj);
 begin
   Objects[index] := avectObj;
 end;
 
-procedure TVectList.ReadFromImg(aimg: TImage);
+procedure TMapFactory.ReadFromImg(aimg: TImage);
 var
   x, y: integer;
   ile: Integer;
@@ -620,7 +488,7 @@ var
 begin
   srcWidth := aimg.Width;
   srcHeight := aimg.Height;
-  SetLength(vectArr, srcWidth, srcHeight);
+  SetLength(fvectArr, srcWidth, srcHeight);
   for y:=0 to aimg.Height-1 do
     for x:=0 to aimg.Width-1 do
     begin
@@ -659,7 +527,7 @@ begin
   Result := inherited getVectObj(x, y) as TVectRectangle
 end;}
 
-class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle; avectList: TVectList);
+class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle; avectList: TMapFactory);
 var
   obj1, obj2: TVectRectangle;
   delIdx: Integer;
@@ -818,7 +686,7 @@ begin
   Result := Abs(a*p.x - p.y + c) / mian;
 end;
 
-procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
+procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TMapFactory);
 var
   i: Integer;
   vectObj: TVectObj;
@@ -856,6 +724,7 @@ begin
   inherited;
   fedgePXList := TIntList.Create;
   frectList := TIntList.Create;
+  MapFactory := nil;
 end;
 
 destructor TVectGroup.Destroy;
@@ -874,6 +743,16 @@ begin
     result := c_fromBottom
   else
     result := c_fromTop;
+end;
+
+function TVectGroup.GeoArray2PxArray(
+  aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
+var
+  i: integer;
+begin
+  SetLength(result, Length(aGeoArr));
+  for i := 0 to Length(aGeoArr)-1 do
+    result[i] := Point(Round(aGeoArr[0].x), Round(aGeoArr[0].y));
 end;
 
 procedure TVectGroup.getLine(p1, p2: TOPoint; var A, C, mian: Double);
@@ -895,7 +774,8 @@ begin
   mian := getMianownik(A);
 end;
 
-function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;
+function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; amulti: Double;
+                                   adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;
 var
   i: integer;
   o1, o2, o3: TOPoint;
@@ -909,43 +789,228 @@ begin
     o1 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
     o2 := (edgePxList.Objects[0] as TVectObj).getP(0);
     o3 := (edgePxList.Objects[1] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, azoom);
+    makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
 
     for i:=1 to edgePxList.Count-2 do
     begin
       o1 := (edgePxList.Objects[i-1] as TVectObj).getP(0);
       o2 := (edgePxList.Objects[i] as TVectObj).getP(0);
       o3 := (edgePxList.Objects[i+1] as TVectObj).getP(0);
-      makePartEdge(o1, o2, o3, counter, result, azoom);
+      makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
     end;
 
     o1 := (edgePxList.Objects[edgePxList.Count-2] as TVectObj).getP(0);
     o2 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
     o3 := (edgePxList.Objects[0] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, azoom);
+    makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
     //SetLength(result, Min(counter,10));
     SetLength(result, counter);
   end else
   begin
     SetLength(result, 4);
     makePartEdge4OnePoint((edgePxList.Objects[0] as TVectObj).getP(0),
-                          result, azoom);
+                          result, amulti, adisplaceX, adisplaceY);
     counter := 4;
   end;
 end;
 
 procedure TVectGroup.PxListToGeoList;
+var
+  i: Integer;
+  edgePoint: TVectRectangle;
 begin
   {!!}
+  for i:=0 to edgePxList.Count-1 do
+  begin
+    edgePoint := edgePxList.Objects[i] as TVectRectangle;
+
+  end;
+
+end;
+
+function TVectGroup.SrcHeight: Integer;
+begin
+  Result := mapFactory.srcHeight;
+end;
+
+function TVectGroup.SrcWidth: Integer;
+begin
+  Result := mapFactory.srcWidth;
+end;
+
+function TVectGroup.vectObjArr: TDynamicPointArray;
+begin
+  Result := mapFactory.vectArr;
 end;
 
 function TVectGroup.simplifyVectorEdge(
-  arr: TDynamicEdgeArray): TDynamicEdgeArray;
+  arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
 begin
   //to do
 end;
 
-procedure TVectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+procedure TVectGroup.makeEdges;
+  function nextDirection(aDirection: Integer): Integer;
+  var
+    res, reminder: Word;
+  begin
+    inc(aDirection);
+    DivMod(aDirection, 4, res, reminder);
+    result := reminder;
+  end;
+
+  function CheckBottomPX(astartEdgePoint: TVectRectangle): boolean;
+  var
+    bottomVectorRectangle: TVectObj;
+  begin
+    result := false;
+    if astartEdgePoint.p1.y < srcHeight-1 then
+    try
+      bottomVectorRectangle := vectObjArr[astartEdgePoint.p1.x, astartEdgePoint.p1.y+1];
+      result := (bottomVectorRectangle <> nil) and (bottomVectorRectangle.vectGroupId = astartEdgePoint.vectGroupId);
+    except
+      raise;
+    end;
+  end;
+
+  function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
+    function checkNextEdge(aprevEdge: TVectRectangle; arrDir: integer): TVectRectangle;
+      function checkTop(aprevEdge: TVectRectangle): TVectRectangle;
+      begin
+        if aprevEdge.getP1.y > 0 then
+        begin
+          Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
+          if aprevEdge.vectGroupId = Result.vectGroupId then
+            Exit;
+          Result := nil;
+        end;
+        Result := nil;
+      end;
+      function checkRight(aprevEdge: TVectRectangle): TVectRectangle;
+      begin
+        if aprevEdge.getP1.x < srcWidth-1 then
+        begin
+          Result := vectObjArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
+          if aprevEdge.vectGroupId = Result.vectGroupId then
+            Exit;
+          Result := nil;
+        end;
+        Result := nil;
+      end;
+      function checkBottom(aprevEdge: TVectRectangle): TVectRectangle;
+      begin
+        if aprevEdge.getP1.y < srcHeight-1 then
+        begin
+          Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
+          if aprevEdge.vectGroupId = Result.vectGroupId then
+            Exit;
+          Result := nil;
+        end;
+        Result := nil;
+      end;
+      function checkLeft(aprevEdge: TVectRectangle): TVectRectangle;
+      begin
+        if aprevEdge.getP1.x > 0 then
+        begin
+          Result := vectObjArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
+          if aprevEdge.vectGroupId = Result.vectGroupId then
+            Exit;
+          Result := nil;
+        end;
+        Result := nil;
+      end;
+    begin
+      if arrDir = c_goTop then
+        Result := checkTop(aprevEdge)
+      else if arrDir = c_goRight then
+        Result := checkRight(aprevEdge)
+      else if arrDir = c_goBottom then
+        Result := checkBottom(aprevEdge)
+      else if arrDir = c_goLeft then
+        Result := checkLeft(aprevEdge);
+    end;
+  var
+    i, j: Integer;
+  begin
+    i := 0;
+    j := 0;
+    for i := 0 to 3 do
+    begin
+      if arrDir + j = 4 then
+        j := -arrDir;
+      Result := checkNextEdge(aprevEdge, arrDir+j);
+      if Result <> nil then
+      begin
+        if arrDir + j = c_fromLeft then
+          arrDir := c_fromBottom
+        else if arrDir + j = c_fromBottom then
+          arrDir := c_fromRight
+        else if arrDir + j = c_fromTop then
+          arrDir := c_fromLeft
+        else if arrDir + j = c_fromRight then
+          arrDir:= c_fromTop;
+        Break;
+      end;
+      Inc(j);
+    end;
+  end;
+var
+  startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
+  arrivDir: integer;
+begin
+  edgePxList.Clear;
+  //startEdgePoint to pierwszy punkt na liœcie, bo idziemy ol lewej strony
+  //w najwy¿szym wierszu
+  startEdgePoint := rectList.Objects[0] as TVectRectangle;
+  prevEdgePoint := startEdgePoint;
+  arrivDir := c_goRight; //zaczynamy od max lewego ponktu na górnej linji
+                         //Ka¿emy zacz¹æ szukanie od prawej
+  nextEdgePoint := nil;
+  //1-pixelowwy obiekt traktujemy inaczej
+  if rectList.count <> 1 then
+    //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
+    //while (nextEdgePoint <> startEdgePoint) and (prevEdgePoint <> nil) do
+    while true do
+    begin
+      if nextEdgePoint = startEdgePoint then
+      begin
+        if CheckBottomPX(startEdgePoint) and (arrivDir = c_fromRight) then
+        begin
+          arrivDir := c_goBottom
+        end
+        else
+        begin
+          //arrivDir := -1;
+          Exit;
+        end;
+
+      end;
+      //try
+      nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
+      //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
+      if (nextEdgePoint = nil) and (edgePxList.Count <> 0) then
+        Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
+                                ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
+                                IntToStr(edgePxList.Count));
+
+      edgePxList.AddObject(edgePxList.nextKey, nextEdgePoint);
+      prevEdgePoint := nextEdgePoint;
+
+      //except
+      //  on E: Exception do
+      //    raise;
+      //end;
+
+
+    end
+  //dla obiektu 1-pixelowego
+  else
+    edgePxList.AddObject(edgePxList.nextKey, startEdgePoint);
+end;
+
+procedure TVectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
+                                  var counter: integer; aGeoArr: TDynamicGeoPointArray;
+                                  multi: double; displaceX, displaceY: Double);
 begin
   if direction(prvPoint, actPoint) = c_fromLeft then
   begin
@@ -955,20 +1020,20 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aarr[counter] := Point(actPoint.x*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*multi + displaceX, (actPoint.y)*multi + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+2] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*multi + displaceX, (actPoint.y)*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
       counter := counter + 3;
     end;
   end
@@ -977,8 +1042,8 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
@@ -987,14 +1052,14 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aarr[counter] := Point((actPoint.x + 1)*azoom, (actPoint.y + 1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x + 1)*multi + displaceX, (actPoint.y + 1)*multi + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y)*multi + displaceY);
       counter := counter + 3;
     end;
   end
@@ -1007,20 +1072,20 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
       counter := counter + 3;
     end;
   end
@@ -1029,8 +1094,8 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
@@ -1039,134 +1104,26 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
-      aarr[counter+2] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
       counter := counter + 3;
     end;
   end
 end;
 
-{procedure TVectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+procedure TVectGroup.makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
+                                           multi: Double; displaceX, displaceY: Double);
 begin
-  if direction(prvPoint, actPoint) = c_fromLeft then
-  begin
-    if direction(actPoint, nextPoint) = c_fromBottom then
-    begin
-      //nic
-    end
-    else if direction(actPoint, nextPoint) = c_fromTop then
-    begin
-      aarr[counter] := Point(actPoint.x*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      counter := counter + 2;
-    end
-    else if direction(actPoint, nextPoint) = c_fromLeft then
-    begin
-      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
-      counter := counter + 1;
-    end
-    else
-    begin
-      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+2] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      counter := counter + 3;
-    end;
-  end
-
-  else if direction(prvPoint, actPoint) = c_fromRight then
-  begin
-    if direction(actPoint, nextPoint) = c_fromBottom then
-    begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      counter := counter + 2;
-    end
-    else if direction(actPoint, nextPoint) = c_fromTop then
-    begin
-      //nic
-    end
-    else if direction(actPoint, nextPoint) = c_fromRight then
-    begin
-      aarr[counter] := Point((actPoint.x + 1)*azoom, (actPoint.y + 1)*azoom);
-      counter := counter + 1;
-    end
-    else
-    begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y)*azoom);
-      counter := counter + 3;
-    end;
-  end
-
-  else if direction(prvPoint, actPoint) = c_fromTop then
-  begin
-    if direction(actPoint, nextPoint) = c_fromLeft then
-    begin
-      //nic
-    end
-    else if direction(actPoint, nextPoint) = c_fromRight then
-    begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      counter := counter + 2;
-    end
-    else if direction(actPoint, nextPoint) = c_fromTop then
-    begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      counter := counter + 1;
-    end
-    else
-    begin
-      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      counter := counter + 3;
-    end;
-  end
-
-  else //from bottom
-  begin
-    if direction(actPoint, nextPoint) = c_fromLeft then
-    begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
-      counter := counter + 2;
-    end
-    else if direction(actPoint, nextPoint) = c_fromRight then
-    begin
-      //nic
-    end
-    else if direction(actPoint, nextPoint) = c_fromBottom then
-    begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      counter := counter + 1;
-    end
-    else
-    begin
-      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
-      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
-      aarr[counter+2] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
-      counter := counter + 3;
-    end;
-  end
-end;}
-
-procedure TVectGroup.makePartEdge4OnePoint(aPoint: TOPoint;
-                                           aarr: TDynamicEdgeArray;
-                                           azoom: integer);
-begin
-  aarr[0] := Point((aPoint.x)*azoom, (aPoint.y)*azoom);
-  aarr[1] := Point((aPoint.x+1)*azoom, aPoint.y*azoom);
-  aarr[2] := Point((aPoint.x+1)*azoom, (aPoint.y+1)*azoom);
-  aarr[3] := Point((aPoint.x)*azoom, (aPoint.y+1)*azoom);
+  aGeoArr[0] := TGeoPoint.Create((aPoint.x)*multi + displaceX, (aPoint.y)*multi + displaceY);
+  aGeoArr[1] := TGeoPoint.Create((aPoint.x+1)*multi + displaceX, aPoint.y*multi + displaceY);
+  aGeoArr[2] := TGeoPoint.Create((aPoint.x+1)*multi + displaceX, (aPoint.y+1)*multi + displaceY);
+  aGeoArr[3] := TGeoPoint.Create((aPoint.x)*multi + displaceX, (aPoint.y+1)*multi + displaceY);
 end;
 
 { TSeparateThreadVectList }
@@ -1261,6 +1218,18 @@ begin
   end;
 end;
 
+procedure TMPFile.AddPolygon;
+begin
+  with LineList do
+  begin
+    Add('[POLYGON]');
+    Add('Type=0x15');
+    Add('Label=Testowa nazwa');
+    Add('Data0=(54.59917,18.29001),(54.59999,18.29112),(54.60059,18.29421)');
+    Add('[END]');
+  end;
+end;
+
 procedure TMPFile.AddMPFileHead;
 begin
   with LineList do
@@ -1283,35 +1252,33 @@ begin
     Add('[Countries]');
     Add('Country1=POLSKA~[0x1d]PL');
     Add('[END-Countries]');
-
-    Add('[POLYLINE]');
-    Add('Type=0x15');
-    Add('Label=P czarny');
-    Add('Data0=(54.59917,18.29001),(54.59999,18.29112),(54.60059,18.29421)');
-    Add('[END]');
   end;
 end;
 
-procedure TMPFile.AddPolygonFromIntList(aEdgeList: TIntList; aLevel: integer);
+procedure TMPFile.AddPolygonsFromIntList(aGeoEdge: TIntList; aLevel: integer);
 
-  function getGdgeStr(aEdgeList: TIntList): String;
+  function getEdgeStr: String;
   var
     i: integer;
-
+    geoPoint: TGeoPoint;
   begin
     result := '';
-    {!!}
-   // for i := 0 to aEdgeList.Count-1 do
-   //   result := StrConcat(',', result, '('++','++')');
+    for i := 0 to aGeoEdge.Count-1 do
+    begin
+      geoPoint := aGeoEdge.objects[i] as TGeoPoint;
+      result := StrConcat(',', result, '('+(geoPoint.x)+','+(geoPoint.y)+')');
+    end;
   end;
+
+  {Format(%2.8d, geoPoint.x)}
 
 begin
   with lineList do
   begin
     Add('[POLYGON]');
     Add('Type=0x9');
-    Add('Label=eee');
-    Add('Data' + intToStr(aLevel) + getGdgeStr(aEdgeList));//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    Add('Label=');
+    Add('Data' + intToStr(aLevel) + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
     Add('[END]');
   end;
 end;
@@ -1322,11 +1289,15 @@ begin
   ReWrite(mpFile);
 end;
 
-procedure TMPFile.MPFileSave;
+procedure TMPFile.MPFileSave(aMapFactory: TMapFactory);
+var
+  i: Integer;
 begin
   //MPFileOpen;
   ClearList;
   AddMPFileHead;
+  for i:=0 to aMapFactory.Count-1 do
+    AddPolygonsFromIntList(TVectGroup(aMapFactory.Objects[i]).edgeGeoList, 0);
   lineList.SaveToFile(mpFileName);
  // MPFileClose;
 end;
@@ -1344,6 +1315,15 @@ begin
   reg.OpenKey(REGSOFT + progName, true);
   mpFileName := reg.ReadString('MPFilePathName');
   reg.CloseKey;
+end;
+
+{ TGeoPoint }
+
+constructor TGeoPoint.Create(ax, ay: Double);
+begin
+  Create;
+  x := ax;
+  y := ay;
 end;
 
 end.

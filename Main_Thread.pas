@@ -16,7 +16,7 @@ type
   TR2VOmniWorker = class (TOmniWorker)
   public
     //zawiera
-    vectorGroupList: TSeparateThreadVectList;
+    mapFactory: TSeparateThreadVectList;
     procedure OMSendMessage(msg: String); {message MSG_DO_SEND_MESSAGE;}
     procedure OMDoWork(var msg: TOmniMessage); message OW_DO_R2V;
     function Initialize: boolean; override;
@@ -28,15 +28,15 @@ implementation
 
 function TR2VOmniWorker.Initialize: boolean;
 begin
-  vectorGroupList.otWorker := Self;
+  mapFactory.otWorker := Self;
   result := true;
 end;
 
 procedure TR2VOmniWorker.OMDoWork(var msg: TOmniMessage);
 begin
   Task.ClearTimer(1);
-  vectorGroupList.groupRect;
-  vectorGroupList.makeEdgesForRect;
+  mapFactory.groupRect;
+  mapFactory.makeEdgesForGroups;
 end;
 
 procedure TR2VOmniWorker.OMSendMessage(msg: String);

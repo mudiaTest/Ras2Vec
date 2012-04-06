@@ -14,9 +14,9 @@
     <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Main_Form.pas=D:\praca\Ras2Vec\mainForm.pas</Transaction>
     <Transaction>1899-12-30 00:00:00.000.dproj,C:\Praca\Ras2Vec\Project2.dproj=C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Project2.dproj</Transaction>
     <Transaction>1899-12-30 00:00:00.000.057,=D:\Praca\R2V\Unit1.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.810,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Sys_Const.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\mainForm.pas=D:\praca\Ras2Vec\Unit2.pas</Transaction>
     <Transaction>1899-12-30 00:00:00.000.031,D:\Praca\R2V\Main_Treads.pas=D:\Praca\R2V\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\mainForm.pas=D:\praca\Ras2Vec\Unit2.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.810,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Sys_Const.pas</Transaction>
     <Transaction>1899-12-30 00:00:00.000.492,=D:\praca\Ras2Vec\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>
