@@ -43,7 +43,7 @@ type
     procedure AddMPFileHead;
     procedure AddLevels;
     procedure AddZoom;
-    procedure AddPolygonsFromIntList(aGeoEdge: TIntList; aLevel: integer);
+    procedure AddPolygonStringsFromVectGroup(aGeoEdgeArr: TDynamicGeoPointArray; aLevel: integer);
     procedure AddPolygon;
   public
     lineList: TStringList;
@@ -86,15 +86,15 @@ type
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
   end;
 
-  //grupa obiektów wektorowych;
-  TVectGroup = class(TObject)
+  //grupa rectangli wektorowych tworz¹cych jeden¹ grupê koloru;
+  TVectRectGroup = class(TObject)
   private
     //cztery punkty geograficzne okreœlan¹ce rogi obrazka
     leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
     //lista krawêdzi punktów Integer (pixeli) (kolejnych)
     fedgePxList: TIntList;
     //lista krawêdzi punktów Double
-    fedgeGeoList: TIntList;
+    //fedgeGeoList: TIntList;
     //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
     fsimpleEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
@@ -120,13 +120,14 @@ type
     procedure makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
                                     multi: Double; displaceX, displaceY: Double);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
-    procedure PxListToGeoList;
+    //procedure PxListToGeoList;
     function SrcHeight: Integer;
     function SrcWidth: Integer;
     function vectObjArr: TDynamicPointArray;
+    function PxPointToGeoPoint(aPxPoint: TVectRectangle): TGeoPoint;
   published
     property edgePxList: TIntList read fedgePxList write fedgePxList;
-    property edgeGeoList: TIntList read fedgeGeoList write fedgeGeoList;
+    //property edgeGeoList: TIntList read fedgeGeoList write fedgeGeoList;
     property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
@@ -136,7 +137,7 @@ type
     constructor Create; overload;
     destructor Destroy; override;
     //tworzy tablicê punktów z ponktów zawartych w edgePxList
-    function makeVectorEdge(vectArr: TDynamicPointArray; Amulti: Double;
+    function makeVectorEdge({vectArr: TDynamicPointArray; }aMulti: Double;
                             adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;//(vectArr: TVarArray);
     function simplifyVectorEdge(arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
     function GeoArray2PxArray(aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
@@ -144,13 +145,14 @@ type
     procedure makeEdges;
   end;
 
-  //lista obiektów wektorowych
+  //lista grup rectangli wektorowych - TVectRectGroup
   //obiekty wektorowe przechowywane s¹ w Objects
   TMapFactory = class(TIntList)
   private
     fvectArr: TDynamicPointArray; //tablica z obektami wektorowymi
     fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
+    fvectRectGroupsByColor: TIntList; //key - kolor; obj - lista grup w tym kolorze
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
     procedure InfoAkcja(aStr: String); virtual;
@@ -159,6 +161,7 @@ type
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
     property vectArr: TDynamicPointArray read fvectArr write fvectArr;
+    property vectRectGroupsByColor: TIntList read fvectRectGroupsByColor write fvectRectGroupsByColor;
   protected
     inMod: Integer;
   public
@@ -179,6 +182,7 @@ type
     procedure groupRect;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForGroups;
+    constructor Create; override;
   end;
 
   TSeparateThreadVectList = class(TMapFactory)
@@ -209,19 +213,19 @@ type
     //kolor wype³niaj¹cy obiekt
     fcolor: TColor;
     //odnoœnik do grupy, która posiada dany obiekt vektorowy
-    fvectGroup: TVectGroup;
+    fvectGroup: TVectRectGroup;
     //numer grupy (w liœcie grup), która posiada dany obiekt vektorowy
     fvectGroupId: Integer;
     //fvectArr: array of array of TVectObj;
     //przepisanie (do³¹czenie) obiektów z innej grupy do tej, która posiada obiekt self
-    procedure dopiszGrupe(agroupList: TVectGroup; avectList: TMapFactory);
+    procedure dopiszGrupe(agroupList: TVectRectGroup; avectList: TMapFactory);
     function getP(lp: Integer): TOPoint;
     //function getVectObj(x, y: integer): TVectObj; virtual;
   published
     //kolor wype³niaj¹cy obiekt
     property color: TColor read fcolor write fcolor;
     //odnoœnik do grupy, która posiada dany obiekt vektorowy
-    property vectGroup: TVectGroup read fvectGroup write fvectGroup;
+    property vectGroup: TVectRectGroup read fvectGroup write fvectGroup;
     //numer grupy (w liœcie grup), która posiada dany obiekt vektorowy
     property vectGroupId: Integer read fvectGroupId write fvectGroupId;
   public
@@ -242,7 +246,8 @@ type
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
     property p1: TOPoint read getP1;
     property p2: TOPoint read getP2;
-    class procedure zintegruj(aobj1, aobj2: TVectRectangle; avectList: TMapFactory);
+    class procedure zintegruj(aobj1, aobj2: TVectRectangle;
+                              amapFactory: TMapFactory);
   end;
 
   TGeoPoint = class
@@ -314,6 +319,12 @@ begin
   aimg.Canvas.Unlock;
 end;
 
+constructor TMapFactory.Create;
+begin
+  inherited;
+  vectRectGroupsByColor := TIntList.Create;
+end;
+
 function TMapFactory.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
@@ -322,7 +333,7 @@ var
   vectObj: TVectRectangle;
   p: Pointer;
   bmp: TBitmap;
-  vectGroup: TVectGroup;
+  vectGroup: TVectRectGroup;
   geoPointArr: TDynamicGeoPointArray; //lista punktów do przekazania, aby stworzyæ polygon
   pxPointArray: TDynamicPxPointArray;
   tmpPoint: TPoint;
@@ -360,8 +371,7 @@ begin
   begin
     for i:=0 to Count-1 do
     begin
-      vectGroup := Objects[i] as TVectGroup;
-      SetLength(geoPointArr, vectGroup.edgePxList.Count*3);
+      vectGroup := Objects[i] as TVectRectGroup;
 
       if not atestColor then
         Brush.Color := vectGroup.color
@@ -369,7 +379,7 @@ begin
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      geoPointArr := vectGroup.makeVectorEdge(self.vectArr, azoom, 0 ,0);
+      geoPointArr := vectGroup.makeVectorEdge({self.vectArr,} azoom, 0 ,0);
       pxPointArray := vectGroup.GeoArray2PxArray(geoPointArr);
 
       {for j:=0 to vectGroup.edgePxList.Count-1 do
@@ -402,6 +412,7 @@ var
   lpGrupa: integer;
   perf: TTimeInterval;
   perf2, perf3: TTimeInterval;
+  colorGruopList: TIntList;
 begin
   perf := TTimeInterval.Create;
   perf2 := TTimeInterval.Create;
@@ -418,11 +429,10 @@ begin
       perf2.Start(false);
       if vectObj.vectGroup = nil then
       begin
-        vectObj.vectGroup := TVectGroup.Create;
+        vectObj.vectGroup := TVectRectGroup.Create;
         vectObj.vectGroup.mapFactory := Self;
         vectObj.vectGroup.lpGrupa := lpGrupa;
         inc(lpGrupa);
-        //vectObj.vectGroup.testColor := TColo;
         vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
         vectObj.vectGroup.color := vectObj.color;
         vectObj.vectGroup.rectList.AddObject(0, vectObj);
@@ -430,6 +440,12 @@ begin
         key := nextKey;
         addObject(key, vectObj.vectGroup);
         vectObj.vectGroupId := key;
+
+        //dodanie grupy do listy kolorów
+        if vectRectGroupsByColor.indexOf(vectObj.vectGroup.color) = -1 then
+          vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TIntList.Create);
+        colorGruopList := vectRectGroupsByColor.ObjByVal[vectObj.vectGroup.color] as TIntList;
+        colorGruopList.AddObject(vectObj.vectGroupId, vectObj.vectGroup);
       end;
       perf2.Stop;
       perf3.Start(false);
@@ -460,12 +476,12 @@ end;
 procedure TMapFactory.makeEdgesForGroups;
 var
   i: Integer;
-  vectGroup: TVectGroup;
+  vectGroup: TVectRectGroup;
   wrRes, wrDiv: Word;
 begin
   for i:=0 to Count-1 do
   begin
-    vectGroup := Objects[i] as TVectGroup;
+    vectGroup := Objects[i] as TVectRectGroup;
     DivMod(i, inMod, wrRes, wrDiv);
     if wrDiv = 0 then
       InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
@@ -527,10 +543,13 @@ begin
   Result := inherited getVectObj(x, y) as TVectRectangle
 end;}
 
-class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle; avectList: TMapFactory);
+class procedure TVectRectangle.zintegruj(aobj1, aobj2: TVectRectangle;
+                                         amapFactory: TMapFactory);
 var
   obj1, obj2: TVectRectangle;
   delIdx: Integer;
+  colorGruopList: TIntList;
+  colorGruopListIdx: Integer;
 begin
   if (aobj2.vectGroup = nil) or (aobj1.vectGroup.lpGrupa < aobj2.vectGroup.lpGrupa) then
   begin
@@ -558,16 +577,21 @@ begin
     if obj1.vectGroup.rectList.Count > obj2.vectGroup.rectList.Count then
     begin
       delIdx := obj2.vectGroupId;
-      obj1.dopiszGrupe(obj2.vectGroup, avectList);
+      obj1.dopiszGrupe(obj2.vectGroup, amapFactory);
+      colorGruopListIdx := obj2.vectGroup.color;
     end
     else
     begin
       delIdx := obj1.vectGroupId;
-      obj2.dopiszGrupe(obj1.vectGroup, avectList);
+      obj2.dopiszGrupe(obj1.vectGroup, amapFactory);
+      colorGruopListIdx := obj1.vectGroup.color;
     end;
     //usuniêcie przepisanej grupy z listy grup
-    assert(avectList.indexOf(delIdx) >= 0, 'Brak grupy do usuniêcia: ' + intToStr(delIdx) + '.');
-    avectList.delete(avectList.indexOf(delIdx));
+    assert(amapFactory.indexOf(delIdx) >= 0, 'Brak grupy do usuniêcia: ' + intToStr(delIdx) + '.');
+    amapFactory.delete(amapFactory.indexOf(delIdx));
+
+    colorGruopList := amapFactory.vectRectGroupsByColor.ObjByVal[colorGruopListIdx] as TIntList;
+    colorGruopList.Delete(delIdx);
   end;
 end;
 
@@ -686,7 +710,7 @@ begin
   Result := Abs(a*p.x - p.y + c) / mian;
 end;
 
-procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TMapFactory);
+procedure TVectObj.dopiszGrupe(agroupList: TVectRectGroup; avectList: TMapFactory);
 var
   i: Integer;
   vectObj: TVectObj;
@@ -717,9 +741,9 @@ begin
   Result := fvectArr[x, y] as TVectObj;
 end;}
 
-{ TVectGroup }
+{ TVectRectGroup }
 
-constructor TVectGroup.Create;
+constructor TVectRectGroup.Create;
 begin
   inherited;
   fedgePXList := TIntList.Create;
@@ -727,13 +751,13 @@ begin
   MapFactory := nil;
 end;
 
-destructor TVectGroup.Destroy;
+destructor TVectRectGroup.Destroy;
 begin
   beep;
   inherited;
 end;
 
-function TVectGroup.direction(p1, p2: TOpoint): integer;
+function TVectRectGroup.direction(p1, p2: TOpoint): integer;
 begin
   if p1.X > p2.X then
     result := c_fromRight
@@ -745,17 +769,17 @@ begin
     result := c_fromTop;
 end;
 
-function TVectGroup.GeoArray2PxArray(
+function TVectRectGroup.GeoArray2PxArray(
   aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
 var
   i: integer;
 begin
   SetLength(result, Length(aGeoArr));
   for i := 0 to Length(aGeoArr)-1 do
-    result[i] := Point(Round(aGeoArr[0].x), Round(aGeoArr[0].y));
+    result[i] := Point(Round(aGeoArr[i].x), Round(aGeoArr[i].y));
 end;
 
-procedure TVectGroup.getLine(p1, p2: TOPoint; var A, C, mian: Double);
+procedure TVectRectGroup.getLine(p1, p2: TOPoint; var A, C, mian: Double);
   function getLineA(p1, p2: TOpoint): Double;
   begin
     Result := (p2.y - p1.y) / (p2.x - p1.x);
@@ -774,7 +798,7 @@ begin
   mian := getMianownik(A);
 end;
 
-function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; amulti: Double;
+function TVectRectGroup.makeVectorEdge({vectArr: TDynamicPointArray; }aMulti: Double;
                                    adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;
 var
   i: integer;
@@ -782,7 +806,7 @@ var
   counter: integer;
 begin
   counter := 0;
-
+  SetLength(result, edgePxList.Count*3);
   if edgePxList.Count > 1 then
   begin
     //SetLength(result, self.rectList.Count+30);
@@ -814,42 +838,50 @@ begin
   end;
 end;
 
-procedure TVectGroup.PxListToGeoList;
+{procedure TVectRectGroup.PxListToGeoList;
 var
   i: Integer;
   edgePoint: TVectRectangle;
+  geoPoint: TGeoPoint;
 begin
-  {!!}
   for i:=0 to edgePxList.Count-1 do
   begin
     edgePoint := edgePxList.Objects[i] as TVectRectangle;
-
+    geoPoint := PxPointToGeoPoint(edgePoint);
+    //edgeGeoList.AddObject(edgePxList[i], geoPoint);//przepisujemy klucz z edgePxList
   end;
+end;  }
 
+function TVectRectGroup.PxPointToGeoPoint(aPxPoint: TVectRectangle): TGeoPoint;
+begin
+  Result := TGeoPoint.Create;
+  //P1 i P2 bêd¹ takie same, bo aPxPoint reprezentuje pojedynczy pixel, wiêc wartoœæi x i y mo¿emy wzi¹æ z p1
+  Result.x := aPxPoint.p1.x;
+  Result.y := aPxPoint.p1.y;
 end;
 
-function TVectGroup.SrcHeight: Integer;
+function TVectRectGroup.SrcHeight: Integer;
 begin
   Result := mapFactory.srcHeight;
 end;
 
-function TVectGroup.SrcWidth: Integer;
+function TVectRectGroup.SrcWidth: Integer;
 begin
   Result := mapFactory.srcWidth;
 end;
 
-function TVectGroup.vectObjArr: TDynamicPointArray;
+function TVectRectGroup.vectObjArr: TDynamicPointArray;
 begin
   Result := mapFactory.vectArr;
 end;
 
-function TVectGroup.simplifyVectorEdge(
+function TVectRectGroup.simplifyVectorEdge(
   arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
 begin
   //to do
 end;
 
-procedure TVectGroup.makeEdges;
+procedure TVectRectGroup.makeEdges;
   function nextDirection(aDirection: Integer): Integer;
   var
     res, reminder: Word;
@@ -1001,14 +1033,14 @@ begin
       //    raise;
       //end;
 
-
     end
   //dla obiektu 1-pixelowego
   else
     edgePxList.AddObject(edgePxList.nextKey, startEdgePoint);
+  //PxListToGeoList;
 end;
 
-procedure TVectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
+procedure TVectRectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
                                   var counter: integer; aGeoArr: TDynamicGeoPointArray;
                                   multi: double; displaceX, displaceY: Double);
 begin
@@ -1117,7 +1149,7 @@ begin
   end
 end;
 
-procedure TVectGroup.makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
+procedure TVectRectGroup.makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
                                            multi: Double; displaceX, displaceY: Double);
 begin
   aGeoArr[0] := TGeoPoint.Create((aPoint.x)*multi + displaceX, (aPoint.y)*multi + displaceY);
@@ -1255,18 +1287,29 @@ begin
   end;
 end;
 
-procedure TMPFile.AddPolygonsFromIntList(aGeoEdge: TIntList; aLevel: integer);
+procedure TMPFile.AddPolygonStringsFromVectGroup(aGeoEdgeArr: TDynamicGeoPointArray; aLevel: integer);
 
   function getEdgeStr: String;
+    function GeoPiontToStr(aVal: Double): String;
+    begin
+      result := StringReplace(Format('%.5f', [aVal]),',','.',[rfReplaceAll]);
+      //FormatFloat('0.00000', aVal);
+    end;
   var
     i: integer;
     geoPoint: TGeoPoint;
   begin
     result := '';
-    for i := 0 to aGeoEdge.Count-1 do
+    for i := 0 to Length(aGeoEdgeArr)-1 do
     begin
-      geoPoint := aGeoEdge.objects[i] as TGeoPoint;
-      result := StrConcat(',', result, '('+(geoPoint.x)+','+(geoPoint.y)+')');
+      geoPoint := aGeoEdgeArr[i] as TGeoPoint;
+      //result := StrConcat(',', result, '('+Format('%.5g', [geoPoint.x])+','+Format('%.5g', [geoPoint.y])+')');
+      //najpiewrw" mapa ma "wysokoœæ" a potem "szerokoœæ"
+      //"wysokoœæ" mapy dla polski zwiêksza siê z po³udnia na pó³noc, podczas gdy
+      //punkt 0 grafiki to lewy górny róg, wiêc dlatego w wysokoœci jest minus
+      //"szerokoœæ" mapy zwiêksza siê z zachodu na wschód, wiêc tak jak na
+      //grafice, dlatego jest plus
+      result := StrConcat(',', result, '('+GeoPiontToStr(18-geoPoint.y/10)+','+GeoPiontToStr(54+geoPoint.x/10)+')');
     end;
   end;
 
@@ -1278,7 +1321,7 @@ begin
     Add('[POLYGON]');
     Add('Type=0x9');
     Add('Label=');
-    Add('Data' + intToStr(aLevel) + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    Add('Data' + intToStr(aLevel) + '=' + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
     Add('[END]');
   end;
 end;
@@ -1297,7 +1340,7 @@ begin
   ClearList;
   AddMPFileHead;
   for i:=0 to aMapFactory.Count-1 do
-    AddPolygonsFromIntList(TVectGroup(aMapFactory.Objects[i]).edgeGeoList, 0);
+    AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]).makeVectorEdge(1, 0, 0), 0);
   lineList.SaveToFile(mpFileName);
  // MPFileClose;
 end;
