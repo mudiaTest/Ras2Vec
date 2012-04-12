@@ -31,10 +31,31 @@ type
   TVectRectangle = class;
   TGeoPoint = class;
   TMapFactory = class;
+  TVectRectGroup = class;
 
   TDynamicPointArray = array of array of TVectObj;
   TDynamicGeoPointArray = array of TGeoPoint;
   TDynamicPxPointArray = array of TPoint;
+
+  TColorGroupList = class(TIntList)
+  private
+    fcolorPx: Integer;
+    fcolorMP: String;
+    fidMPGroup: integer;
+    procedure setColorPx(acolorPx: Integer);
+  published
+    property colorPx: Integer read fcolorPx write setColorPx;
+    property colorMP: String read fcolorMP write fcolorMP;
+    property idMPGroup: Integer read fidMPGroup write fidMPGroup;
+  end;
+
+  {TMPTyp = class
+    typ: integer;
+  end;
+
+  TMPTypList = class (TIntList)
+
+  end;}
 
   TMPFile = class
   private
@@ -43,7 +64,10 @@ type
     procedure AddMPFileHead;
     procedure AddLevels;
     procedure AddZoom;
-    procedure AddPolygonStringsFromVectGroup(aGeoEdgeArr: TDynamicGeoPointArray; aLevel: integer);
+    procedure AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; aLevel: integer;
+                                             axGeoPX, ayGeoPX: Double;
+                                             adisplaceX, adisplaceY: Double;
+                                             aColorGroupList: TColorGroupList);
     procedure AddPolygon;
   public
     lineList: TStringList;
@@ -115,10 +139,10 @@ type
     //          geograficzna jednego px
     procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
                            var counter: integer; aGeoArr: TDynamicGeoPointArray;
-                           multi: Double; displaceX, displaceY: Double);
+                           amultiX, aMultiY: Double; displaceX, displaceY: Double);
     //tworzy krawêdzie dla pojedynczego punktu
     procedure makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
-                                    multi: Double; displaceX, displaceY: Double);
+                                    amultiX, amultiY: Double; displaceX, displaceY: Double);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
     //procedure PxListToGeoList;
     function SrcHeight: Integer;
@@ -137,7 +161,7 @@ type
     constructor Create; overload;
     destructor Destroy; override;
     //tworzy tablicê punktów z ponktów zawartych w edgePxList
-    function makeVectorEdge({vectArr: TDynamicPointArray; }aMulti: Double;
+    function makeVectorEdge({vectArr: TDynamicPointArray; }aMultiX, aMultiY: Double;
                             adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;//(vectArr: TVarArray);
     function simplifyVectorEdge(arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
     function GeoArray2PxArray(aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
@@ -152,6 +176,14 @@ type
     fvectArr: TDynamicPointArray; //tablica z obektami wektorowymi
     fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
     fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
+    //wsp. geo. lewego górnego rogu
+    fgeoLeftUpX: Double;
+    fgeoLeftUpY: Double;
+    //wsp. geo. prawego dolnego rogu
+    fgeoRightDownX: Double;
+    fgeoRightDownY: Double;
+    fXGeoPX: Double;
+    fYGeoPX: Double;
     fvectRectGroupsByColor: TIntList; //key - kolor; obj - lista grup w tym kolorze
     function getObjById(index: Integer): TVectObj;
     procedure setObjById(index: Integer; avectObj: TVectObj);
@@ -162,6 +194,12 @@ type
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
     property vectArr: TDynamicPointArray read fvectArr write fvectArr;
     property vectRectGroupsByColor: TIntList read fvectRectGroupsByColor write fvectRectGroupsByColor;
+    property geoLeftUpX: Double read fgeoLeftUpX write fgeoLeftUpX;
+    property geoLeftUpY: Double read fgeoLeftUpY write fgeoLeftUpY;
+    property geoRightDownX: Double read fgeoRightDownX write fgeoRightDownX;
+    property geoRightDownY: Double read fgeoRightDownY write fgeoRightDownY;
+    property xGeoPX: Double read fXGeoPX write fXGeoPX;
+    property yGeoPX: Double read fYGeoPX write fYGeoPX;
   protected
     inMod: Integer;
   public
@@ -183,6 +221,8 @@ type
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForGroups;
     constructor Create; override;
+    //Oblicze ile stopni zawiera jeden PX
+    procedure CalculateGeoPx;
   end;
 
   TSeparateThreadVectList = class(TMapFactory)
@@ -319,6 +359,12 @@ begin
   aimg.Canvas.Unlock;
 end;
 
+procedure TMapFactory.CalculateGeoPx;
+begin
+  xGeoPX := (geoRightDownX - geoLeftUpX) / (srcWidth + 1);
+  yGeoPX := (geoLeftUpY - geoRightDownY) / (srcHeight + 1);
+end;
+
 constructor TMapFactory.Create;
 begin
   inherited;
@@ -379,7 +425,7 @@ begin
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      geoPointArr := vectGroup.makeVectorEdge({self.vectArr,} azoom, 0 ,0);
+      geoPointArr := vectGroup.makeVectorEdge({self.vectArr,} azoom, azoom, 0 ,0);
       pxPointArray := vectGroup.GeoArray2PxArray(geoPointArr);
 
       {for j:=0 to vectGroup.edgePxList.Count-1 do
@@ -412,7 +458,7 @@ var
   lpGrupa: integer;
   perf: TTimeInterval;
   perf2, perf3: TTimeInterval;
-  colorGruopList: TIntList;
+  colorGroupList: TColorGroupList;
 begin
   perf := TTimeInterval.Create;
   perf2 := TTimeInterval.Create;
@@ -443,9 +489,11 @@ begin
 
         //dodanie grupy do listy kolorów
         if vectRectGroupsByColor.indexOf(vectObj.vectGroup.color) = -1 then
-          vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TIntList.Create);
-        colorGruopList := vectRectGroupsByColor.ObjByVal[vectObj.vectGroup.color] as TIntList;
-        colorGruopList.AddObject(vectObj.vectGroupId, vectObj.vectGroup);
+          vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TColorGroupList.Create);
+        colorGroupList := vectRectGroupsByColor.ObjByVal[vectObj.vectGroup.color] as TColorGroupList;
+        colorGroupList.idMPGroup := vectRectGroupsByColor.Count;
+        colorGroupList.colorPx := vectObj.vectGroup.color;
+        colorGroupList.AddObject(vectObj.vectGroupId, vectObj.vectGroup);
       end;
       perf2.Stop;
       perf3.Start(false);
@@ -591,7 +639,7 @@ begin
     amapFactory.delete(amapFactory.indexOf(delIdx));
 
     colorGruopList := amapFactory.vectRectGroupsByColor.ObjByVal[colorGruopListIdx] as TIntList;
-    colorGruopList.Delete(delIdx);
+    colorGruopList.Delete(colorGruopList.indexOf(delIdx));
   end;
 end;
 
@@ -798,7 +846,7 @@ begin
   mian := getMianownik(A);
 end;
 
-function TVectRectGroup.makeVectorEdge({vectArr: TDynamicPointArray; }aMulti: Double;
+function TVectRectGroup.makeVectorEdge({vectArr: TDynamicPointArray; }aMultiX, aMultiY: Double;
                                    adisplaceX, adisplaceY: Double): TDynamicGeoPointArray;
 var
   i: integer;
@@ -813,27 +861,27 @@ begin
     o1 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
     o2 := (edgePxList.Objects[0] as TVectObj).getP(0);
     o3 := (edgePxList.Objects[1] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
+    makePartEdge(o1, o2, o3, counter, result, aMultiX, aMultiY, adisplaceX, adisplaceY);
 
     for i:=1 to edgePxList.Count-2 do
     begin
       o1 := (edgePxList.Objects[i-1] as TVectObj).getP(0);
       o2 := (edgePxList.Objects[i] as TVectObj).getP(0);
       o3 := (edgePxList.Objects[i+1] as TVectObj).getP(0);
-      makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
+      makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY);
     end;
 
     o1 := (edgePxList.Objects[edgePxList.Count-2] as TVectObj).getP(0);
     o2 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
     o3 := (edgePxList.Objects[0] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, amulti, adisplaceX, adisplaceY);
+    makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY);
     //SetLength(result, Min(counter,10));
     SetLength(result, counter);
   end else
   begin
     SetLength(result, 4);
     makePartEdge4OnePoint((edgePxList.Objects[0] as TVectObj).getP(0),
-                          result, amulti, adisplaceX, adisplaceY);
+                          result, amultiX, aMultiY, adisplaceX, adisplaceY);
     counter := 4;
   end;
 end;
@@ -1042,7 +1090,7 @@ end;
 
 procedure TVectRectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
                                   var counter: integer; aGeoArr: TDynamicGeoPointArray;
-                                  multi: double; displaceX, displaceY: Double);
+                                  amultiX, aMultiY: double; displaceX, displaceY: Double);
 begin
   if direction(prvPoint, actPoint) = c_fromLeft then
   begin
@@ -1052,20 +1100,20 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*multi + displaceX, (actPoint.y)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*multi + displaceX, (actPoint.y)*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
       counter := counter + 3;
     end;
   end
@@ -1074,8 +1122,8 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
@@ -1084,14 +1132,14 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x + 1)*multi + displaceX, (actPoint.y + 1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x + 1)*amultiX + displaceX, (actPoint.y + 1)*amultiY + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
       counter := counter + 3;
     end;
   end
@@ -1104,20 +1152,20 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
       counter := counter + 3;
     end;
   end
@@ -1126,8 +1174,8 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
       counter := counter + 2;
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
@@ -1136,32 +1184,33 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
       counter := counter + 1;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*multi + displaceX, (actPoint.y+1)*multi + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*multi + displaceX, actPoint.y*multi + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*multi + displaceX, actPoint.y*multi + displaceY);
+      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
       counter := counter + 3;
     end;
   end
 end;
 
 procedure TVectRectGroup.makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
-                                           multi: Double; displaceX, displaceY: Double);
+                                           amultiX, amultiY: Double; displaceX, displaceY: Double);
 begin
-  aGeoArr[0] := TGeoPoint.Create((aPoint.x)*multi + displaceX, (aPoint.y)*multi + displaceY);
-  aGeoArr[1] := TGeoPoint.Create((aPoint.x+1)*multi + displaceX, aPoint.y*multi + displaceY);
-  aGeoArr[2] := TGeoPoint.Create((aPoint.x+1)*multi + displaceX, (aPoint.y+1)*multi + displaceY);
-  aGeoArr[3] := TGeoPoint.Create((aPoint.x)*multi + displaceX, (aPoint.y+1)*multi + displaceY);
+  aGeoArr[0] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y)*amultiY + displaceY);
+  aGeoArr[1] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, aPoint.y*amultiY + displaceY);
+  aGeoArr[2] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
+  aGeoArr[3] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
 end;
 
 { TSeparateThreadVectList }
 
 constructor TSeparateThreadVectList.Create;
 begin
+  inherited;
   otWorker := nil;
   inMod := 10;
 end;
@@ -1287,7 +1336,10 @@ begin
   end;
 end;
 
-procedure TMPFile.AddPolygonStringsFromVectGroup(aGeoEdgeArr: TDynamicGeoPointArray; aLevel: integer);
+procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; aLevel: integer;
+                                                 axGeoPX, ayGeoPX: Double;
+                                                 adisplaceX, adisplaceY: Double;
+                                                 aColorGroupList: TColorGroupList);
 
   function getEdgeStr: String;
     function GeoPiontToStr(aVal: Double): String;
@@ -1298,18 +1350,21 @@ procedure TMPFile.AddPolygonStringsFromVectGroup(aGeoEdgeArr: TDynamicGeoPointAr
   var
     i: integer;
     geoPoint: TGeoPoint;
+    geoEdgeArr: TDynamicGeoPointArray;
   begin
+    //najpiewrw" mapa ma "wysokoœæ" a potem "szerokoœæ"
+    //"wysokoœæ" mapy dla polski zwiêksza siê z po³udnia na pó³noc, podczas gdy
+    //punkt 0 grafiki to lewy górny róg, wiêc dlatego w wysokoœci jest minus
+    //"szerokoœæ" mapy zwiêksza siê z zachodu na wschód, wiêc tak jak na
+    //grafice, dlatego jest plus
+    geoEdgeArr := aVectRecGroup.makeVectorEdge(axGeoPX, -ayGeoPX, adisplaceX, adisplaceY);
     result := '';
-    for i := 0 to Length(aGeoEdgeArr)-1 do
+    for i := 0 to Length(GeoEdgeArr)-1 do
     begin
-      geoPoint := aGeoEdgeArr[i] as TGeoPoint;
+      geoPoint := GeoEdgeArr[i] as TGeoPoint;
       //result := StrConcat(',', result, '('+Format('%.5g', [geoPoint.x])+','+Format('%.5g', [geoPoint.y])+')');
-      //najpiewrw" mapa ma "wysokoœæ" a potem "szerokoœæ"
-      //"wysokoœæ" mapy dla polski zwiêksza siê z po³udnia na pó³noc, podczas gdy
-      //punkt 0 grafiki to lewy górny róg, wiêc dlatego w wysokoœci jest minus
-      //"szerokoœæ" mapy zwiêksza siê z zachodu na wschód, wiêc tak jak na
-      //grafice, dlatego jest plus
-      result := StrConcat(',', result, '('+GeoPiontToStr(18-geoPoint.y/10)+','+GeoPiontToStr(54+geoPoint.x/10)+')');
+
+      result := StrConcat(',', result, '('+GeoPiontToStr(geoPoint.y)+','+GeoPiontToStr(geoPoint.x)+')');
     end;
   end;
 
@@ -1319,7 +1374,7 @@ begin
   with lineList do
   begin
     Add('[POLYGON]');
-    Add('Type=0x9');
+    Add('Type=' + aColorGroupList.colorMP);
     Add('Label=');
     Add('Data' + intToStr(aLevel) + '=' + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
     Add('[END]');
@@ -1340,7 +1395,10 @@ begin
   ClearList;
   AddMPFileHead;
   for i:=0 to aMapFactory.Count-1 do
-    AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]).makeVectorEdge(1, 0, 0), 0);
+    AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
+                                   aMapFactory.xGeoPX, aMapFactory.yGeoPX,
+                                   aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
+                                   aMapFactory.vectRectGroupsByColor.GetObjByVal(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList);
   lineList.SaveToFile(mpFileName);
  // MPFileClose;
 end;
@@ -1367,6 +1425,18 @@ begin
   Create;
   x := ax;
   y := ay;
+end;
+
+{ TColorGroupList }
+
+procedure TColorGroupList.setColorPx(acolorPx: Integer);
+begin
+  if fcolorMP = '' then
+  begin
+    fcolorPx := acolorPx;
+    fcolorMP := '0x' + IntToHex(idMPGroup,4)
+  end else
+    Assert(fcolorPx = acolorPx, 'Przypisujemy inny kolor. By³o: ' + intToStr(fcolorPx) + ' a ma byæ:' + IntToStr(acolorPx)) ;
 end;
 
 end.

@@ -57,6 +57,12 @@ type
     Button3: TButton;
     btnSave: TButton;
     SaveDialog: TSaveDialog;
+    edtLeftUpX: TEdit;
+    edtLeftUpY: TEdit;
+    edtRightDownY: TEdit;
+    lbl1: TLabel;
+    lbl2: TLabel;
+    edtRightDownX: TEdit;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -397,8 +403,14 @@ begin
     Screen.Cursor := crHourGlass;
     mapFactory.Clear;
     mapFactory.ReadFromImg(imgMain);
+    mapFactory.geoLeftUpX := StrToFloat(edtLeftUpX.text);
+    mapFactory.geoLeftUpY := StrToFloat(edtLeftUpY.text);
+    mapFactory.geoRightDownX := StrToFloat(edtRightDownX.text);
+    mapFactory.geoRightDownY := StrToFloat(edtRightDownY.text);
     imgZoom.Width := imgMain.Width;
     imgZoom.Height := imgMain.Height;
+    mapFactory.CalculateGeoPx;
+
     //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
     perf := TTimeInterval.Create;
     perf.Start;

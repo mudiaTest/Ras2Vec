@@ -29,6 +29,20 @@ object MainForm: TMainForm
     Height = 13
     Caption = 'lblTime'
   end
+  object lbl1: TLabel
+    Left = 368
+    Top = 112
+    Width = 8
+    Height = 13
+    Caption = '>'
+  end
+  object lbl2: TLabel
+    Left = 368
+    Top = 83
+    Width = 8
+    Height = 13
+    Caption = '>'
+  end
   object sbMain: TScrollBox
     Left = 520
     Top = 144
@@ -219,6 +233,7 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
+    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 590
@@ -228,6 +243,38 @@ object MainForm: TMainForm
     Caption = 'Save'
     TabOrder = 16
     OnClick = btnSaveClick
+  end
+  object edtLeftUpX: TEdit
+    Left = 224
+    Top = 80
+    Width = 121
+    Height = 21
+    TabOrder = 17
+    Text = '18,489034'
+  end
+  object edtLeftUpY: TEdit
+    Left = 224
+    Top = 107
+    Width = 121
+    Height = 21
+    TabOrder = 18
+    Text = '54,492328'
+  end
+  object edtRightDownX: TEdit
+    Left = 400
+    Top = 80
+    Width = 121
+    Height = 21
+    TabOrder = 19
+    Text = '18,500565'
+  end
+  object edtRightDownY: TEdit
+    Left = 400
+    Top = 107
+    Width = 121
+    Height = 21
+    TabOrder = 20
+    Text = '54,489520'
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804

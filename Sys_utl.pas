@@ -100,7 +100,7 @@ end;
 
 function TIntList.GetObjByVal(val: Integer): TObject;
 begin
-  Objects[IndexOf(val)];
+  result := Objects[IndexOf(val)];
 end;
 
 function TIntList.IndexOf(const val: integer): Integer;
