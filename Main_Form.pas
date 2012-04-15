@@ -7,7 +7,7 @@ uses
   Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl,
   Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus,
   OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
-  Main_Thread, Sys_utl, Vcl.ActnList
+  Main_Thread, Sys_utl, Vcl.ActnList, Vcl.Mask
   ;
 
 const
@@ -57,12 +57,12 @@ type
     Button3: TButton;
     btnSave: TButton;
     SaveDialog: TSaveDialog;
-    edtLeftUpX: TEdit;
-    edtLeftUpY: TEdit;
-    edtRightDownY: TEdit;
+    edtLeftUpX: TMaskEdit;
+    edtLeftUpY: TMaskEdit;
+    edtRightDownY: TMaskEdit;
     lbl1: TLabel;
     lbl2: TLabel;
-    edtRightDownX: TEdit;
+    edtRightDownX: TMaskEdit;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -124,6 +124,7 @@ type
     procedure DoOnR2VTerminate;
     procedure CreateMainThreadVectorGroupList;
     procedure CreateSeperateThreadVectorGroupList;
+    function  DecodeGeoStr(aGeoPointStr: String): Double;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -151,6 +152,10 @@ begin
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
   MPFile.SavePathToReg(SaveDialog.FileName);
+  mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
+  mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
+  mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
+  mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
   MPFile.MPFileSave(mapFactory);
 end;
 
@@ -236,7 +241,7 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t3.bmp');
+  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t4.bmp');
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
@@ -394,6 +399,18 @@ begin
   end;
 end;
 
+function TMainForm.DecodeGeoStr(aGeoPointStr: String): Double;
+var
+  list: TStringList;
+  wideChars : PWideChar;
+begin
+  list := TStringList.Create;
+  New(wideChars);
+  StringToWideChar(aGeoPointStr, wideChars, Length(aGeoPointStr) + 1);
+  ExtractStrings([','], [], wideChars, list);
+  Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+end;
+
 procedure TMainForm.R2V1Click(Sender: TObject);
 var
   workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
@@ -403,10 +420,10 @@ begin
     Screen.Cursor := crHourGlass;
     mapFactory.Clear;
     mapFactory.ReadFromImg(imgMain);
-    mapFactory.geoLeftUpX := StrToFloat(edtLeftUpX.text);
-    mapFactory.geoLeftUpY := StrToFloat(edtLeftUpY.text);
-    mapFactory.geoRightDownX := StrToFloat(edtRightDownX.text);
-    mapFactory.geoRightDownY := StrToFloat(edtRightDownY.text);
+    mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
+    mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
+    mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
+    mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
     imgZoom.Width := imgMain.Width;
     imgZoom.Height := imgMain.Height;
     mapFactory.CalculateGeoPx;

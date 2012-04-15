@@ -30,14 +30,14 @@ object MainForm: TMainForm
     Caption = 'lblTime'
   end
   object lbl1: TLabel
-    Left = 368
+    Left = 315
     Top = 112
     Width = 8
     Height = 13
     Caption = '>'
   end
   object lbl2: TLabel
-    Left = 368
+    Left = 315
     Top = 83
     Width = 8
     Height = 13
@@ -233,7 +233,6 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
-    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 590
@@ -244,37 +243,46 @@ object MainForm: TMainForm
     TabOrder = 16
     OnClick = btnSaveClick
   end
-  object edtLeftUpX: TEdit
-    Left = 224
+  object edtLeftUpX: TMaskEdit
+    Left = 226
     Top = 80
-    Width = 121
+    Width = 80
     Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
     TabOrder = 17
-    Text = '18,489034'
+    Text = '18,22,44,75'
   end
-  object edtLeftUpY: TEdit
-    Left = 224
+  object edtLeftUpY: TMaskEdit
+    Left = 225
     Top = 107
-    Width = 121
+    Width = 81
     Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
     TabOrder = 18
-    Text = '54,492328'
+    Text = '54,33,37,37'
   end
-  object edtRightDownX: TEdit
-    Left = 400
+  object edtRightDownX: TMaskEdit
+    Left = 347
     Top = 80
-    Width = 121
+    Width = 75
     Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
     TabOrder = 19
-    Text = '18,500565'
+    Text = '18,23,35,60'
   end
-  object edtRightDownY: TEdit
-    Left = 400
+  object edtRightDownY: TMaskEdit
+    Left = 347
     Top = 107
-    Width = 121
+    Width = 74
     Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
     TabOrder = 20
-    Text = '54,489520'
+    Text = '54,33,16,68'
+    TextHint = '         ;       '
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
