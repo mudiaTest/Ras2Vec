@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\mainForm.pas=D:\praca\Ras2Vec\Main_Form.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.dfm,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.dfm=C:\Praca\Ras2Vec\Unit2.dfm</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.810,D:\praca\Ras2Vec\Sys_Const.pas=D:\praca\Ras2Vec\Unit1.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.dfm,D:\praca\Ras2Vec\Unit2.dfm=D:\praca\Ras2Vec\mainForm.dfm</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Obj.pas=D:\praca\Ras2Vec\Main_Obj.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Unit2.pas=D:\praca\Ras2Vec\mainForm.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Functions.pas=D:\praca\Ras2Vec\Obj.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.dfm,D:\praca\Ras2Vec\mainForm.dfm=D:\praca\Ras2Vec\Main_Form.dfm</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.954,D:\Praca\R2V\Main_Treads.pas=D:\Praca\R2V\Main_Thread.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Sys_utl.pas=D:\praca\Ras2Vec\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.954,D:\Praca\R2V\Main_Thread.pas=D:\Praca\R2V\Main_Treads.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Main_Obj.pas=D:\praca\Ras2Vec\Obj.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Functions.pas=D:\praca\Ras2Vec\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Praca\Ras2Vec\Unit2.pas=C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Obj.pas=D:\praca\Ras2Vec\Functions.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.dfm,D:\praca\Ras2Vec\mainForm.dfm=D:\praca\Ras2Vec\Unit2.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Form_utl.pas=D:\praca\Ras2Vec\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.dfm,D:\praca\Ras2Vec\Main_Form.dfm=D:\praca\Ras2Vec\mainForm.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.dfm,C:\Praca\Ras2Vec\Unit2.dfm=C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Main_Form.pas=D:\praca\Ras2Vec\mainForm.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.dproj,C:\Praca\Ras2Vec\Project2.dproj=C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Project2.dproj</Transaction>
     <Transaction>1899-12-30 00:00:00.000.057,=D:\Praca\R2V\Unit1.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.031,D:\Praca\R2V\Unit1.pas=D:\Praca\R2V\Main_Treads.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Unit2.pas=C:\Praca\Ras2Vec\Unit2.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.dproj,C:\Documents and Settings\Mudia\Moje dokumenty\RAD Studio\Projects\Project2.dproj=C:\Praca\Ras2Vec\Project2.dproj</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Form_utl.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.031,D:\Praca\R2V\Main_Treads.pas=D:\Praca\R2V\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\mainForm.pas=D:\praca\Ras2Vec\Unit2.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.810,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Sys_Const.pas</Transaction>
     <Transaction>1899-12-30 00:00:00.000.492,=D:\praca\Ras2Vec\Unit1.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Sys_utl.pas</Transaction>
-    <Transaction>1899-12-30 00:00:00.000.pas,D:\praca\Ras2Vec\Unit1.pas=D:\praca\Ras2Vec\Functions.pas</Transaction>
   </Transactions>
 </BorlandProject>

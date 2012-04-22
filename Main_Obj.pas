@@ -39,14 +39,17 @@ type
 
   TColorGroupList = class(TIntList)
   private
-    fcolorPx: Integer;
-    fcolorMP: String;
+    fcolorPx: Integer;//color grupy
+    fcolorMP: String;//string dl pliku mp: 0x....
+    fcolorTyp: string;//string do pliku mp(hex)
     fidMPGroup: integer;
     procedure setColorPx(acolorPx: Integer);
   published
     property colorPx: Integer read fcolorPx write setColorPx;
     property colorMP: String read fcolorMP write fcolorMP;
+    property colorTyp: String read fcolorTyp write fcolorTyp;
     property idMPGroup: Integer read fidMPGroup write fidMPGroup;
+    //procedure initiateColorMP;
   end;
 
   {TMPTyp = class
@@ -61,6 +64,7 @@ type
   private
     reg: TRegistry;
     mpFile: TextFile;
+    typFile: TextFile;
     procedure AddMPFileHead;
     procedure AddLevels;
     procedure AddZoom;
@@ -69,18 +73,24 @@ type
                                              adisplaceX, adisplaceY: Double;
                                              aColorGroupList: TColorGroupList);
     procedure AddPolygon;
+    procedure TypPathFromMpPath;
+    procedure TypFileSave(aMapFactory: TMapFactory);
   public
-    lineList: TStringList;
+    mpLineList: TStringList;
+    typLineList: TStringList;
     path: String;
     name: String;
     mpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
+    typFileName: String; //plik typ ma tak¹ sam¹ œcie¿kê i nazwê, ale inne rozszerzenie
     procedure SavePathToReg(aPath: String);
     procedure LoadPathFromReg;
     procedure MPFileOpen;
     procedure MPFileClose;
+    procedure TypFileOpen;
+    procedure TypFileClose;
     constructor Create; reintroduce; virtual;
     procedure MPFileSave(aMapFactory: TMapFactory);
-    procedure ClearList;
+    procedure ClearLists;
   end;
 
 
@@ -492,7 +502,7 @@ begin
           vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TColorGroupList.Create);
         colorGroupList := vectRectGroupsByColor.ObjByVal[vectObj.vectGroup.color] as TColorGroupList;
         colorGroupList.idMPGroup := vectRectGroupsByColor.Count;
-        colorGroupList.colorPx := vectObj.vectGroup.color;
+        colorGroupList.setColorPx(vectObj.vectGroup.color);
         colorGroupList.AddObject(vectObj.vectGroupId, vectObj.vectGroup);
       end;
       perf2.Stop;
@@ -1251,16 +1261,19 @@ end;
 
 { TMPFile }
 
-procedure TMPFile.ClearList;
+procedure TMPFile.ClearLists;
 begin
-  lineList.Clear;
+  mpLineList.Clear;
+  typLineList.Clear;
 end;
 
 constructor TMPFile.Create;
 begin
   reg := TRegistry.Create;
   mpFileName := '';
-  lineList := TStringList.Create;
+  typFileName := '';
+  mpLineList := TStringList.Create;
+  typLineList := TStringList.Create;
 end;
 
 procedure TMPFile.MPFileClose;
@@ -1270,7 +1283,7 @@ end;
 
 procedure TMPFile.AddLevels;
 begin
-  with LineList do
+  with mpLineList do
   begin
     Add('Levels=8');
     Add('Level0=24');
@@ -1286,7 +1299,7 @@ end;
 
 procedure TMPFile.AddZoom;
 begin
-  with LineList do
+  with mpLineList do
   begin
     Add('Zoom0=0');
     Add('Zoom1=1');
@@ -1301,7 +1314,7 @@ end;
 
 procedure TMPFile.AddPolygon;
 begin
-  with LineList do
+  with mpLineList do
   begin
     Add('[POLYGON]');
     Add('Type=0x15');
@@ -1313,7 +1326,7 @@ end;
 
 procedure TMPFile.AddMPFileHead;
 begin
-  with LineList do
+  with mpLineList do
   begin
     Add('[IMG ID]');
     Add('CodePage=1252');
@@ -1371,10 +1384,11 @@ procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; 
   {Format(%2.8d, geoPoint.x)}
 
 begin
-  with lineList do
+  with mpLineList do
   begin
     Add('[POLYGON]');
     Add('Type=' + aColorGroupList.colorMP);
+    Add(' * Typ=' + aColorGroupList.colorTyp);
     Add('Label=');
     Add('Data' + intToStr(aLevel) + '=' + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
     Add('[END]');
@@ -1392,20 +1406,53 @@ var
   i: Integer;
 begin
   //MPFileOpen;
-  ClearList;
+  ClearLists;
   AddMPFileHead;
   for i:=0 to aMapFactory.Count-1 do
     AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
                                    aMapFactory.xGeoPX, aMapFactory.yGeoPX,
                                    aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
                                    aMapFactory.vectRectGroupsByColor.GetObjByVal(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList);
-  lineList.SaveToFile(mpFileName);
+  mpLineList.SaveToFile(mpFileName);
  // MPFileClose;
+end;
+
+procedure TMPFile.TypFileClose;
+begin
+  CloseFile(typFile);
+end;
+
+procedure TMPFile.TypFileOpen;
+begin
+  AssignFile(typFile, typFileName);
+  ReWrite(typFile);
+end;
+
+procedure TMPFile.TypFileSave(aMapFactory: TMapFactory);
+var
+  i: Integer;
+begin
+  //MPFileOpen;
+  ClearLists;
+  AddMPFileHead;
+  for i:=0 to aMapFactory.Count-1 do
+    AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
+                                   aMapFactory.xGeoPX, aMapFactory.yGeoPX,
+                                   aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
+                                   aMapFactory.vectRectGroupsByColor.GetObjByVal(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList);
+  mpLineList.SaveToFile(mpFileName);
+ // MPFileClose;
+end;
+
+procedure TMPFile.TypPathFromMpPath;
+begin
+  typFileName := Copy(mpFileName, 1, Length(mpFileName)-2) + 'typ';
 end;
 
 procedure TMPFile.SavePathToReg(aPath: String);
 begin
   mpFileName := aPath;
+  TypPathFromMpPath;
   reg.OpenKey(REGSOFT + progName, true);
   reg.WriteString('MPFilePathName', mpFileName);
   reg.CloseKey;
@@ -1415,6 +1462,7 @@ procedure TMPFile.LoadPathFromReg;
 begin
   reg.OpenKey(REGSOFT + progName, true);
   mpFileName := reg.ReadString('MPFilePathName');
+  TypPathFromMpPath;
   reg.CloseKey;
 end;
 
@@ -1430,11 +1478,18 @@ end;
 { TColorGroupList }
 
 procedure TColorGroupList.setColorPx(acolorPx: Integer);
+var
+  stRed, stGreen, stBlue, stColor: String;
 begin
   if fcolorMP = '' then
   begin
     fcolorPx := acolorPx;
-    fcolorMP := '0x' + IntToHex(idMPGroup,4)
+    fcolorMP := '0x' + IntToHex(idMPGroup,4);
+    stColor := IntToHex(acolorPx, 6);
+    stBlue := copy(stColor, 1, 2);
+    stGreen := copy(stColor, 3, 2);
+    stRed := copy(stColor, 5, 2);
+    fcolorTyp := stRed + stGreen + stBlue;
   end else
     Assert(fcolorPx = acolorPx, 'Przypisujemy inny kolor. By³o: ' + intToStr(fcolorPx) + ' a ma byæ:' + IntToStr(acolorPx)) ;
 end;
