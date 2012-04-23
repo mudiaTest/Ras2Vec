@@ -62,6 +62,8 @@ type
 
   function StrConcat(separator, left, right: String): String;
 
+  procedure addIntToStrHex(aInt: integer; aDigits: integer; var aStr: String);
+
 implementation
 
   function StrConcat(separator, left, right: String): String;
@@ -85,6 +87,22 @@ implementation
     aPath1 := TrimSlash(aPath1);
     Result := aPath1 + aPath2;
   end;
+
+  procedure addIntToStrHex(aInt: integer; aDigits: integer; var aStr: String);
+  var
+    i: integer;
+    stMain: String;
+    stPart: String;
+  begin
+    stMain := intToHex(aInt, aDigits*2);
+    for i := 0 to Ceil(Length(stMain)/2)-1 do
+    begin
+      stPart := Copy(stMain, 0, Min(Length(stMain), 2));
+      stMain := Copy(stMain, 3, Length(stMain)-2);
+      aStr := aStr + char(strToInt64('$' + stPart));
+    end;
+  end;
+
 { TIntList }
 
 function TIntList.AddObject(val: integer; obj: TObject): Integer;

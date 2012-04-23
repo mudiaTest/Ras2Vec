@@ -284,6 +284,15 @@ object MainForm: TMainForm
     Text = '54,33,16,68'
     TextHint = '         ;       '
   end
+  object Button4: TButton
+    Left = 576
+    Top = 104
+    Width = 75
+    Height = 25
+    Caption = 'Button4'
+    TabOrder = 21
+    OnClick = Button4Click
+  end
   object dlgPicture: TOpenPictureDialog
     Left = 804
     Top = 44

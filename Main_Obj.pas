@@ -74,10 +74,9 @@ type
                                              aColorGroupList: TColorGroupList);
     procedure AddPolygon;
     procedure TypPathFromMpPath;
-    procedure TypFileSave(aMapFactory: TMapFactory);
   public
     mpLineList: TStringList;
-    typLineList: TStringList;
+    stTypBody: String;
     path: String;
     name: String;
     mpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
@@ -90,7 +89,10 @@ type
     procedure TypFileClose;
     constructor Create; reintroduce; virtual;
     procedure MPFileSave(aMapFactory: TMapFactory);
-    procedure ClearLists;
+    procedure ClearFilesBody;
+    procedure AddTypFileHeader(aPolyCount: integer);
+    procedure typAdd(aStr: String);
+    procedure TypFileSave(aMapFactory: TMapFactory);
   end;
 
 
@@ -1261,10 +1263,10 @@ end;
 
 { TMPFile }
 
-procedure TMPFile.ClearLists;
+procedure TMPFile.ClearFilesBody;
 begin
   mpLineList.Clear;
-  typLineList.Clear;
+  stTypBody := '';
 end;
 
 constructor TMPFile.Create;
@@ -1273,7 +1275,7 @@ begin
   mpFileName := '';
   typFileName := '';
   mpLineList := TStringList.Create;
-  typLineList := TStringList.Create;
+  stTypBody := '';
 end;
 
 procedure TMPFile.MPFileClose;
@@ -1395,6 +1397,48 @@ begin
   end;
 end;
 
+procedure TMPFile.AddTypFileHeader(aPolyCount: integer);
+var
+  y,m,d: Word;
+  hr,mi,se,ms: Word;
+  i: integer;
+begin
+  DecodeDate(now,y,m,d);
+  DecodeTime(now,hr,mi,se,ms);
+  typAdd(#91);
+  //zero - 1 bajt
+  typAdd(#0);
+  //nazwa - 10 bajtów
+  typAdd('R2V typ   ');
+  //jedynka - 1 bajt
+  typAdd(#1);
+  //zero - 1 bajt
+  typAdd(#0);
+  //7 bajtów daty i czasu
+  typAdd(chr(y-1900) + #0);
+  typAdd(chr(m));
+  typAdd(chr(d));
+  typAdd(chr(hr));
+  typAdd(chr(mi));
+  typAdd(chr(se));
+  //zapis striny kodowej - 2 bajty
+  addIntToStrHex(1252, 2, stTypBody);
+  //offset bloku poi - 4bajty
+  addIntToStrHex(0, 4, stTypBody);
+  //d³ugoœæ bloku poi - 4 bajty
+  addIntToStrHex(0, 4, stTypBody);
+  //offset lini - bajty
+  addIntToStrHex(0, 4, stTypBody);
+  //d³ugoœæ bloku linji - 4 bajty
+  addIntToStrHex(0, 4, stTypBody);
+
+  //offset polygogów
+  addIntToStrHex(91 {+ d³ugoœæ bloku poi i linji}, 2, stTypBody);
+  //offset polygonów - bajty
+  //dla prostych polygonów u¿ywamy 4 bajty na 1 definicjê
+  addIntToStrHex( aPolyCount*4 , 4, stTypBody);
+end;
+
 procedure TMPFile.MPFileOpen;
 begin
   AssignFile(mpFile, mpFileName);
@@ -1406,7 +1450,7 @@ var
   i: Integer;
 begin
   //MPFileOpen;
-  ClearLists;
+  ClearFilesBody;
   AddMPFileHead;
   for i:=0 to aMapFactory.Count-1 do
     AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
@@ -1414,6 +1458,7 @@ begin
                                    aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
                                    aMapFactory.vectRectGroupsByColor.GetObjByVal(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList);
   mpLineList.SaveToFile(mpFileName);
+  TypFileSave(aMapFactory);
  // MPFileClose;
 end;
 
@@ -1431,17 +1476,18 @@ end;
 procedure TMPFile.TypFileSave(aMapFactory: TMapFactory);
 var
   i: Integer;
+  typFile : TextFile;
 begin
-  //MPFileOpen;
-  ClearLists;
-  AddMPFileHead;
-  for i:=0 to aMapFactory.Count-1 do
-    AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
-                                   aMapFactory.xGeoPX, aMapFactory.yGeoPX,
-                                   aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
-                                   aMapFactory.vectRectGroupsByColor.GetObjByVal(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList);
-  mpLineList.SaveToFile(mpFileName);
- // MPFileClose;
+  //Assert(aMapFactory <> nil);
+  if aMapFactory <> nil then
+    AddTypFileHeader(aMapFactory.vectRectGroupsByColor.Count)
+  else
+    AddTypFileHeader(0);
+  AssignFile(typFile, typFileName);
+  ReWrite(typFile);
+  Write(typFile, stTypBody);
+  CloseFile(typFile);
+  //typLineList.SaveToFile(typFileName);
 end;
 
 procedure TMPFile.TypPathFromMpPath;
@@ -1456,6 +1502,11 @@ begin
   reg.OpenKey(REGSOFT + progName, true);
   reg.WriteString('MPFilePathName', mpFileName);
   reg.CloseKey;
+end;
+
+procedure TMPFile.typAdd(aStr: String);
+begin
+  stTypBody := stTypBody + aStr;
 end;
 
 procedure TMPFile.LoadPathFromReg;

@@ -63,6 +63,7 @@ type
     lbl1: TLabel;
     lbl2: TLabel;
     edtRightDownX: TMaskEdit;
+    Button4: TButton;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -93,6 +94,7 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -209,6 +211,11 @@ begin
   R2V1Click(nil);
 end;
 
+procedure TMainForm.Button4Click(Sender: TObject);
+begin
+  MPFile.TypFileSave(nil);
+end;
+
 procedure TMainForm.CreateMainThreadVectorGroupList;
 begin
   if mapFactory <> nil then
@@ -241,7 +248,7 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t4.bmp');
+  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
