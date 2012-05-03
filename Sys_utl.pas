@@ -1,5 +1,7 @@
 unit Sys_utl;
 
+{$M+}
+
 interface
 
 uses
@@ -7,6 +9,7 @@ uses
 
 type
   TTimeInterval = class (TObject)
+  public
     dtStart, dtStop: TDateTime;
     interval: Double;
     procedure Start(blReset: boolean = true);
@@ -97,9 +100,14 @@ implementation
     stMain := intToHex(aInt, aDigits*2);
     for i := 0 to Ceil(Length(stMain)/2)-1 do
     begin
-      stPart := Copy(stMain, 0, Min(Length(stMain), 2));
-      stMain := Copy(stMain, 3, Length(stMain)-2);
-      aStr := aStr + char(strToInt64('$' + stPart));
+      {stPart := Copy(stMain, 0, Min(Length(stMain), 2));
+      stMain := Copy(stMain, 3, Length(stMain)-2);   }
+      stPart := Copy(stMain, Length(stMain)-1, 2);
+      stMain := Copy(stMain, 0, Length(stMain)-2);
+      aStr := aStr + AnsiChar(strToInt('$' + stPart));
+
+      //aStr := aStr + chr(strToInt('$' + stPart[1]));
+      //aStr := aStr + chr(strToInt('$' + stPart[2]));
     end;
   end;
 
@@ -207,7 +215,7 @@ end;
 
 function TDoubleList.GetObjByVal(val: Double): TObject;
 begin
-  Objects[IndexOf(val)];
+  Result := Objects[IndexOf(val)];
 end;
 
 function TDoubleList.IndexOf(const val: double): Integer;

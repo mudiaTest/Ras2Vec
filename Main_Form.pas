@@ -118,9 +118,8 @@ type
     perf: TTimeInterval; //perf dla ca³ego R2V
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-    procedure setScrollPos(asbDest, asbSrc: TScrollBox);
+    //procedure setScrollPos(asbDest, asbSrc: TScrollBox);
     procedure saveZoomPos;
-    procedure init;
     procedure DoZoom;
     procedure SetControls(atask: integer);
     procedure DoOnR2VTerminate;
@@ -235,9 +234,6 @@ begin
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
-var
-  x, y: integer;
-  f: TCanvas;
 begin
   inherited;
   mapFactory := nil;
@@ -248,7 +244,7 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t1.bmp');
+  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t3.bmp');
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
@@ -280,11 +276,6 @@ end;
 procedure TMainForm.InfoAkcja(aStr: String);
 begin
   lblAkcja.Caption := aStr;
-end;
-
-procedure TMainForm.init;
-begin
-  gridColor := RGB(249, 192, 192);
 end;
 
 procedure TMainForm.Load1Click(Sender: TObject);
@@ -336,7 +327,7 @@ begin
   imgZoom.Refresh;
 end;
 
-procedure TMainForm.setScrollPos(asbDest, asbSrc: TScrollBox);
+{procedure TMainForm.setScrollPos(asbDest, asbSrc: TScrollBox);
 var
   src: Integer;
 begin
@@ -344,12 +335,12 @@ begin
     src := c_zoomImage
   else
     src := c_mainImage;
-end;
+end;}
 
 procedure TMainForm.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw zoomImage wg main image
-  setScrollPos(sbZoom, sbMain);
+  //setScrollPos(sbZoom, sbMain);
 end;
 
 procedure TMainForm.oemR3VTaskMessage(const task: IOmniTaskControl;
@@ -481,16 +472,14 @@ end;
 procedure TMainForm.DoZoom;
 var
   tmpBmp: TBitmap;
-  scrollHorPos, scrollVerPos: double;
-  prvLpZoom: integer;
+  //scrollHorPos, scrollVerPos: double;
 begin
 
   Screen.Cursor := crHourGlass;
   try
     saveZoomPos;
-    prvLpZoom := lpZoom;
-    scrollHorPos := sbZoom.HorzScrollBar.Position;
-    scrollVerPos := sbZoom.VertScrollBar.Position;
+    //scrollHorPos := sbZoom.HorzScrollBar.Position;
+    //scrollVerPos := sbZoom.VertScrollBar.Position;
     //zapisyje do zmiennej glob. nowy poziom zoomu 2^x
     lpZoom := round(Math.Power(2.0, tbZoom.Position-1));
     lpActImgZoom := lpZoom;

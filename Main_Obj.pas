@@ -1,5 +1,7 @@
 unit Main_Obj;
 
+{$M+}
+
 interface
 
 uses
@@ -50,6 +52,7 @@ type
     property colorTyp: String read fcolorTyp write fcolorTyp;
     property idMPGroup: Integer read fidMPGroup write fidMPGroup;
     //procedure initiateColorMP;
+    constructor Create(aidMPGroup: Integer); overload;
   end;
 
   {TMPTyp = class
@@ -72,8 +75,10 @@ type
                                              axGeoPX, ayGeoPX: Double;
                                              adisplaceX, adisplaceY: Double;
                                              aColorGroupList: TColorGroupList);
-    procedure AddPolygon;
     procedure TypPathFromMpPath;
+    procedure AddPolyColorDefs(avectRectGroupsByColor: TIntList);
+    procedure AddPolyDataDefs(avectRectGroupsByColor: TIntList);
+    procedure AddPolyDrawOrderDefs(avectRectGroupsByColor: TIntList);
   public
     mpLineList: TStringList;
     stTypBody: String;
@@ -90,17 +95,19 @@ type
     constructor Create; reintroduce; virtual;
     procedure MPFileSave(aMapFactory: TMapFactory);
     procedure ClearFilesBody;
-    procedure AddTypFileHeader(aPolyCount: integer);
+    procedure AddTypFileHeader(aPOICount, aLineCount, aPolyCount: integer);
     procedure typAdd(aStr: String);
     procedure TypFileSave(aMapFactory: TMapFactory);
   end;
 
 
   TOColor = class
+  public
     color: TColor;
   end;
 
   TOPointArr = class
+public
     pointArr: array of TOPoint;
   end;
 
@@ -126,7 +133,7 @@ type
   TVectRectGroup = class(TObject)
   private
     //cztery punkty geograficzne okreœlan¹ce rogi obrazka
-    leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
+    //leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
     //lista krawêdzi punktów Integer (pixeli) (kolejnych)
     fedgePxList: TIntList;
     //lista krawêdzi punktów Double
@@ -320,9 +327,7 @@ function TMapFactory.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: B
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
   x, y: Integer;
-  i: Integer;
   vectObj: TVectRectangle;
-  p: Pointer;
   bmp: TBitmap;
 begin
   //ustalamy wielkoœæ obrazu do wype³nienia bior¹c pod uwagê, ¿e jest zoom
@@ -386,15 +391,12 @@ end;
 function TMapFactory.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
-  x, y: Integer;
-  i, j: Integer;
-  vectObj: TVectRectangle;
-  p: Pointer;
+  i: Integer;
+  //vectObj: TVectRectangle;
   bmp: TBitmap;
   vectGroup: TVectRectGroup;
   geoPointArr: TDynamicGeoPointArray; //lista punktów do przekazania, aby stworzyæ polygon
   pxPointArray: TDynamicPxPointArray;
-  tmpPoint: TPoint;
   doit: boolean;
 begin
   //ustalamy wielkoœæ obrazu do wype³nienia bior¹c pod uwagê, ¿e jest zoom
@@ -501,9 +503,10 @@ begin
 
         //dodanie grupy do listy kolorów
         if vectRectGroupsByColor.indexOf(vectObj.vectGroup.color) = -1 then
-          vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TColorGroupList.Create);
+        begin
+          vectRectGroupsByColor.addObject(vectObj.vectGroup.color, TColorGroupList.Create(vectRectGroupsByColor.Count));
+        end;
         colorGroupList := vectRectGroupsByColor.ObjByVal[vectObj.vectGroup.color] as TColorGroupList;
-        colorGroupList.idMPGroup := vectRectGroupsByColor.Count;
         colorGroupList.setColorPx(vectObj.vectGroup.color);
         colorGroupList.AddObject(vectObj.vectGroupId, vectObj.vectGroup);
       end;
@@ -557,10 +560,7 @@ end;
 procedure TMapFactory.ReadFromImg(aimg: TImage);
 var
   x, y: integer;
-  ile: Integer;
-  p: Pointer;
   rec: TVectRectangle;
-  rec2: TVectRectangle;
 begin
   srcWidth := aimg.Width;
   srcHeight := aimg.Height;
@@ -574,7 +574,6 @@ begin
                   TOpoint.getPoint(Point(x, y))
                );
       vectArr[x,y] := rec;
-      inc(ile);
     end;
 end;
 
@@ -674,9 +673,7 @@ procedure TVectByCoordList.FillImgWithRect(aimg: TImage; azoom: Integer; agrid: 
   agridColor: TColor);
 var
   x, y: Integer;
-  i: Integer;
   vectObj: TVectRectangle;
-  h: integer;
 begin
   aimg.Width := srcWidth;
   aimg.Height := srcHeight;
@@ -696,12 +693,7 @@ begin
       begin
         for y:=0 to srcHeight-1 do
         begin
-          try
-            vectObj := get(x, y) as TVectRectangle;
-          except
-            inc(h);
-          end;
-
+          vectObj := get(x, y) as TVectRectangle;
           Brush.Color := vectObj.color;
           Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
                     (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
@@ -736,9 +728,7 @@ end;
 procedure TVectByCoordList.ReadFromImg(aimg: TImage);
 var
   x, y: integer;
-  ile: Integer;
 begin
-  ile := 0;
   if (aimg.Width * aimg.Height = 0) then
   begin
     Clear;
@@ -750,7 +740,6 @@ begin
       begin
         put(x, y, TVectRectangle.Create(aimg.Canvas.Pixels[x, y],
                   TOPoint.getPoint(Point(x, y)), TOpoint.getPoint(Point(x, y))));
-        inc(ile);
       end;
   end;
   srcWidth := aimg.Width;
@@ -974,7 +963,6 @@ procedure TVectRectGroup.makeEdges;
           Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
           if aprevEdge.vectGroupId = Result.vectGroupId then
             Exit;
-          Result := nil;
         end;
         Result := nil;
       end;
@@ -985,7 +973,6 @@ procedure TVectRectGroup.makeEdges;
           Result := vectObjArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
           if aprevEdge.vectGroupId = Result.vectGroupId then
             Exit;
-          Result := nil;
         end;
         Result := nil;
       end;
@@ -996,7 +983,6 @@ procedure TVectRectGroup.makeEdges;
           Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
           if aprevEdge.vectGroupId = Result.vectGroupId then
             Exit;
-          Result := nil;
         end;
         Result := nil;
       end;
@@ -1007,7 +993,6 @@ procedure TVectRectGroup.makeEdges;
           Result := vectObjArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
           if aprevEdge.vectGroupId = Result.vectGroupId then
             Exit;
-          Result := nil;
         end;
         Result := nil;
       end;
@@ -1019,12 +1004,17 @@ procedure TVectRectGroup.makeEdges;
       else if arrDir = c_goBottom then
         Result := checkBottom(aprevEdge)
       else if arrDir = c_goLeft then
-        Result := checkLeft(aprevEdge);
+        Result := checkLeft(aprevEdge)
+      else
+      begin
+        Result := nil;
+        Assert(False, 'checkNextEdge');
+      end;
+
     end;
   var
     i, j: Integer;
   begin
-    i := 0;
     j := 0;
     for i := 0 to 3 do
     begin
@@ -1314,18 +1304,6 @@ begin
   end;
 end;
 
-procedure TMPFile.AddPolygon;
-begin
-  with mpLineList do
-  begin
-    Add('[POLYGON]');
-    Add('Type=0x15');
-    Add('Label=Testowa nazwa');
-    Add('Data0=(54.59917,18.29001),(54.59999,18.29112),(54.60059,18.29421)');
-    Add('[END]');
-  end;
-end;
-
 procedure TMPFile.AddMPFileHead;
 begin
   with mpLineList do
@@ -1390,53 +1368,209 @@ begin
   begin
     Add('[POLYGON]');
     Add('Type=' + aColorGroupList.colorMP);
-    Add(' * Typ=' + aColorGroupList.colorTyp);
+    //Add(' * Typ=' + aColorGroupList.colorTyp);
     Add('Label=');
+    Add('EndLevel=4');
     Add('Data' + intToStr(aLevel) + '=' + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
     Add('[END]');
   end;
 end;
 
-procedure TMPFile.AddTypFileHeader(aPolyCount: integer);
+procedure TMPFile.AddTypFileHeader(aPOICount, aLineCount, aPolyCount: integer);
 var
   y,m,d: Word;
   hr,mi,se,ms: Word;
-  i: integer;
+  lpStartBlock, lDummypStartBlock: Integer;
+  //offset dla  bloku POI, Line, Poly
+  lpPOIOff, lpLineOff, lpPolyOff: Integer;
+  //d³ugoœæ bloku dla POI, Linji i Poly
+  lpPOILength, lpLineLength, lpPolyLength: Integer;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  lpPOIDataOff, lpPOIDataLength, lpPOIDataBlockLength: Integer;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  lpLineDataOff, lpLineDataLength, lpLineDataBlockLength: Integer;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  lpPolyDataOff, lpPolyDataLength, lpPolyDataBlockLength: Integer;
+  //offset, d³ugoœæ danych, d³ugoœæ bloku dla drawOrder
+  lpPolyDrawOff, lpPolyDrawLength, lpPolyDrawBlockLength: Integer;
 begin
+  lpStartBlock := 91;
+  lDummypStartBlock := 0;
   DecodeDate(now,y,m,d);
   DecodeTime(now,hr,mi,se,ms);
-  typAdd(#91);
-  //zero - 1 bajt
-  typAdd(#0);
-  //nazwa - 10 bajtów
-  typAdd('R2V typ   ');
-  //jedynka - 1 bajt
-  typAdd(#1);
-  //zero - 1 bajt
-  typAdd(#0);
-  //7 bajtów daty i czasu
-  typAdd(chr(y-1900) + #0);
-  typAdd(chr(m));
-  typAdd(chr(d));
-  typAdd(chr(hr));
-  typAdd(chr(mi));
-  typAdd(chr(se));
-  //zapis striny kodowej - 2 bajty
+
+  lpPOIOff := lDummypStartBlock;
+  lpPOILength := aPOICount * 666;
+
+  lpLineOff := lDummypStartBlock + lpPOILength;
+  lpLineLength := aLineCount * 666;
+
+  lpPolyOff := lpStartBlock + lpPOILength + lpLineLength;
+  lpPolyLength := aPolyCount * 4; //4 bajty na reprezentacjê polygonu
+
+  if aPOICount = 0 then
+  begin
+    lpPOIDataOff := 0;
+    lpPOIDataLength := 0;
+    lpPOIDataBlockLength := 0;
+  end
+  else
+  begin
+    lpPOIDataOff := lDummypStartBlock + lpPOILength + lpLineLength + lpPolyLength;
+    lpPOIDataLength := 3;// przyk³adowa iloœæ bajów
+    lpPOIDataBlockLength := aPOICount * lpPOIDataLength;
+  end;
+
+  if aLineCount = 0 then
+  begin
+    lpLineDataOff := 0;
+    lpLineDataLength := 0;
+    lpLineDataBlockLength := 0;
+  end
+  else
+  begin
+    lpLineDataOff := lDummypStartBlock + lpPOILength + lpLineLength + lpPolyLength +
+                     lpPOIDataBlockLength;
+    lpLineDataLength := 3;// przyk³adowa iloœæ bajów
+    lpLineDataBlockLength := aLineCount * lpLineDataLength;
+  end;
+
+  if aPolyCount = 0 then
+  begin
+    lpPolyDataOff := 0;
+    lpPolyDataLength := 0;
+    lpPolyDataBlockLength := 0;
+    lpPolyDrawOff := 0;
+    lpPolyDrawLength := 0;
+    lpPolyDrawBlockLength := 0;
+  end
+  else
+  begin
+    lpPolyDataOff := lpStartBlock + lpPOILength + lpLineLength + lpPolyLength +
+                     lpPOIDataBlockLength + lpLineDataBlockLength;
+    lpPolyDataLength := 4; //bajt pocz¹tkowy (?) + 3 bajty koloru dla polygona prostego
+    lpPolyDataBlockLength := aPolyCount * lpPolyDataLength;
+    lpPolyDrawOff := lpStartBlock + lpPOILength + lpLineLength + lpPolyLength +
+                     lpPOIDataBlockLength + lpLineDataBlockLength + lpPolyDataBlockLength;
+    lpPolyDrawLength := 5; //d³ugoœæ bloku dla poly Draw
+    lpPolyDrawBlockLength := aPolyCount {+ iloœæ zmian leveli - same 0} * lpPolyDrawLength;
+  end;
+
+  //pocz¹tek bloku z danymi: 5B = 91
+  addIntToStrHex(91, 1, stTypBody);
+  //zero
+  addIntToStrHex(0, 1, stTypBody);
+  //nazwa - 10 bajtów/znaków
+  typAdd('GARMIN TYP');
+  //0/1: zero to ignorowanie pliku typ
+  addIntToStrHex(1, 1, stTypBody);
+  //zero: w inftukcji pisze FF or 00
+  addIntToStrHex(0, 1, stTypBody);
+  //7 bajtów daty i czasu, 2 na rok i po jednym na resztê
+  addIntToStrHex(y-1900, 2, stTypBody);
+  addIntToStrHex(m, 1, stTypBody);
+  addIntToStrHex(d, 1, stTypBody);
+  addIntToStrHex(hr, 1, stTypBody);
+  addIntToStrHex(mi, 1, stTypBody);
+  addIntToStrHex(se, 1, stTypBody);
+  //zapis strony kodowej - 2 bajty
   addIntToStrHex(1252, 2, stTypBody);
+
   //offset bloku poi - 4bajty
-  addIntToStrHex(0, 4, stTypBody);
-  //d³ugoœæ bloku poi - 4 bajty
-  addIntToStrHex(0, 4, stTypBody);
+  addIntToStrHex(lpPOIOff, 4, stTypBody);
+  //d³ugoœæ bloku poi: lpPOI*d³ugoœæPOI w bajtach - 4 bajty
+  addIntToStrHex(lpPOILength, 4, stTypBody);
+
   //offset lini - bajty
-  addIntToStrHex(0, 4, stTypBody);
-  //d³ugoœæ bloku linji - 4 bajty
-  addIntToStrHex(0, 4, stTypBody);
+  addIntToStrHex(lpLineOff, 4, stTypBody);
+  //d³ugoœæ bloku linji: lpLine*d³ugoœæLine w bajtach - 4 bajty
+  addIntToStrHex(lpLineLength, 4, stTypBody);
 
   //offset polygogów
-  addIntToStrHex(91 {+ d³ugoœæ bloku poi i linji}, 2, stTypBody);
+  addIntToStrHex(lpPolyOff, 4, stTypBody);
   //offset polygonów - bajty
   //dla prostych polygonów u¿ywamy 4 bajty na 1 definicjê
-  addIntToStrHex( aPolyCount*4 , 4, stTypBody);
+  addIntToStrHex(lpPolyLength , 4, stTypBody);
+
+  //Family ID:
+  addIntToStrHex(666, 2, stTypBody);
+  //Produvt ID:
+  addIntToStrHex(666, 2, stTypBody);
+
+  //offste POI data
+  addIntToStrHex(lpPOIDataOff , 4, stTypBody);
+  //d³ugoœæ pojedynczego data dla POI
+  addIntToStrHex(lpPOIDataLength , 2, stTypBody);
+  //d³ugoœæ ca³ego bloku data dla POI
+  addIntToStrHex(lpPOIDataBlockLength , 4, stTypBody);
+
+  //offste Line data
+  addIntToStrHex(lpLineDataOff , 4, stTypBody);
+  //d³ugoœæ pojedynczego data dla Line
+  addIntToStrHex(lpLineDataLength , 2, stTypBody);
+  //d³ugoœæ ca³ego bloku data dla Line
+  addIntToStrHex(lpLineDataBlockLength , 4, stTypBody);
+
+  //offste Line data
+  addIntToStrHex(lpPolyDataOff , 4, stTypBody);
+  //d³ugoœæ pojedynczego data dla Line
+  addIntToStrHex(lpPolyDataLength , 1, stTypBody);
+  //linked to polygons
+  addIntToStrHex(0 , 1, stTypBody);
+  //d³ugoœæ ca³ego bloku data dla Line
+  addIntToStrHex(lpPolyDataBlockLength , 4, stTypBody);
+
+  //offste Line data
+  addIntToStrHex(lpPolyDrawOff , 4, stTypBody);
+  //d³ugoœæ pojedynczego data dla Line
+  addIntToStrHex(lpPolyDrawLength , 2, stTypBody);
+  //d³ugoœæ ca³ego bloku data dla Line
+  addIntToStrHex(lpPolyDrawBlockLength , 4, stTypBody);
+end;
+
+procedure TMPFile.AddPolyColorDefs(avectRectGroupsByColor: TIntList);
+var
+  i: Integer;
+  colorGroupList :TColorGroupList;
+begin
+  for i := avectRectGroupsByColor.Count-1 downTo 0 do
+  //i:=0;
+  begin
+    addIntToStrHex(6 , 1, stTypBody);
+    colorGroupList := avectRectGroupsByColor.Objects[i] as TColorGroupList;
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
+    stTypBody := stTypBody +  AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
+  end;
+end;
+
+procedure TMPFile.AddPolyDataDefs(avectRectGroupsByColor: TIntList);
+var
+  i: Integer;
+  colorGroupList :TColorGroupList;
+begin
+  for i := avectRectGroupsByColor.Count-1 downTo 0 do
+  //i:=0;
+  begin
+    colorGroupList := avectRectGroupsByColor.Objects[i] as TColorGroupList;
+    addIntToStrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
+    //offset: 4 bajty na ka¿dy polygon
+    addIntToStrHex(i*4 , 2, stTypBody);
+  end;
+end;
+
+procedure TMPFile.AddPolyDrawOrderDefs(avectRectGroupsByColor: TIntList);
+var
+  i: Integer;
+  colorGroupList :TColorGroupList;
+begin
+  for i := avectRectGroupsByColor.Count-1 downTo 0 do
+  //i:=0;
+  begin
+    colorGroupList := avectRectGroupsByColor.Objects[i] as TColorGroupList;
+    addIntToStrHex(colorGroupList.idMPGroup , 1, stTypBody);
+    addIntToStrHex(0 , 4, stTypBody);
+  end;
 end;
 
 procedure TMPFile.MPFileOpen;
@@ -1452,6 +1586,16 @@ begin
   //MPFileOpen;
   ClearFilesBody;
   AddMPFileHead;
+
+  with mpLineList do
+  begin
+    Add('[POLYGON]');
+    Add('Type=0x4b');
+    Add('Backgruond=Y');
+    Add('Data0=(55.00000,17.00000),(53.00000,17.10000),(53.00000,19.00000),(55.00000,19.00000)');//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    Add('[END]');
+  end;
+
   for i:=0 to aMapFactory.Count-1 do
     AddPolygonStringsFromVectGroup(TVectRectGroup(aMapFactory.Objects[i]), 0,
                                    aMapFactory.xGeoPX, aMapFactory.yGeoPX,
@@ -1475,16 +1619,24 @@ end;
 
 procedure TMPFile.TypFileSave(aMapFactory: TMapFactory);
 var
-  i: Integer;
   typFile : TextFile;
 begin
   //Assert(aMapFactory <> nil);
   if aMapFactory <> nil then
-    AddTypFileHeader(aMapFactory.vectRectGroupsByColor.Count)
+  begin
+    AddTypFileHeader(0,0, aMapFactory.vectRectGroupsByColor.Count);
+    //toDo - jeœli w przysz³oœci bêdzie
+    //AddPOIDefs
+    //AddLineDefs
+    AddPolyColorDefs(aMapFactory.vectRectGroupsByColor);
+    AddPolyDataDefs(aMapFactory.vectRectGroupsByColor);
+    AddPolyDrawOrderDefs(aMapFactory.vectRectGroupsByColor);
+  end
   else
-    AddTypFileHeader(0);
+    AddTypFileHeader(0, 0, 0);
   AssignFile(typFile, typFileName);
   ReWrite(typFile);
+
   Write(typFile, stTypBody);
   CloseFile(typFile);
   //typLineList.SaveToFile(typFileName);
@@ -1528,6 +1680,12 @@ end;
 
 { TColorGroupList }
 
+constructor TColorGroupList.Create(aidMPGroup: Integer);
+begin
+  Create;
+  idMPGroup := aidMPGroup+1;
+end;
+
 procedure TColorGroupList.setColorPx(acolorPx: Integer);
 var
   stRed, stGreen, stBlue, stColor: String;
@@ -1537,10 +1695,11 @@ begin
     fcolorPx := acolorPx;
     fcolorMP := '0x' + IntToHex(idMPGroup,4);
     stColor := IntToHex(acolorPx, 6);
-    stBlue := copy(stColor, 1, 2);
+    {stBlue := copy(stColor, 1, 2);
     stGreen := copy(stColor, 3, 2);
     stRed := copy(stColor, 5, 2);
-    fcolorTyp := stRed + stGreen + stBlue;
+    fcolorTyp := stRed + stGreen + stBlue; }
+    fcolorTyp := stColor;
   end else
     Assert(fcolorPx = acolorPx, 'Przypisujemy inny kolor. By³o: ' + intToStr(fcolorPx) + ' a ma byæ:' + IntToStr(acolorPx)) ;
 end;
