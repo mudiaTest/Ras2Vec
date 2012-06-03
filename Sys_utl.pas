@@ -115,7 +115,7 @@ implementation
 
 function TIntList.AddObject(val: integer; obj: TObject): Integer;
 begin
-  Result := inherited AddObject(IntToStr(val), obj);
+Result := inherited AddObject(IntToStr(val), obj);
   fnextKey := Math.max(fnextKey, val+1);
 end;
 

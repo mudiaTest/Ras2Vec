@@ -233,6 +233,7 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
+    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 590
