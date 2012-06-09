@@ -340,6 +340,12 @@ object MainForm: TMainForm
       Caption = 'Exit'
       OnClick = Exit1Click
     end
+    object TEST: TMenuItem
+      Caption = 'test'
+      object test1: TMenuItem
+        Caption = 'test'
+      end
+    end
   end
   object oemR3V: TOmniEventMonitor
     OnTaskMessage = oemR3VTaskMessage
@@ -348,7 +354,7 @@ object MainForm: TMainForm
     Top = 464
   end
   object MainActionList: TActionList
-    Left = 8
+    Left = 40
     Top = 208
     object actR2VBtnStop: TAction
       Caption = 'R2V Stop'
@@ -356,7 +362,6 @@ object MainForm: TMainForm
     end
     object actR2VMenu: TAction
       Caption = 'actR2VMenu'
-      OnUpdate = actR2VMenuExecute
     end
   end
   object SaveDialog: TSaveDialog

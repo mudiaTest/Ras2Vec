@@ -64,6 +64,8 @@ type
     lbl2: TLabel;
     edtRightDownX: TMaskEdit;
     Button4: TButton;
+    TEST: TMenuItem;
+    test1: TMenuItem;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -144,11 +146,13 @@ Uses
 
 procedure TMainForm.btn1Click(Sender: TObject);
 begin
+  inherited;
   CreateMainThreadVectorGroupList;
 end;
 
 procedure TMainForm.btnSaveClick(Sender: TObject);
 begin
+  inherited;
   SaveDialog.FileName := MPFile.mpFileName;
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
@@ -162,6 +166,7 @@ end;
 
 procedure TMainForm.btnStopR2VClick(Sender: TObject);
 begin
+  inherited;
   try
     if assigned(taskR2V) then
     begin
@@ -177,6 +182,7 @@ end;
 
 procedure TMainForm.btnZoomInClick(Sender: TObject);
 begin
+  inherited;
   if tbZoom.Position < 9 then
   begin
     tbZoom.Position := tbZoom.Position + 1;
@@ -187,6 +193,7 @@ end;
 
 procedure TMainForm.btnZoomOutClick(Sender: TObject);
 begin
+  inherited;
   if tbZoom.Position > 0 then
   begin
     tbZoom.Position := tbZoom.Position - 1;
@@ -197,21 +204,25 @@ end;
 
 procedure TMainForm.Button1Click(Sender: TObject);
 begin
+  inherited;
   DoZoom;
 end;
 
 procedure TMainForm.Button2Click(Sender: TObject);
 begin
+  inherited;
   CreateSeperateThreadVectorGroupList;
 end;
 
 procedure TMainForm.Button3Click(Sender: TObject);
 begin
+  inherited;
   R2V1Click(nil);
 end;
 
 procedure TMainForm.Button4Click(Sender: TObject);
 begin
+  inherited;
   MPFile.TypFileSave(nil);
 end;
 
@@ -237,7 +248,8 @@ constructor TMainForm.Create(AOwner: TComponent);
 begin
   inherited;
   mapFactory := nil;
-  CreateSeperateThreadVectorGroupList;
+  //CreateSeperateThreadVectorGroupList;
+  CreateMainThreadVectorGroupList;
   MPFile := TMPFile.Create;
   MPFile.LoadPathFromReg;
 
@@ -280,6 +292,7 @@ end;
 
 procedure TMainForm.Load1Click(Sender: TObject);
 begin
+  inherited;
   if dlgPicture.Execute then
   begin
     imageName := dlgPicture.FileName;
@@ -368,6 +381,7 @@ end;
 
 procedure TMainForm.Open1Click(Sender: TObject);
 begin
+  inherited;
   PaintBoxMain.Repaint;
 end;
 
@@ -413,6 +427,7 @@ procedure TMainForm.R2V1Click(Sender: TObject);
 var
   workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
 begin
+  inherited;
   try
     InfoAkcja('Wczytywanie obrazka.');
     Screen.Cursor := crHourGlass;
@@ -441,6 +456,7 @@ begin
     else if mapFactory is TMainThreadVectList then
     begin
       mapFactory.groupRect;
+      mapFactory.fillColorArr;
       mapFactory.makeEdgesForGroups;
     end else
       Assert(False, 'Klasa mapFactory rózna od TSeparateThreadVectList i TMainThreadVectList');
@@ -463,6 +479,7 @@ end;
 
 procedure TMainForm.Tylkoread1Click(Sender: TObject);
 begin
+  inherited;
   Screen.Cursor := crHourGlass;
   mapFactory.ReadFromImg(imgMain);
   DoZoom;
@@ -536,24 +553,26 @@ end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
 begin
+  inherited;
   Close;
 end;
 
 procedure TMainForm.GridColor1Click(Sender: TObject);
 begin
+  inherited;
   if cdGrid.execute then
     gridColor := cdGrid.Color;
 end;
 
 procedure TMainForm.actR2VMenuExecute(Sender: TObject);
 begin
-  OtherMG.Enabled := not assigned(taskR2V);
-  MainMG.Enabled := not assigned(taskR2V);
+//  OtherMG.Enabled := not assigned(taskR2V);
+//  MainMG.Enabled := not assigned(taskR2V);
 end;
 
 procedure TMainForm.actR2VBtnStopExecute(Sender: TObject);
 begin
-  btnStopR2V.Enabled := assigned(taskR2V);
+//  btnStopR2V.Enabled := assigned(taskR2V);
 end;
 
 end.
