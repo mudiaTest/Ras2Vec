@@ -233,7 +233,6 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
-    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 590
@@ -313,7 +312,6 @@ object MainForm: TMainForm
       Caption = 'Main'
     end
     object OtherMG: TMenuItem
-      Action = actR2VMenu
       Caption = 'Other'
       object Open1: TMenuItem
         Caption = 'Open'

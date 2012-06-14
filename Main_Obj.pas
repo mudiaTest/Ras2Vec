@@ -59,6 +59,8 @@ type
     fborderSN: boolean;
     fborderEW: boolean;
     fborderWE: boolean;
+    fcanidate: Boolean;
+    fused: Boolean;
   published
     property color: Integer read fcolor write fcolor;
     property colorN: Integer read fcolorN write fcolorN;
@@ -74,6 +76,8 @@ type
     property borderSN: boolean read fborderSN write fborderSN;
     property borderEW: boolean read fborderEW write fborderEW;
     property borderWE: boolean read fborderWE write fborderWE;
+    property candidate: boolean read fcanidate write fcanidate;
+    property used: boolean read fused write fused;
   public
     constructor Create;
   end;
@@ -176,6 +180,8 @@ public
     //leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
     //lista krawêdzi punktów Integer (pixeli) (kolejnych)
     fedgePxList: TIntList;
+    //lista wewnêtrznych krawêdzi. Ka¿da z nich ma konstrukcjê jak fedgePxList
+    finnerEdgesList: TIntList;
     //lista krawêdzi punktów Double
     //fedgeGeoList: TIntList;
     //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
@@ -209,9 +215,11 @@ public
     function SrcHeight: Integer;
     function SrcWidth: Integer;
     function vectObjArr: TDynamicPointArray;
+    function colorArr:  TDynamicPxColorPointArray;
     function PxPointToGeoPoint(aPxPoint: TVectRectangle): TGeoPoint;
   published
     property edgePxList: TIntList read fedgePxList write fedgePxList;
+    property innerEdgesList: TIntList read finnerEdgesList write finnerEdgesList;
     //property edgeGeoList: TIntList read fedgeGeoList write fedgeGeoList;
     property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
@@ -228,7 +236,7 @@ public
     function simplifyVectorEdge(arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
     function GeoArray2PxArray(aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
     //buduje krawêdŸ
-    procedure makeEdges;
+    procedure makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false);
   end;
 
   //lista grup rectangli wektorowych - TVectRectGroup
@@ -248,8 +256,8 @@ public
     fYGeoPX: Double;
     fvectRectGroupsByColor: TJclIntegerHashMap; //key - kolor; obj - lista grup w tym kolorze
     fcolorArr: TDynamicPxColorPointArray;
-    function getObjById(index: Integer): TVectObj;
-    procedure setObjById(index: Integer; avectObj: TVectObj);
+    function getObjByIdx(index: Integer): TVectObj;
+    procedure setObjByIdx(index: Integer; avectObj: TVectObj);
     procedure InfoAkcja(aStr: String); virtual;
     procedure InfoTime(aStr: String); virtual;
   published
@@ -279,13 +287,18 @@ public
     function FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor,
                      agrid: boolean; agridColor: TColor): TBitmap;
     //dostêp do obiektów u¿ywaj¹c getObjById i setObjById
-    property vObj[index: integer]: TVectObj read getObjById write setObjById;
+    property vObj[index: integer]: TVectObj read getObjByIdx write setObjByIdx;
     //tworzy grupy obiektów TVectRectangle czyli przysz³e polygony
     procedure groupRect;
     //wype³ania arrColor, czyli tablicê z informacj¹ o kolorach piceli i ich s¹siadów
-    procedure fillColorArr;
+    procedure FillColorArr;
+    //uzupe³nia arrColor i informacje o kierunkach dla px bêd¹cymi granicami zewnêtrznymi
+    procedure UpdateColorArr;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForGroups;
+    //wybudowanie granic wewnêtrznych. Przechodzimy po tablicy colorArr i dla 
+    //kandydatów dodajemy do ich grup nowe granice wewnêtrzne - dlo listy
+    procedure makeInnerEdgesForGroups;
     constructor Create; override;
     //Oblicze ile stopni zawiera jeden PX
     procedure CalculateGeoPx;
@@ -506,7 +519,7 @@ begin
   aimg.Canvas.Unlock;
 end;
 
-function TMapFactory.getObjById(index: Integer): TVectObj;
+function TMapFactory.getObjByIdx(index: Integer): TVectObj;
 begin
   result := Objects[index] as TVectObj;
 end;
@@ -574,7 +587,7 @@ begin
   end;
 end;
 
-procedure TMapFactory.fillColorArr;
+procedure TMapFactory.FillColorArr;
   function dajColorPx(x, y: Integer): TColorPx;
   begin
     result := TColorPx.Create;
@@ -626,6 +639,7 @@ var
  // perf2, perf3: TTimeInterval;
   //colorGroupList: TColorGroupList;
   colorPx: TColorPx;
+  colorPx2: TColorPx;
 begin
   //perf := TTimeInterval.Create;
   //perf2 := TTimeInterval.Create;
@@ -637,6 +651,52 @@ begin
     //perf.Start;
     for x:=0 to srcWidth-1 do
       colorArr[x,y] := dajColorPx(x, y);
+
+  for y:=0 to srcHeight-2 do
+    //perf.Start;
+    for x:=0 to srcWidth-1 do
+    begin
+      colorPx := colorArr[x,y] as TColorPx;
+      colorPx2 := colorArr[x,y+1] as TColorPx;
+      if (colorPx.group <> colorPx2.group) and
+         not colorPx.borderEW then
+      begin
+        colorPx.candidate := True;
+      end
+    end;
+end;
+
+procedure TMapFactory.UpdateColorArr;
+var
+  x, y: Integer;
+  vectObj: TVectRectangle;
+  key: integer;
+  //lpGrupa: integer;
+  //perf: TTimeInterval;
+ // perf2, perf3: TTimeInterval;
+  //colorGroupList: TColorGroupList;
+  colorPx: TColorPx;
+  colorPx2: TColorPx;
+begin
+  //perf := TTimeInterval.Create;
+  //perf2 := TTimeInterval.Create;
+  //perf3 := TTimeInterval.Create;
+  //Clear;
+  //lpGrupa := 0;
+  //srodek
+
+  for y:=0 to srcHeight-2 do
+    //perf.Start;
+    for x:=0 to srcWidth-1 do
+    begin
+      colorPx := colorArr[x,y] as TColorPx;
+      colorPx2 := colorArr[x,y+1] as TColorPx;
+      if (colorPx.group <> colorPx2.group) and
+         not colorPx.borderEW then
+      begin
+        colorPx.candidate := True;
+      end
+    end;
 end;
 
 
@@ -662,11 +722,40 @@ begin
     DivMod(i, inMod, wrRes, wrDiv);
     if wrDiv = 0 then
       InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
-    vectGroup.makeEdges;
+    vectGroup.makeEdges(vectGroup.edgePxList);
   end;
 end;
 
-procedure TMapFactory.setObjById(index: Integer; avectObj: TVectObj);
+procedure TMapFactory.makeInnerEdgesForGroups;
+var
+  x, y: Integer;
+  colorPx: TColorPx;
+  colorPxDown: TColorPx;
+  vectGroup: TVectRectGroup;
+  vectGroupDown: TVectRectGroup;
+  list: TIntList; 
+begin
+  for y:=0 to srcHeight-2 do
+    for x:=0 to srcWidth-1 do
+    begin
+      colorPx := colorArr[x,y] as TColorPx;
+      colorPxDown := colorArr[x,y+1] as TColorPx;
+      if colorPx.candidate and
+         not colorPx.used then
+      begin
+        //wybuduj i dodaj wewnêtrzn¹ granicê
+
+        //budujemy listê punktów dla nowej granicy wewnêtrznej
+        list := TIntList.Create;
+        vectGroup := ObjByVal[colorPx.group] as TVectRectGroup;
+        vectGroupDown := ObjByVal[colorPxDown.group] as TVectRectGroup;
+        vectGroupDown.makeEdges(list, true);
+        vectGroup.innerEdgesList.AddObject(vectGroup.innerEdgesList.nextKey, list);
+      end;
+    end;
+end;
+
+procedure TMapFactory.setObjByIdx(index: Integer; avectObj: TVectObj);
 begin
   Objects[index] := avectObj;
 end;
@@ -907,12 +996,18 @@ end;}
 
 { TVectRectGroup }
 
+function TVectRectGroup.colorArr: TDynamicPxColorPointArray;
+begin
+  Result := mapFactory.colorArr;
+end;
+
 constructor TVectRectGroup.Create;
 begin
   inherited;
   fedgePXList := TIntList.Create;
   frectList := TIntList.Create;
   MapFactory := nil;
+  finnerEdgesList := TIntList.Create;
 end;
 
 destructor TVectRectGroup.Destroy;
@@ -1047,7 +1142,7 @@ begin
   //to do
 end;
 
-procedure TVectRectGroup.makeEdges;
+procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false);
   function nextDirection(aDirection: Integer): Integer;
   var
     res, reminder: Word;
@@ -1152,12 +1247,23 @@ procedure TVectRectGroup.makeEdges;
       end;
       Inc(j);
     end;
+    if (Result <> nil) and
+       //przeszliœmy z prawa na lewo
+       (arrDir = c_fromRight) then
+      (colorArr[Result.p1.x, Result.p1.y] as TColorPx).borderEW := True;
   end;
-var
+
+  procedure Uncandidate(aedgePoint: TVectRectangle);
+  begin
+    if ablInnerBorder then
+      (colorArr[aedgePoint.P1.x, aedgePoint.P1.y-1] as TColorPx).used := True;
+  end;
+  
+  var
   startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
   arrivDir: integer;
 begin
-  edgePxList.Clear;
+  aedgePxList.Clear;
   //startEdgePoint to pierwszy punkt na liœcie, bo idziemy ol lewej strony
   //w najwy¿szym wierszu
   startEdgePoint := rectList.Objects[0] as TVectRectangle;
@@ -1187,12 +1293,13 @@ begin
       //try
       nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
       //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
-      if (nextEdgePoint = nil) and (edgePxList.Count <> 0) then
+      if (nextEdgePoint = nil) and (aedgePxList.Count <> 0) then
         Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
                                 ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                                IntToStr(edgePxList.Count));
+                                IntToStr(aedgePxList.Count));
 
-      edgePxList.AddObject(edgePxList.nextKey, nextEdgePoint);
+      aedgePxList.AddObject(aedgePxList.nextKey, nextEdgePoint);
+      Uncandidate(nextEdgePoint);
       prevEdgePoint := nextEdgePoint;
 
       //except
@@ -1205,7 +1312,8 @@ begin
   else
   begin
     //dodajemy punkty graniczne do listy
-    edgePxList.AddObject(edgePxList.nextKey, startEdgePoint);
+    aedgePxList.AddObject(aedgePxList.nextKey, startEdgePoint);
+    Uncandidate(startEdgePoint);
   end;
   //PxListToGeoList;
 end;
@@ -1876,6 +1984,8 @@ begin
   borderSN := False;
   borderEW := False;
   borderWE := False;
+  candidate := False;
+  used := False;
 end;
 
 end.

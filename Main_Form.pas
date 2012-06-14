@@ -405,9 +405,9 @@ procedure TMainForm.SetControls(atask: integer);
 begin
   if atask = OW_DO_R2V then
   begin
-    OtherMG.Enabled := not assigned(taskR2V);
-    MainMG.Enabled := not assigned(taskR2V);
-    btnStopR2V.Enabled := assigned(taskR2V);
+    //OtherMG.Enabled := not assigned(taskR2V);
+    //MainMG.Enabled := not assigned(taskR2V);
+    //btnStopR2V.Enabled := assigned(taskR2V);
   end;
 end;
 
@@ -456,8 +456,10 @@ begin
     else if mapFactory is TMainThreadVectList then
     begin
       mapFactory.groupRect;
-      mapFactory.fillColorArr;
+      mapFactory.FillColorArr;
       mapFactory.makeEdgesForGroups;
+      mapFactory.UpdateColorArr;
+      mapFactory.makeInnerEdgesForGroups;
     end else
       Assert(False, 'Klasa mapFactory rózna od TSeparateThreadVectList i TMainThreadVectList');
 
