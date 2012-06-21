@@ -114,7 +114,9 @@ type
     procedure AddMPFileHead;
     procedure AddLevels;
     procedure AddZoom;
-    procedure AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; aLevel: integer;
+    //podstawowa funkcja buduj¹ca plik MP
+    procedure AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup;
+                                             aLevel: integer;
                                              axGeoPX, ayGeoPX: Double;
                                              adisplaceX, adisplaceY: Double;
                                              aColorGroupList: TColorGroupList;
@@ -205,11 +207,13 @@ public
     procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
                            var counter: integer; aGeoArr: TDynamicGeoPointArray;
                            amultiX, aMultiY: Double; displaceX, displaceY: Double;
-                           acolorArr: TDynamicPxColorPointArray);
+                           acolorArr: TDynamicPxColorPointArray;
+                           ablOnlyFillColorArr: Boolean);
     //tworzy krawêdzie dla pojedynczego punktu
     procedure makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
                                     amultiX, amultiY: Double; displaceX, displaceY: Double;
-                                    acolorArr: TDynamicPxColorPointArray);
+                                    acolorArr: TDynamicPxColorPointArray;
+                                    ablOnlyFillColorArr: Boolean);
     procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
     //procedure PxListToGeoList;
     function SrcHeight: Integer;
@@ -230,13 +234,16 @@ public
     constructor Create; overload;
     destructor Destroy; override;
     //tworzy tablicê punktów z ponktów zawartych w edgePxList
-    function makeVectorEdge({vectArr: TDynamicPointArray; }aMultiX, aMultiY: Double;
-                            adisplaceX, adisplaceY: Double;
-                            acolorArr: TDynamicPxColorPointArray): TDynamicGeoPointArray;//(vectArr: TVarArray);
+    function makeVectorEdge(aedgePxList: TIntList;
+                            acolorArr: TDynamicPxColorPointArray;{vectArr: TDynamicPointArray; }
+                            ablOnlyFillColorArr: Boolean;
+                            aMultiX: Double = 0; aMultiY: Double = 0;
+                            adisplaceX: Double = 0; adisplaceY: Double = 0): TDynamicGeoPointArray;//(vectArr: TVarArray);
     function simplifyVectorEdge(arr: TDynamicGeoPointArray): TDynamicGeoPointArray;
     function GeoArray2PxArray(aGeoArr: TDynamicGeoPointArray): TDynamicPxPointArray;
     //buduje krawêdŸ
-    procedure makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false);
+    procedure makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false;
+                        aOuterGroup: Integer = 0);
   end;
 
   //lista grup rectangli wektorowych - TVectRectGroup
@@ -283,7 +290,7 @@ public
     //oddaje bitmapê - wype³nia obraz "rectanglami"
     function FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                      agrid: boolean; agridColor: TColor): TBitmap;
-    //oddaje bitmapê - wype³nia obraz polygonami"
+    //oddaje bitmapê - wype³nia obraz "polygonami"
     function FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor,
                      agrid: boolean; agridColor: TColor): TBitmap;
     //dostêp do obiektów u¿ywaj¹c getObjById i setObjById
@@ -499,7 +506,8 @@ begin
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      geoPointArr := vectGroup.makeVectorEdge({self.vectArr,} azoom, azoom, 0 ,0, colorArr);
+      geoPointArr := vectGroup.makeVectorEdge(vectGroup.edgePxList, colorArr, false, {self.vectArr,}
+                                              azoom, azoom, 0 ,0);
       pxPointArray := vectGroup.GeoArray2PxArray(geoPointArr);
 
       {for j:=0 to vectGroup.edgePxList.Count-1 do
@@ -695,7 +703,8 @@ begin
          not colorPx.borderEW then
       begin
         colorPx.candidate := True;
-      end
+      end else
+        colorPx.candidate := False;
     end;
 end;
 
@@ -747,9 +756,12 @@ begin
 
         //budujemy listê punktów dla nowej granicy wewnêtrznej
         list := TIntList.Create;
+        //vectGroup grupa g³ówna
         vectGroup := ObjByVal[colorPx.group] as TVectRectGroup;
+        //vectGroupDown - grupa px bêd¹cego poni¿ej. Z niego zaczniemy budowaæ  granicê wewnêtrzn¹
         vectGroupDown := ObjByVal[colorPxDown.group] as TVectRectGroup;
-        vectGroupDown.makeEdges(list, true);
+        //makeEdges wybuduje granicê i wszystkie px powy¿ej punktów granicy ustawi used=true
+        vectGroupDown.makeEdges(list, true, colorPx.group);
         vectGroup.innerEdgesList.AddObject(vectGroup.innerEdgesList.nextKey, list);
       end;
     end;
@@ -1057,44 +1069,49 @@ begin
   mian := getMianownik(A);
 end;
 
-function TVectRectGroup.makeVectorEdge({vectArr: TDynamicPointArray; }aMultiX, aMultiY: Double;
-                                   adisplaceX, adisplaceY: Double;
-                                   acolorArr: TDynamicPxColorPointArray): TDynamicGeoPointArray;
+function TVectRectGroup.makeVectorEdge(aedgePxList: TIntList;
+                                       acolorArr: TDynamicPxColorPointArray; {vectArr: TDynamicPointArray; }
+                                       ablOnlyFillColorArr: Boolean;
+                                       aMultiX: Double; aMultiY: Double;
+                                       adisplaceX: Double; adisplaceY: Double): TDynamicGeoPointArray;
 var
   i: integer;
   o1, o2, o3: TOPoint;
   counter: integer;
 begin
   counter := 0;
-  SetLength(result, edgePxList.Count*3);
-  if edgePxList.Count > 1 then
+  if not ablOnlyFillColorArr then
+    SetLength(result, aedgePxList.Count*3);
+  if aedgePxList.Count > 1 then
   begin
     //SetLength(result, self.rectList.Count+30);
-    o1 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
-    o2 := (edgePxList.Objects[0] as TVectObj).getP(0);
-    o3 := (edgePxList.Objects[1] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, aMultiX, aMultiY, adisplaceX, adisplaceY, acolorArr);
+    o1 := (aedgePxList.Objects[aedgePxList.Count-1] as TVectObj).getP(0);
+    o2 := (aedgePxList.Objects[0] as TVectObj).getP(0);
+    o3 := (aedgePxList.Objects[1] as TVectObj).getP(0);
+    makePartEdge(o1, o2, o3, counter, result, aMultiX, aMultiY, adisplaceX, adisplaceY, acolorArr, ablOnlyFillColorArr);
 
-    for i:=1 to edgePxList.Count-2 do
+    for i:=1 to aedgePxList.Count-2 do
     begin
-      o1 := (edgePxList.Objects[i-1] as TVectObj).getP(0);
-      o2 := (edgePxList.Objects[i] as TVectObj).getP(0);
-      o3 := (edgePxList.Objects[i+1] as TVectObj).getP(0);
-      makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY, acolorArr);
+      o1 := (aedgePxList.Objects[i-1] as TVectObj).getP(0);
+      o2 := (aedgePxList.Objects[i] as TVectObj).getP(0);
+      o3 := (aedgePxList.Objects[i+1] as TVectObj).getP(0);
+      makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY, acolorArr, ablOnlyFillColorArr);
     end;
 
-    o1 := (edgePxList.Objects[edgePxList.Count-2] as TVectObj).getP(0);
-    o2 := (edgePxList.Objects[edgePxList.Count-1] as TVectObj).getP(0);
-    o3 := (edgePxList.Objects[0] as TVectObj).getP(0);
-    makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY, acolorArr);
+    o1 := (aedgePxList.Objects[aedgePxList.Count-2] as TVectObj).getP(0);
+    o2 := (aedgePxList.Objects[aedgePxList.Count-1] as TVectObj).getP(0);
+    o3 := (aedgePxList.Objects[0] as TVectObj).getP(0);
+    makePartEdge(o1, o2, o3, counter, result, amultiX, aMultiY, adisplaceX, adisplaceY, acolorArr, ablOnlyFillColorArr);
     //SetLength(result, Min(counter,10));
-    SetLength(result, counter);
+    if not ablOnlyFillColorArr then
+      SetLength(result, counter);
   end else
   begin
-    SetLength(result, 4);
-    makePartEdge4OnePoint((edgePxList.Objects[0] as TVectObj).getP(0),
+    if not ablOnlyFillColorArr then
+      SetLength(result, 4);
+    makePartEdge4OnePoint((aedgePxList.Objects[0] as TVectObj).getP(0),
                           result, amultiX, aMultiY, adisplaceX, adisplaceY,
-                          acolorArr);
+                          acolorArr, ablOnlyFillColorArr);
     counter := 4;
   end;
 end;
@@ -1142,7 +1159,8 @@ begin
   //to do
 end;
 
-procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false);
+procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolean = false;
+                                   aOuterGroup: Integer = 0);
   function nextDirection(aDirection: Integer): Integer;
   var
     res, reminder: Word;
@@ -1173,7 +1191,8 @@ procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolea
         if aprevEdge.getP1.y > 0 then
         begin
           Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y-1] as TVectRectangle;
-          if aprevEdge.vectGroupId = Result.vectGroupId then
+          if (not ablInnerBorder and (aprevEdge.vectGroupId = Result.vectGroupId)) or
+             (ablInnerBorder and( Result.vectGroupId <> aOuterGroup)) then
             Exit;
         end;
         Result := nil;
@@ -1183,7 +1202,8 @@ procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolea
         if aprevEdge.getP1.x < srcWidth-1 then
         begin
           Result := vectObjArr[aprevEdge.getP1.x+1, aprevEdge.getP1.y] as TVectRectangle;
-          if aprevEdge.vectGroupId = Result.vectGroupId then
+          if (not ablInnerBorder and (aprevEdge.vectGroupId = Result.vectGroupId)) or
+             (ablInnerBorder and (Result.vectGroupId <> aOuterGroup)) then
             Exit;
         end;
         Result := nil;
@@ -1193,7 +1213,8 @@ procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolea
         if aprevEdge.getP1.y < srcHeight-1 then
         begin
           Result := vectObjArr[aprevEdge.getP1.x, aprevEdge.getP1.y+1] as TVectRectangle;
-          if aprevEdge.vectGroupId = Result.vectGroupId then
+          if (not ablInnerBorder and (aprevEdge.vectGroupId = Result.vectGroupId)) or
+             (ablInnerBorder and (Result.vectGroupId <> aOuterGroup)) then
             Exit;
         end;
         Result := nil;
@@ -1203,7 +1224,8 @@ procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolea
         if aprevEdge.getP1.x > 0 then
         begin
           Result := vectObjArr[aprevEdge.getP1.x-1, aprevEdge.getP1.y] as TVectRectangle;
-          if aprevEdge.vectGroupId = Result.vectGroupId then
+          if (not ablInnerBorder and (aprevEdge.vectGroupId = Result.vectGroupId)) or
+             (ablInnerBorder and (Result.vectGroupId <> aOuterGroup)) then
             Exit;
         end;
         Result := nil;
@@ -1253,15 +1275,48 @@ procedure TVectRectGroup.makeEdges(aedgePxList: TIntList; ablInnerBorder: boolea
       (colorArr[Result.p1.x, Result.p1.y] as TColorPx).borderEW := True;
   end;
 
-  procedure Uncandidate(aedgePoint: TVectRectangle);
+  {procedure Uncandidate;
+  var
+    i: Integer;
+    pointPrv: TVectRectangle;
+    point: TVectRectangle;
+    pointNext: TVectRectangle;
+  begin
+    if aedgePxList.Count = 1 then
+    begin
+      point := aedgePxList.Objects[0] as TVectRectangle;
+      (colorArr[point.P1.x, point.P1.y-1] as TColorPx).used := True;
+    end
+    else if aedgePxList.Count = 2 then
+    begin
+
+    end
+    else
+    begin
+      for i:=1 to aedgePxList.Count-3 do
+      pointPrv := aedgePxList.Objects[i-1] as TVectRectangle;
+      point := aedgePxList.Objects[i] as TVectRectangle;
+      pointNext := aedgePxList.Objects[i+1] as TVectRectangle;
+    end;
+  end;}
+
+  procedure MakeUsed;
+  var
+    i: Integer;
+    point: TVectRectangle;
   begin
     if ablInnerBorder then
-      (colorArr[aedgePoint.P1.x, aedgePoint.P1.y-1] as TColorPx).used := True;
+      for i:=0 to aedgePxList.Count-1 do
+      begin
+        point := aedgePxList.Objects[i] as TVectRectangle;
+        (colorArr[point.P1.x, point.P1.y-1] as TColorPx).used := True;
+      end;
   end;
-  
+
   var
   startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
   arrivDir: integer;
+  dummyArr: TDynamicGeoPointArray;
 begin
   aedgePxList.Clear;
   //startEdgePoint to pierwszy punkt na liœcie, bo idziemy ol lewej strony
@@ -1286,7 +1341,7 @@ begin
         else
         begin
           //arrivDir := -1;
-          Exit;
+          Break;
         end;
 
       end;
@@ -1299,7 +1354,7 @@ begin
                                 IntToStr(aedgePxList.Count));
 
       aedgePxList.AddObject(aedgePxList.nextKey, nextEdgePoint);
-      Uncandidate(nextEdgePoint);
+      //MakeUsed(nextEdgePoint);
       prevEdgePoint := nextEdgePoint;
 
       //except
@@ -1313,15 +1368,19 @@ begin
   begin
     //dodajemy punkty graniczne do listy
     aedgePxList.AddObject(aedgePxList.nextKey, startEdgePoint);
-    Uncandidate(startEdgePoint);
+   // MakeUsed(startEdgePoint);
   end;
+  dummyArr := makeVectorEdge(aedgePxList, colorArr, true);
+  MakeUsed;
+  SetLength(dummyArr, 0);
   //PxListToGeoList;
 end;
 
 procedure TVectRectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint;
                                   var counter: integer; aGeoArr: TDynamicGeoPointArray;
                                   amultiX, aMultiY: double; displaceX, displaceY: Double;
-                                  acolorArr: TDynamicPxColorPointArray);
+                                  acolorArr: TDynamicPxColorPointArray;
+                                  ablOnlyFillColorArr: Boolean);
 var
   colorPx: TColorPx;
 begin
@@ -1334,24 +1393,33 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      counter := counter + 2;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        counter := counter + 2;
+      end;
       colorPx.borderWE := True;
       colorPx.borderNS := True;
     end
     else if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
-      counter := counter + 1;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
+        counter := counter + 1;
+      end;
       colorPx.borderWE := True;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      counter := counter + 3;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x)*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        counter := counter + 3;
+      end;
       colorPx.borderWE := True;
       colorPx.borderNS := True;
       colorPx.borderEW := True;
@@ -1362,9 +1430,12 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      counter := counter + 2;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        counter := counter + 2;
+      end;
       colorPx.borderEW := True;
       colorPx.borderSN := True;
     end
@@ -1374,16 +1445,22 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x + 1)*amultiX + displaceX, (actPoint.y + 1)*amultiY + displaceY);
-      counter := counter + 1;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x + 1)*amultiX + displaceX, (actPoint.y + 1)*amultiY + displaceY);
+        counter := counter + 1;
+      end;
       colorPx.borderEW := True;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
-      counter := counter + 3;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y)*amultiY + displaceY);
+        counter := counter + 3;
+      end;
       colorPx.borderEW := True;
       colorPx.borderNS := True;
       colorPx.borderWE := True;
@@ -1398,26 +1475,35 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromRight then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      counter := counter + 2;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        counter := counter + 2;
+      end;
       colorPx.borderNS := True;
       colorPx.borderEW := True;
     end
     else if direction(actPoint, nextPoint) = c_fromTop then
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      counter := counter + 1;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        counter := counter + 1;
+      end;
       colorPx.borderNS := True;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      counter := counter + 3;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+2] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        counter := counter + 3;
+      end;
       colorPx.borderNS := True;
-      colorPx.borderWE := True;
+      colorPx.borderEW := True;
       colorPx.borderSN := True;
     end;
   end
@@ -1426,9 +1512,12 @@ begin
   begin
     if direction(actPoint, nextPoint) = c_fromLeft then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      counter := counter + 2;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        counter := counter + 2;
+      end;
       colorPx.borderSN := True;
       colorPx.borderWE := True;
     end
@@ -1438,16 +1527,22 @@ begin
     end
     else if direction(actPoint, nextPoint) = c_fromBottom then
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      counter := counter + 1;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        counter := counter + 1;
+      end;
       colorPx.borderSN := True;
     end
     else
     begin
-      aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
-      aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
-      counter := counter + 3;
+      if not ablOnlyFillColorArr then
+      begin
+        aGeoArr[counter] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, (actPoint.y+1)*amultiY + displaceY);
+        aGeoArr[counter+1] := TGeoPoint.Create(actPoint.x*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        aGeoArr[counter+2] := TGeoPoint.Create((actPoint.x+1)*amultiX + displaceX, actPoint.y*amultiY + displaceY);
+        counter := counter + 3;
+      end;
       colorPx.borderSN := True;
       colorPx.borderWE := True;
       colorPx.borderNS := True;
@@ -1457,14 +1552,18 @@ end;
 
 procedure TVectRectGroup.makePartEdge4OnePoint(aPoint: TOPoint; aGeoArr: TDynamicGeoPointArray;
                                            amultiX, amultiY: Double; displaceX, displaceY: Double;
-                                           acolorArr: TDynamicPxColorPointArray);
+                                           acolorArr: TDynamicPxColorPointArray;
+                                           ablOnlyFillColorArr: Boolean);
 var
   colorPx: TColorPx;
 begin
-  aGeoArr[0] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y)*amultiY + displaceY);
-  aGeoArr[1] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, aPoint.y*amultiY + displaceY);
-  aGeoArr[2] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
-  aGeoArr[3] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
+  if not ablOnlyFillColorArr then
+  begin
+    aGeoArr[0] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y)*amultiY + displaceY);
+    aGeoArr[1] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, aPoint.y*amultiY + displaceY);
+    aGeoArr[2] := TGeoPoint.Create((aPoint.x+1)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
+    aGeoArr[3] := TGeoPoint.Create((aPoint.x)*amultiX + displaceX, (aPoint.y+1)*amultiY + displaceY);
+  end;
   colorPx := acolorArr[aPoint.x, aPoint.y] as TColorPx;
   colorPx.borderNS := true;
   colorPX.borderSN := true;
@@ -1593,13 +1692,14 @@ begin
   end;
 end;
 
-procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; aLevel: integer;
+procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup;
+                                                 aLevel: integer;
                                                  axGeoPX, ayGeoPX: Double;
                                                  adisplaceX, adisplaceY: Double;
                                                  aColorGroupList: TColorGroupList;
                                                  acolorArr: TDynamicPxColorPointArray);
 
-  function getEdgeStr: String;
+  function getEdgeStr(aedgePxList: TIntList): String;
     function GeoPiontToStr(aVal: Double): String;
     begin
       result := StringReplace(Format('%.5f', [aVal]),',','.',[rfReplaceAll]);
@@ -1615,7 +1715,8 @@ procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; 
     //punkt 0 grafiki to lewy górny róg, wiêc dlatego w wysokoœci jest minus
     //"szerokoœæ" mapy zwiêksza siê z zachodu na wschód, wiêc tak jak na
     //grafice, dlatego jest plus
-    geoEdgeArr := aVectRecGroup.makeVectorEdge(axGeoPX, -ayGeoPX, adisplaceX, adisplaceY, acolorArr);
+    geoEdgeArr := aVectRecGroup.makeVectorEdge(aedgePxList, acolorArr, false,
+                                               axGeoPX, -ayGeoPX, adisplaceX, adisplaceY);
     result := '';
     for i := 0 to Length(GeoEdgeArr)-1 do
     begin
@@ -1627,7 +1728,8 @@ procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup; 
   end;
 
   {Format(%2.8d, geoPoint.x)}
-
+var
+  i: Integer;
 begin
   with mpLineList do
   begin
@@ -1636,7 +1738,9 @@ begin
     //Add(' * Typ=' + aColorGroupList.colorTyp);
     Add('Label=');
     Add('EndLevel=4');
-    Add('Data' + intToStr(aLevel) + '=' + getEdgeStr);//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    Add('Data' + intToStr(aLevel) + '=' + getEdgeStr(aVectRecGroup.edgePxList));//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
+    for i:=0 to aVectRecGroup.innerEdgesList.Count-1 do
+      Add('Data' + intToStr(aLevel) + '=' + getEdgeStr(aVectRecGroup.innerEdgesList.Objects[i] as TIntList));
     Add('[END]');
   end;
 end;
