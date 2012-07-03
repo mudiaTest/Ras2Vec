@@ -65,7 +65,14 @@ type
 
   function StrConcat(separator, left, right: String): String;
 
-  procedure addIntToStrHex(aInt: integer; aDigits: integer; var aStr: String);
+  //zmiania int na dowolnej d³ugoœci hexa.
+  //Ka¿dy bajt to 2 znaki w stringu
+  //bajty mniej znacz¹ce s¹ pierwsze (od lewej strony)
+  //aBytesLen okreœla ilobajtowy ma to byæ ci¹g
+  procedure addIntToStrHex(aInt: integer; aBytesLen: integer; var aStr: String);
+
+  //zmienia string Hex na liczbê integer
+  function HexToInt(astHex: String): integer;
 
 implementation
 
@@ -91,24 +98,35 @@ implementation
     Result := aPath1 + aPath2;
   end;
 
-  procedure addIntToStrHex(aInt: integer; aDigits: integer; var aStr: String);
+  procedure addInt2StrHex(aInt: integer; aBytesLen: integer; var aStr: String);
   var
     i: integer;
     stMain: String;
     stPart: String;
   begin
-    stMain := intToHex(aInt, aDigits*2);
+    stMain := intToHex(aInt, aBytesLen*2);
+    //w stMain bajty mniej znacz¹ce s¹ po prawej stronie, a my potrzebujemy ich po lewej
+    //wiêc zamieniamy kolejnoœci¹
     for i := 0 to Ceil(Length(stMain)/2)-1 do
     begin
-      {stPart := Copy(stMain, 0, Min(Length(stMain), 2));
-      stMain := Copy(stMain, 3, Length(stMain)-2);   }
       stPart := Copy(stMain, Length(stMain)-1, 2);
       stMain := Copy(stMain, 0, Length(stMain)-2);
       aStr := aStr + AnsiChar(strToInt('$' + stPart));
-
-      //aStr := aStr + chr(strToInt('$' + stPart[1]));
-      //aStr := aStr + chr(strToInt('$' + stPart[2]));
     end;
+  end;
+
+  function Hex2Int(astHex: String): integer;
+  var
+    i: integer;
+    stPart: String;
+  begin
+    result := 0;
+    for i := 0 to Ceil(Length(astHex)/2)-1 do
+    begin
+      stPart := Copy(astHex, i*2, 2);
+      result := result + HexToInt(stPart);
+    end;
+
   end;
 
 { TIntList }
