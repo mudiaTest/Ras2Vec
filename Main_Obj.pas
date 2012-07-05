@@ -1947,15 +1947,20 @@ begin
   It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
-    {AddInt2StrHex(6 , 1, stTypBody);
-    colorGroupList := TColorGroupList(It.Next);
-    AddInt2StrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
-    //offset: 4 bajty na ka¿dy polygon
-    AddInt2StrHex(i*4 , 2, stTypBody);}
     inc(ile);
     Assert(ile <= 256, 'Liczba typów przekracza 256.');
     colorGroupList := TColorGroupList(It.Next);
-    AddInt2StrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
+    //E002:
+    //E*16+2*256=736
+    //736/32[$20]=_23[$17]
+    //753mod32[$20]=0[$0] wiêc typ17 podtyp 0
+    //
+    //0x1FF18 18[$12] ??
+    //511*32[$20]=16352 16352+09=745[$]
+    //numerTypuPolygonu * 32
+    AddInt2StrHex(colorGroupList.idMPGroup*32, 1, stTypBody);
+    //
+    AddInt2StrHex(0 , 1, stTypBody);
     AddInt2StrHex((ile-1)*4 , 2, stTypBody);
   end;
 end;
