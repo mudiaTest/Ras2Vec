@@ -5,9 +5,12 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl,
-  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus,
-  OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
-  Main_Thread, Sys_utl, Vcl.ActnList, Vcl.Mask
+  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus, Sys_utl, ActnList, Mask
+  {$IFNDEF VER185}
+  ,OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
+  ,Main_Thread,
+  ,Vcl.ActnList, Vcl.Mask
+  {$ENDIF}
   ;
 
 const
@@ -49,7 +52,9 @@ type
     GridColor1: TMenuItem;
     lblAkcja: TLabel;
     lblTime: TLabel;
+    {$IFNDEF VER185}
     oemR3V: TOmniEventMonitor;
+    {$ENDIF}
     btnStopR2V: TButton;
     MainActionList: TActionList;
     actR2VBtnStop: TAction;
@@ -86,9 +91,11 @@ type
     procedure R2V1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure GridColor1Click(Sender: TObject);
+    {$IFNDEF VER185}
     procedure oemR3VTaskTerminated(const task: IOmniTaskControl);
     procedure oemR3VTaskMessage(const task: IOmniTaskControl;
       const msg: TOmniMessage);
+    {$ENDIF}
     procedure btnStopR2VClick(Sender: TObject);
     procedure actR2VBtnStopExecute(Sender: TObject);
     procedure actR2VMenuExecute(Sender: TObject);
@@ -114,9 +121,9 @@ type
     MPFile: TMPFile; //obiekt do kompleksowej obs³ugi plików MP
 
     gridColor: TColor; //kolor siatki/otoczki polygonów
-
+    {$IFNDEF VER185}
     taskR2V: IOmniTaskControl; //omni task grupowania pixeli i wyznaczania granic dla rectangli
-
+    {$ENDIF}
     perf: TTimeInterval; //perf dla ca³ego R2V
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
@@ -124,7 +131,9 @@ type
     procedure saveZoomPos;
     procedure DoZoom;
     procedure SetControls(atask: integer);
+    {$IFNDEF VER185}
     procedure DoOnR2VTerminate;
+    {$ENDIF}
     procedure CreateMainThreadVectorGroupList;
     procedure CreateSeperateThreadVectorGroupList;
     function  DecodeGeoStr(aGeoPointStr: String): Double;
@@ -157,16 +166,20 @@ begin
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
   MPFile.SavePathToReg(SaveDialog.FileName);
-  mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
-  mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
-  mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
-  mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
-  MPFile.MPFileSave(mapFactory);
+  if SaveDialog.FileName <> '' then
+  begin
+    mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
+    mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
+    mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
+    mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
+    MPFile.MPFileSave(mapFactory);
+  end;
 end;
 
 procedure TMainForm.btnStopR2VClick(Sender: TObject);
 begin
   inherited;
+  {$IFNDEF VER185}
   try
     if assigned(taskR2V) then
     begin
@@ -178,6 +191,7 @@ begin
     actR2VBtnStopExecute(nil);
     DoOnR2VTerminate;
   end;
+  {$ENDIF}
 end;
 
 procedure TMainForm.btnZoomInClick(Sender: TObject);
@@ -231,17 +245,21 @@ begin
   if mapFactory <> nil then
     mapFactory.Free;
   mapFactory := TMainThreadVectList.Create;
+  {$IFNDEF VER185}
   mapFactory.OwnsObjects := true;
+  {$ENDIF}
   (mapFactory as TMainThreadVectList).lblAkcja := lblAkcja;
   (mapFactory as TMainThreadVectList).lblTime := lblTime;
 end;
 
 procedure TMainForm.CreateSeperateThreadVectorGroupList;
 begin
+  {$IFNDEF VER185}
   if mapFactory <> nil then
     mapFactory.Free;
   mapFactory := TSeparateThreadVectList.Create;
   mapFactory.OwnsObjects := true;
+  {$ENDIF}
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
@@ -256,7 +274,11 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
+  {$IFNDEF VER185}
   imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t3.bmp');
+  {$ELSE}
+  imgMain.Picture.LoadFromFile('C:\Documents and Settings\Mudia\Pulpit\t1.bmp');
+  {$ENDIF}
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
@@ -356,6 +378,7 @@ begin
   //setScrollPos(sbZoom, sbMain);
 end;
 
+{$IFNDEF VER185}
 procedure TMainForm.oemR3VTaskMessage(const task: IOmniTaskControl;
   const msg: TOmniMessage);
 begin
@@ -378,6 +401,7 @@ procedure TMainForm.oemR3VTaskTerminated(const task: IOmniTaskControl);
 begin
   DoOnR2VTerminate;
 end;
+{$ENDIF}
 
 procedure TMainForm.Open1Click(Sender: TObject);
 begin
@@ -403,14 +427,17 @@ end;
 
 procedure TMainForm.SetControls(atask: integer);
 begin
+  {$IFNDEF VER185}
   if atask = OW_DO_R2V then
   begin
     //OtherMG.Enabled := not assigned(taskR2V);
     //MainMG.Enabled := not assigned(taskR2V);
     //btnStopR2V.Enabled := assigned(taskR2V);
   end;
+  {$ENDIF}
 end;
 
+{$IFNDEF VER185}
 function TMainForm.DecodeGeoStr(aGeoPointStr: String): Double;
 var
   list: TStringList;
@@ -422,10 +449,26 @@ begin
   ExtractStrings([','], [], wideChars, list);
   Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
 end;
+{$ELSE}
+function TMainForm.DecodeGeoStr(aGeoPointStr: String): Double;
+var
+  list: TStringList;
+  chars : PAnsiChar;
+begin
+  list := TStringList.Create;
+  New(chars);
+  chars := PChar(aGeoPointStr);
+  //StringToWideChar(aGeoPointStr, chars, Length(aGeoPointStr) + 1);
+  ExtractStrings([','], [], chars, list);
+  Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+end;
+{$ENDIF}
 
 procedure TMainForm.R2V1Click(Sender: TObject);
+{$IFNDEF VER185}
 var
   workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
+{$ENDIF}
 begin
   inherited;
   try
@@ -444,7 +487,7 @@ begin
     //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
     perf := TTimeInterval.Create;
     perf.Start;
-
+    {$IFNDEF VER185}
     if mapFactory is TSeparateThreadVectList then
     begin
       workerR2V := TR2VOmniWorker.Create;
@@ -453,7 +496,9 @@ begin
         .SetTimer(1, 1, OW_DO_R2V)
         .Run;
     end
-    else if mapFactory is TMainThreadVectList then
+    else
+    {$ENDIF}
+    if mapFactory is TMainThreadVectList then
     begin
       mapFactory.groupRect;
       mapFactory.FillColorArr;

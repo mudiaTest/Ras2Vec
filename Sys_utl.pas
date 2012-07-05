@@ -69,10 +69,10 @@ type
   //Ka¿dy bajt to 2 znaki w stringu
   //bajty mniej znacz¹ce s¹ pierwsze (od lewej strony)
   //aBytesLen okreœla ilobajtowy ma to byæ ci¹g
-  procedure addIntToStrHex(aInt: integer; aBytesLen: integer; var aStr: String);
+  procedure AddInt2StrHex(aInt: integer; aBytesLen: integer; var aStr: String);
 
   //zmienia string Hex na liczbê integer
-  function HexToInt(astHex: String): integer;
+  function Hex2Int(astHex: String): integer;
 
 implementation
 
@@ -123,8 +123,8 @@ implementation
     result := 0;
     for i := 0 to Ceil(Length(astHex)/2)-1 do
     begin
-      stPart := Copy(astHex, i*2, 2);
-      result := result + HexToInt(stPart);
+      stPart := '$' + Copy(astHex, i*2, 2);
+      result := result + StrToInt(stPart);
     end;
 
   end;

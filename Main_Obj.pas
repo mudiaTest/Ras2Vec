@@ -7,6 +7,7 @@ interface
 uses
   Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math, StdCtrls,
   Registry,
+  {$IFNDEF VER185}
   OtlCommon,
   OtlComm,
   OtlSync,
@@ -14,9 +15,9 @@ uses
   OtlTaskControl,
   OtlCollections,
   OtlParallel,
+  {$ENDIF}
   JclHashMaps,
   JclContainerIntf;
-
 const
     c_fromLeft = 0;
     c_fromTop = 1;
@@ -309,8 +310,12 @@ public
     constructor Create; override;
     //Oblicze ile stopni zawiera jeden PX
     procedure CalculateGeoPx;
+    {$IFNDEF VER185}
+    destructor Destroy;
+    {$ENDIF}
   end;
 
+  {$IFNDEF VER185}
   TSeparateThreadVectList = class(TMapFactory)
   private
     fotWorker: TOmniWorker;
@@ -321,6 +326,7 @@ public
   public
     constructor Create; override;
   end;
+  {$ENDIF}
 
   TMainThreadVectList = class(TMapFactory)
   private
@@ -454,6 +460,16 @@ begin
   inherited;
   vectRectGroupsByColor := TJclIntegerHashMap.Create(256, true);
 end;
+
+{$IFNDEF VER185}
+destructor TMapFactory.Destroy;
+var
+  i: integer;
+begin
+  for i:=0 to Count-1 do
+    Objects[i].Free;
+end;
+{$ENDIF}
 
 function TMapFactory.FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
@@ -1570,7 +1586,7 @@ begin
   colorPx.borderEW := true;
   colorPx.borderWE := true;
 end;
-
+{$IFNDEF VER185}
 { TSeparateThreadVectList }
 
 constructor TSeparateThreadVectList.Create;
@@ -1591,6 +1607,7 @@ begin
   //separate tread
   //(otWorker as TR2VOmniWorker).OMSendMessage(aStr);
 end;
+{$ENDIF}
 
 { TMainThreadVectList }
 
@@ -1752,15 +1769,15 @@ var
   lpStartBlock, lDummypStartBlock: Integer;
   //offset dla  bloku POI, Line, Poly
   lpPOIOff, lpLineOff, lpPolyOff: Integer;
-  //d³ugoœæ bloku dla POI, Linji i Poly
+  //d³ugoœæ bloku dla POI, Line i Poly
   lpPOILength, lpLineLength, lpPolyLength: Integer;
-  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloku Data dla POI;
   lpPOIDataOff, lpPOIDataLength, lpPOIDataBlockLength: Integer;
-  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloku Data dla Line;
   lpLineDataOff, lpLineDataLength, lpLineDataBlockLength: Integer;
-  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego bloko Data dla POI;
+  //offset, d³upoœæ danych w bajtach i d³ugoœæ ca³ego blokou Data dla Polygon;
   lpPolyDataOff, lpPolyDataLength, lpPolyDataBlockLength: Integer;
-  //offset, d³ugoœæ danych, d³ugoœæ bloku dla drawOrder
+  //offset, d³ugoœæ danych, d³ugoœæ bloku dla drawOrder dla Poly
   lpPolyDrawOff, lpPolyDrawLength, lpPolyDrawBlockLength: Integer;
 begin
   lpStartBlock := 91;
@@ -1817,84 +1834,89 @@ begin
   begin
     lpPolyDataOff := lpStartBlock + lpPOILength + lpLineLength + lpPolyLength +
                      lpPOIDataBlockLength + lpLineDataBlockLength;
-    lpPolyDataLength := 4; //bajt pocz¹tkowy (?) + 3 bajty koloru dla polygona prostego
+    lpPolyDataLength := 4; //rodzaj i iloœæ kolorów (1 bajt - strona8 - dla nasz "06": 0-bez tekstu, 6-1kolor)
+                           //3 bajty koloru dla polygona prostego
     lpPolyDataBlockLength := aPolyCount * lpPolyDataLength;
     lpPolyDrawOff := lpStartBlock + lpPOILength + lpLineLength + lpPolyLength +
                      lpPOIDataBlockLength + lpLineDataBlockLength + lpPolyDataBlockLength;
-    lpPolyDrawLength := 5; //d³ugoœæ bloku dla poly Draw
+    lpPolyDrawLength := 5; //d³ugoœæ pojedynczego bloku dla poly Draw
     lpPolyDrawBlockLength := aPolyCount {+ iloœæ zmian leveli - same 0} * lpPolyDrawLength;
   end;
 
   //pocz¹tek bloku z danymi: 5B = 91
-  addIntToStrHex(91, 1, stTypBody);
+  AddInt2StrHex(91, 1, stTypBody); //0x00
   //zero
-  addIntToStrHex(0, 1, stTypBody);
+  AddInt2StrHex(0, 1, stTypBody); //0x02
   //nazwa - 10 bajtów/znaków
   typAdd('GARMIN TYP');
   //0/1: zero to ignorowanie pliku typ
-  addIntToStrHex(1, 1, stTypBody);
+  AddInt2StrHex(1, 1, stTypBody); //0x0c
   //zero: w inftukcji pisze FF or 00
-  addIntToStrHex(0, 1, stTypBody);
+  AddInt2StrHex(0, 1, stTypBody); //0x00d
   //7 bajtów daty i czasu, 2 na rok i po jednym na resztê
-  addIntToStrHex(y-1900, 2, stTypBody);
-  addIntToStrHex(m, 1, stTypBody);
-  addIntToStrHex(d, 1, stTypBody);
-  addIntToStrHex(hr, 1, stTypBody);
-  addIntToStrHex(mi, 1, stTypBody);
-  addIntToStrHex(se, 1, stTypBody);
+  AddInt2StrHex(y-1900, 2, stTypBody); //0x00e
+  AddInt2StrHex(m, 1, stTypBody); //0x10
+  AddInt2StrHex(d, 1, stTypBody); //0x11
+  AddInt2StrHex(hr, 1, stTypBody); //0x12
+  AddInt2StrHex(mi, 1, stTypBody); //0x13
+  AddInt2StrHex(se, 1, stTypBody); //0x14
   //zapis strony kodowej - 2 bajty
-  addIntToStrHex(1252, 2, stTypBody);
+  AddInt2StrHex(1252, 2, stTypBody); //0x15
 
   //offset bloku poi - 4bajty
-  addIntToStrHex(lpPOIOff, 4, stTypBody);
+  AddInt2StrHex(lpPOIOff, 4, stTypBody); //0x17
   //d³ugoœæ bloku poi: lpPOI*d³ugoœæPOI w bajtach - 4 bajty
-  addIntToStrHex(lpPOILength, 4, stTypBody);
+  AddInt2StrHex(lpPOILength, 4, stTypBody); //0x1b
 
   //offset lini - bajty
-  addIntToStrHex(lpLineOff, 4, stTypBody);
+  AddInt2StrHex(lpLineOff, 4, stTypBody); //0x1f
   //d³ugoœæ bloku linji: lpLine*d³ugoœæLine w bajtach - 4 bajty
-  addIntToStrHex(lpLineLength, 4, stTypBody);
+  AddInt2StrHex(lpLineLength, 4, stTypBody); //0x23
 
   //offset polygogów
-  addIntToStrHex(lpPolyOff, 4, stTypBody);
+  AddInt2StrHex(lpPolyOff, 4, stTypBody); //0x27
   //offset polygonów - bajty
   //dla prostych polygonów u¿ywamy 4 bajty na 1 definicjê
-  addIntToStrHex(lpPolyLength , 4, stTypBody);
+  AddInt2StrHex(lpPolyLength , 4, stTypBody); //0x2b
 
   //Family ID:
-  addIntToStrHex(666, 2, stTypBody);
+  AddInt2StrHex(666, 2, stTypBody); //0x2f
   //Produvt ID:
-  addIntToStrHex(666, 2, stTypBody);
+  AddInt2StrHex(666, 2, stTypBody); //0x31
+
 
   //offste POI data
-  addIntToStrHex(lpPOIDataOff , 4, stTypBody);
+  AddInt2StrHex(lpPOIDataOff , 4, stTypBody); //0x33
   //d³ugoœæ pojedynczego data dla POI
-  addIntToStrHex(lpPOIDataLength , 2, stTypBody);
+  AddInt2StrHex(lpPOIDataLength , 2, stTypBody); //0x37
   //d³ugoœæ ca³ego bloku data dla POI
-  addIntToStrHex(lpPOIDataBlockLength , 4, stTypBody);
+  AddInt2StrHex(lpPOIDataBlockLength , 4, stTypBody); //0x39
+
 
   //offste Line data
-  addIntToStrHex(lpLineDataOff , 4, stTypBody);
+  AddInt2StrHex(lpLineDataOff , 4, stTypBody); //0x3d
   //d³ugoœæ pojedynczego data dla Line
-  addIntToStrHex(lpLineDataLength , 2, stTypBody);
+  AddInt2StrHex(lpLineDataLength , 2, stTypBody); //0x41
   //d³ugoœæ ca³ego bloku data dla Line
-  addIntToStrHex(lpLineDataBlockLength , 4, stTypBody);
+  AddInt2StrHex(lpLineDataBlockLength , 4, stTypBody); //0x43
 
-  //offste Line data
-  addIntToStrHex(lpPolyDataOff , 4, stTypBody);
-  //d³ugoœæ pojedynczego data dla Line
-  addIntToStrHex(lpPolyDataLength , 1, stTypBody);
+
+  //offste Poly data
+  AddInt2StrHex(lpPolyDataOff , 4, stTypBody); //0x47
+  //d³ugoœæ pojedynczego data dla Poly
+  AddInt2StrHex(lpPolyDataLength , 1, stTypBody); //0x4b
   //linked to polygons
-  addIntToStrHex(0 , 1, stTypBody);
+  AddInt2StrHex(0 , 1, stTypBody); //0x4c
   //d³ugoœæ ca³ego bloku data dla Line
-  addIntToStrHex(lpPolyDataBlockLength , 4, stTypBody);
+  AddInt2StrHex(lpPolyDataBlockLength , 4, stTypBody); //0x4d
 
-  //offste Line data
-  addIntToStrHex(lpPolyDrawOff , 4, stTypBody);
-  //d³ugoœæ pojedynczego data dla Line
-  addIntToStrHex(lpPolyDrawLength , 2, stTypBody);
-  //d³ugoœæ ca³ego bloku data dla Line
-  addIntToStrHex(lpPolyDrawBlockLength , 4, stTypBody);
+  
+  //offste Poly data
+  AddInt2StrHex(lpPolyDrawOff , 4, stTypBody); //0x51
+  //d³ugoœæ pojedynczego data dla Poly
+  AddInt2StrHex(lpPolyDrawLength , 2, stTypBody); //0x55
+  //d³ugoœæ ca³ego bloku data dla Poly
+  AddInt2StrHex(lpPolyDrawBlockLength , 4, stTypBody); //0x57
 end;
 
 procedure TMPFile.AddPolyColorDefs(avectRectGroupsByColor: TJclIntegerHashMap);
@@ -1906,7 +1928,7 @@ begin
   It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
-    addIntToStrHex(6 , 1, stTypBody);
+    AddInt2StrHex(6 , 1, stTypBody);
     colorGroupList := TColorGroupList(It.Next);
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
@@ -1919,15 +1941,22 @@ var
   i: Integer;
   colorGroupList :TColorGroupList;
   It: IJclIterator;
+  ile: integer;
 begin
+  ile := 0;
   It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
-    addIntToStrHex(6 , 1, stTypBody);
+    {AddInt2StrHex(6 , 1, stTypBody);
     colorGroupList := TColorGroupList(It.Next);
-    addIntToStrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
+    AddInt2StrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
     //offset: 4 bajty na ka¿dy polygon
-    addIntToStrHex(i*4 , 2, stTypBody);
+    AddInt2StrHex(i*4 , 2, stTypBody);}
+    inc(ile);
+    Assert(ile <= 256, 'Liczba typów przekracza 256.');
+    colorGroupList := TColorGroupList(It.Next);
+    AddInt2StrHex(colorGroupList.idMPGroup*32, 2, stTypBody);
+    AddInt2StrHex((ile-1)*4 , 2, stTypBody);
   end;
 end;
 
@@ -1940,10 +1969,10 @@ begin
   It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
-    addIntToStrHex(6 , 1, stTypBody);
+    //AddInt2StrHex(6 , 1, stTypBody);
     colorGroupList := TColorGroupList(It.Next);
-    addIntToStrHex(colorGroupList.idMPGroup , 1, stTypBody);
-    addIntToStrHex(0 , 4, stTypBody);
+    AddInt2StrHex(colorGroupList.idMPGroup , 1, stTypBody);
+    AddInt2StrHex(0 , 4, stTypBody);
   end;
 end;
 
