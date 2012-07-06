@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl,
-  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus, Sys_utl, ActnList, Mask
+  Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus, Sys_utl, ActnList, Mask,
+  Register_Obj
   {$IFNDEF VER185}
   ,OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
   ,Main_Thread,
@@ -104,6 +105,10 @@ type
     procedure Button3Click(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure edtLeftUpXExit(Sender: TObject);
+    procedure edtLeftUpYExit(Sender: TObject);
+    procedure edtRightDownXExit(Sender: TObject);
+    procedure edtRightDownYExit(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -125,6 +130,8 @@ type
     taskR2V: IOmniTaskControl; //omni task grupowania pixeli i wyznaczania granic dla rectangli
     {$ENDIF}
     perf: TTimeInterval; //perf dla ca³ego R2V
+
+    srcReg: TSrcReg; //obiekt czytania i pisania do rejestru - ostatni plik graficzny i koordynaty z kontrolek
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     //procedure setScrollPos(asbDest, asbSrc: TScrollBox);
@@ -263,9 +270,12 @@ begin
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
+var
+  filePathName: String;
 begin
   inherited;
   mapFactory := nil;
+  srcReg := TSrcReg.Create;
   //CreateSeperateThreadVectorGroupList;
   CreateMainThreadVectorGroupList;
   MPFile := TMPFile.Create;
@@ -274,11 +284,14 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  {$IFNDEF VER185}
-  imgMain.Picture.LoadFromFile('C:\Users\mudia\Desktop\t3.bmp');
-  {$ELSE}
-  imgMain.Picture.LoadFromFile('C:\Documents and Settings\Mudia\Pulpit\t1.bmp');
-  {$ENDIF}
+  filePathName := srcReg.GetFilePathName;
+  if filePathName <> '' then
+    imgMain.Picture.LoadFromFile(filePathName);
+  edtLeftUpX.Text := srcReg.GetGeo1X;
+  edtLeftUpY.Text := srcReg.GetGeo1Y;
+  edtRightDownX.Text := srcReg.GetGeo2X;
+  edtRightDownY.Text := srcReg.GetGeo2Y;
+
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
 
@@ -319,6 +332,7 @@ begin
   begin
     imageName := dlgPicture.FileName;
     imgMain.Picture.LoadFromFile(imageName);
+    srcReg.SetFilePathName(imageName);
   end;
 end;
 
@@ -596,6 +610,27 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TMainForm.edtLeftUpXExit(Sender: TObject);
+begin
+  srcReg.SetGeo1X(edtLeftUpX.Text);
+end;
+
+procedure TMainForm.edtLeftUpYExit(Sender: TObject);
+begin
+  srcReg.SetGeo1Y(edtLeftUpY.Text);
+end;
+
+procedure TMainForm.edtRightDownXExit(Sender: TObject);
+begin
+  inherited;
+  srcReg.SetGeo2X(edtRightDownX.Text);
+end;
+
+procedure TMainForm.edtRightDownYExit(Sender: TObject);
+begin
+  srcReg.SetGeo2Y(edtRightDownY.Text);
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);

@@ -1725,7 +1725,6 @@ procedure TMPFile.AddPolygonStringsFromVectGroup(aVectRecGroup: TVectRectGroup;
     function GeoPiontToStr(aVal: Double): String;
     begin
       result := StringReplace(Format('%.5f', [aVal]),',','.',[rfReplaceAll]);
-      //FormatFloat('0.00000', aVal);
     end;
   var
     i: integer;
@@ -1757,7 +1756,6 @@ begin
   begin
     Add('[POLYGON]');
     Add('Type=' + IntToStr(aColorGroupList.idMPGroup));
-    //Add(' * Typ=' + aColorGroupList.colorTyp);
     Add('Label=');
     Add('EndLevel=4');
     Add('Data' + intToStr(aLevel) + '=' + getEdgeStr(aVectRecGroup.edgePxList));//'=(54.60100,18.29108),(54.60102,18.29284),(54.60042,18.29267),(54.60038,18.29103)
@@ -1928,18 +1926,7 @@ procedure TMPFile.AddPolyColorDefs(asortedIdMpGroupList: TStringList; avectRectG
 var
   i: Integer;
   colorGroupList :TColorGroupList;
-  //It: IJclIterator;
 begin
-  {It := avectRectGroupsByColor.Values.First;
-  while It.HasNext do
-  begin
-    AddInt2StrHex(6 , 1, stTypBody);
-    colorGroupList := TColorGroupList(It.Next);
-    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
-    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
-    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
-  end;}
-
   for i:=0 to asortedIdMpGroupList.Count-1 do
   begin
     AddInt2StrHex(6 , 1, stTypBody);
@@ -1957,29 +1944,7 @@ var
   i: Integer;
   colorGroupList :TColorGroupList;
   It: IJclIterator;
-  //ile: integer;
 begin
-  //ile := 0;
-  {It := avectRectGroupsByColor.Values.First;
-  while It.HasNext do
-  begin
-    inc(ile);
-    Assert(ile <= 256, 'Liczba typów przekracza 256.');
-    colorGroupList := TColorGroupList(It.Next);
-    //E002:
-    //E*16+2*256=736
-    //736/32[$20]=_23[$17]
-    //753mod32[$20]=0[$0] wiêc typ17 podtyp 0
-    //
-    //0x1FF18 18[$12] ??
-    //511*32[$20]=16352 16352+09=745[$]
-    //numerTypuPolygonu * 32
-    AddInt2StrHex(colorGroupList.idMPGroup*32, 1, stTypBody);
-    //
-    AddInt2StrHex(0 , 1, stTypBody);
-    AddInt2StrHex((ile-1)*4 , 2, stTypBody);
-  end;}
-
   for i:=0 to asortedIdMpGroupList.Count-1 do
   begin
     Assert(i < 256, 'Liczba typów przekracza 256.');
@@ -1995,8 +1960,6 @@ begin
     //511*32[$20]=16352 16352+09=745[$]
     //numerTypuPolygonu * 32
     AddInt2StrHex(StrToInt(asortedIdMpGroupList[i])*32, 2, stTypBody);
-    //
-    //AddInt2StrHex(0 , 1, stTypBody);
     AddInt2StrHex(i*4 , 2, stTypBody);
   end;
 end;
@@ -2007,14 +1970,6 @@ var
   colorGroupList :TColorGroupList;
   It: IJclIterator;
 begin
-  {It := avectRectGroupsByColor.Values.First;
-  while It.HasNext do
-  begin
-    //AddInt2StrHex(6 , 1, stTypBody);
-    colorGroupList := TColorGroupList(It.Next);
-    AddInt2StrHex(colorGroupList.idMPGroup , 1, stTypBody);
-    AddInt2StrHex(0 , 4, stTypBody);
-  end;}
   for i:=0 to asortedIdMpGroupList.Count-1 do
   begin
     colorGroupList := avectRectGroupsByColor.GetRectGroupsMap(StrToInt(asortedIdMpGroupList[i]));
@@ -2086,7 +2041,6 @@ var
   typFile : TextFile;
   sortedIdMpGroupList: TStringList;
 begin
-  //Assert(aMapFactory <> nil);
   if aMapFactory <> nil then
   begin
     AddTypFileHeader(0,0, aMapFactory.vectRectGroupsByColor.Size);
@@ -2106,7 +2060,6 @@ begin
 
   Write(typFile, stTypBody);
   CloseFile(typFile);
-  //typLineList.SaveToFile(typFileName);
 end;
 
 procedure TMPFile.TypPathFromMpPath;

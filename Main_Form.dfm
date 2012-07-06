@@ -233,6 +233,7 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
+    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 590
@@ -244,7 +245,7 @@ object MainForm: TMainForm
     OnClick = btnSaveClick
   end
   object edtLeftUpX: TMaskEdit
-    Left = 226
+    Left = 229
     Top = 80
     Width = 80
     Height = 21
@@ -252,6 +253,7 @@ object MainForm: TMainForm
     MaxLength = 11
     TabOrder = 17
     Text = '18,22,44,75'
+    OnExit = edtLeftUpXExit
   end
   object edtLeftUpY: TMaskEdit
     Left = 225
@@ -262,6 +264,7 @@ object MainForm: TMainForm
     MaxLength = 11
     TabOrder = 18
     Text = '54,33,37,37'
+    OnExit = edtLeftUpYExit
   end
   object edtRightDownX: TMaskEdit
     Left = 347
@@ -272,6 +275,7 @@ object MainForm: TMainForm
     MaxLength = 11
     TabOrder = 19
     Text = '18,23,35,60'
+    OnExit = edtRightDownXExit
   end
   object edtRightDownY: TMaskEdit
     Left = 347
@@ -282,7 +286,7 @@ object MainForm: TMainForm
     MaxLength = 11
     TabOrder = 20
     Text = '54,33,16,68'
-    TextHint = '         ;       '
+    OnExit = edtRightDownYExit
   end
   object Button4: TButton
     Left = 576
@@ -344,12 +348,6 @@ object MainForm: TMainForm
         Caption = 'test'
       end
     end
-  end
-  object oemR3V: TOmniEventMonitor
-    OnTaskMessage = oemR3VTaskMessage
-    OnTaskTerminated = oemR3VTaskTerminated
-    Left = 680
-    Top = 464
   end
   object MainActionList: TActionList
     Left = 40

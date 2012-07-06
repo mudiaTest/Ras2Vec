@@ -7,7 +7,9 @@ uses
   Sys_utl in 'Sys_utl.pas',
   Main_Obj in 'Main_Obj.pas',
   Main_Thread in 'Main_Thread.pas',
-  Sys_Const in 'Sys_Const.pas';
+  Sys_Const in 'Sys_Const.pas',
+  Register_Obj in 'Register_Obj.pas',
+  Main_Const in 'Main_Const.pas';
 
 {$R *.res}
 
