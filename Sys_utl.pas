@@ -74,6 +74,9 @@ type
   //zmienia string Hex na liczbê integer
   function Hex2Int(astHex: String): integer;
 
+  //funkcja sortuj¹ca dla TStringList porównuj¹ca inrwgwery zapisane jako stringi
+  function sortIntStr(aList: TStringList; id1, id2: Integer): integer;
+
 implementation
 
   function StrConcat(separator, left, right: String): String;
@@ -245,6 +248,29 @@ procedure TDoubleList.PutDouble(Index: integer; const S: double);
 begin
   Put(Index, FloatToStr(s));
   fnextKey := Math.max(fnextKey, Math.Ceil(s+1));
+end;
+
+function sortIntStr(aList: TStringList; id1, id2: Integer): integer;
+var
+  val1, val2: integer;
+begin
+  try
+    val1 := strToInt(aList[id1]);
+  except
+    Assert(false, 'Problem z konwersj¹ "' + aList[id1] + '" do typu integer.');
+  end;
+  try
+    val2 := strToInt(aList[id2]);
+  except
+    Assert(false, 'Problem z konwersj¹ "' + aList[id2] + '" do typu intege.');
+  end;
+  if val1 < val2 then
+    result := -1
+  else if val1 > val2 then
+    result := 1
+  else
+    result := 0;
+
 end;
 
 end.

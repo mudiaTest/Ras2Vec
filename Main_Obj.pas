@@ -107,6 +107,11 @@ type
 
   end;}
 
+  TRectGroupsByColorMap = class(TJclIntegerHashMap)
+  public
+    function GetRectGroupsMap(aidMPGroup: integer): TColorGroupList;
+  end;
+
   TMPFile = class
   private
     reg: TRegistry;
@@ -123,9 +128,9 @@ type
                                              aColorGroupList: TColorGroupList;
                                              acolorArr: TDynamicPxColorPointArray);
     procedure TypPathFromMpPath;
-    procedure AddPolyColorDefs(avectRectGroupsByColor: TJclIntegerHashMap);
-    procedure AddPolyDataDefs(avectRectGroupsByColor: TJclIntegerHashMap);
-    procedure AddPolyDrawOrderDefs(avectRectGroupsByColor: TJclIntegerHashMap);
+    procedure AddPolyColorDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
+    procedure AddPolyDataDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
+    procedure AddPolyDrawOrderDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
   public
     mpLineList: TStringList;
     stTypBody: String;
@@ -262,7 +267,7 @@ public
     fgeoRightDownY: Double;
     fXGeoPX: Double;
     fYGeoPX: Double;
-    fvectRectGroupsByColor: TJclIntegerHashMap; //key - kolor; obj - lista grup w tym kolorze
+    fvectRectGroupsByColor: TRectGroupsByColorMap; //key - kolor; obj - lista grup w tym kolorze
     fcolorArr: TDynamicPxColorPointArray;
     function getObjByIdx(index: Integer): TVectObj;
     procedure setObjByIdx(index: Integer; avectObj: TVectObj);
@@ -272,7 +277,7 @@ public
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
     property vectArr: TDynamicPointArray read fvectArr write fvectArr;
-    property vectRectGroupsByColor: TJclIntegerHashMap read fvectRectGroupsByColor write fvectRectGroupsByColor;
+    property vectRectGroupsByColor: TRectGroupsByColorMap read fvectRectGroupsByColor write fvectRectGroupsByColor;
     property geoLeftUpX: Double read fgeoLeftUpX write fgeoLeftUpX;
     property geoLeftUpY: Double read fgeoLeftUpY write fgeoLeftUpY;
     property geoRightDownX: Double read fgeoRightDownX write fgeoRightDownX;
@@ -458,7 +463,7 @@ end;
 constructor TMapFactory.Create;
 begin
   inherited;
-  vectRectGroupsByColor := TJclIntegerHashMap.Create(256, true);
+  vectRectGroupsByColor := TRectGroupsByColorMap.Create(256, true);
 end;
 
 {$IFNDEF VER185}
@@ -1751,7 +1756,7 @@ begin
   with mpLineList do
   begin
     Add('[POLYGON]');
-    Add('Type=' + aColorGroupList.colorMP);
+    Add('Type=' + IntToStr(aColorGroupList.idMPGroup));
     //Add(' * Typ=' + aColorGroupList.colorTyp);
     Add('Label=');
     Add('EndLevel=4');
@@ -1919,32 +1924,43 @@ begin
   AddInt2StrHex(lpPolyDrawBlockLength , 4, stTypBody); //0x57
 end;
 
-procedure TMPFile.AddPolyColorDefs(avectRectGroupsByColor: TJclIntegerHashMap);
+procedure TMPFile.AddPolyColorDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
 var
   i: Integer;
   colorGroupList :TColorGroupList;
-  It: IJclIterator;
+  //It: IJclIterator;
 begin
-  It := avectRectGroupsByColor.Values.First;
+  {It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
     AddInt2StrHex(6 , 1, stTypBody);
     colorGroupList := TColorGroupList(It.Next);
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
-    stTypBody := stTypBody +  AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
-  end;
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
+  end;}
+
+  for i:=0 to asortedIdMpGroupList.Count-1 do
+  begin
+    AddInt2StrHex(6 , 1, stTypBody);
+    colorGroupList := avectRectGroupsByColor.GetRectGroupsMap(StrToInt(asortedIdMpGroupList[i]));
+    Assert(colorGroupList <> nil, 'Brak obiektu colorGroupList o kluczu "' + asortedIdMpGroupList[i] +
+                                  '" w liœcie avectRectGroupsByColor');
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
+    stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
+  end;  
 end;
 
-procedure TMPFile.AddPolyDataDefs(avectRectGroupsByColor: TJclIntegerHashMap);
+procedure TMPFile.AddPolyDataDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
 var
   i: Integer;
   colorGroupList :TColorGroupList;
   It: IJclIterator;
-  ile: integer;
+  //ile: integer;
 begin
-  ile := 0;
-  It := avectRectGroupsByColor.Values.First;
+  //ile := 0;
+  {It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
     inc(ile);
@@ -1962,21 +1978,49 @@ begin
     //
     AddInt2StrHex(0 , 1, stTypBody);
     AddInt2StrHex((ile-1)*4 , 2, stTypBody);
+  end;}
+
+  for i:=0 to asortedIdMpGroupList.Count-1 do
+  begin
+    Assert(i < 256, 'Liczba typów przekracza 256.');
+    colorGroupList := avectRectGroupsByColor.GetRectGroupsMap(StrToInt(asortedIdMpGroupList[i]));
+    Assert(colorGroupList <> nil, 'Brak obiektu colorGroupList o kluczu "' + asortedIdMpGroupList[i] +
+                                  '" w liœcie avectRectGroupsByColor');
+    //E002:
+    //E*16+2*256=736
+    //736/32[$20]=_23[$17]
+    //753mod32[$20]=0[$0] wiêc typ17 podtyp 0
+    //
+    //0x1FF18 18[$12] ??
+    //511*32[$20]=16352 16352+09=745[$]
+    //numerTypuPolygonu * 32
+    AddInt2StrHex(StrToInt(asortedIdMpGroupList[i])*32, 2, stTypBody);
+    //
+    //AddInt2StrHex(0 , 1, stTypBody);
+    AddInt2StrHex(i*4 , 2, stTypBody);
   end;
 end;
 
-procedure TMPFile.AddPolyDrawOrderDefs(avectRectGroupsByColor: TJclIntegerHashMap);
+procedure TMPFile.AddPolyDrawOrderDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
 var
   i: Integer;
   colorGroupList :TColorGroupList;
   It: IJclIterator;
 begin
-  It := avectRectGroupsByColor.Values.First;
+  {It := avectRectGroupsByColor.Values.First;
   while It.HasNext do
   begin
     //AddInt2StrHex(6 , 1, stTypBody);
     colorGroupList := TColorGroupList(It.Next);
     AddInt2StrHex(colorGroupList.idMPGroup , 1, stTypBody);
+    AddInt2StrHex(0 , 4, stTypBody);
+  end;}
+  for i:=0 to asortedIdMpGroupList.Count-1 do
+  begin
+    colorGroupList := avectRectGroupsByColor.GetRectGroupsMap(StrToInt(asortedIdMpGroupList[i]));
+    Assert(colorGroupList <> nil, 'Brak obiektu colorGroupList o kluczu "' + asortedIdMpGroupList[i] +
+                                  '" w liœcie avectRectGroupsByColor');
+    AddInt2StrHex(StrToInt(asortedIdMpGroupList[i]) , 1, stTypBody);
     AddInt2StrHex(0 , 4, stTypBody);
   end;
 end;
@@ -2027,8 +2071,20 @@ begin
 end;
 
 procedure TMPFile.TypFileSave(aMapFactory: TMapFactory);
+  function makeSortedIdMpGroupList: TStringList;
+  var
+    it: IJclIterator;
+  begin
+    result := TStringList.Create;
+    it := aMapFactory.vectRectGroupsByColor.Values.First;
+    while it.HasNext do
+      result.add(intToStr(TColorGroupList(It.Next).idMPGroup));
+    result.CustomSort(sortIntStr);
+  end;
+
 var
   typFile : TextFile;
+  sortedIdMpGroupList: TStringList;
 begin
   //Assert(aMapFactory <> nil);
   if aMapFactory <> nil then
@@ -2037,9 +2093,11 @@ begin
     //toDo - jeœli w przysz³oœci bêdzie
     //AddPOIDefs
     //AddLineDefs
-    AddPolyColorDefs(aMapFactory.vectRectGroupsByColor);
-    AddPolyDataDefs(aMapFactory.vectRectGroupsByColor);
-    AddPolyDrawOrderDefs(aMapFactory.vectRectGroupsByColor);
+    sortedIdMpGroupList := makeSortedIdMpGroupList;
+
+    AddPolyColorDefs(sortedIdMpGroupList, aMapFactory.vectRectGroupsByColor);
+    AddPolyDataDefs(sortedIdMpGroupList, aMapFactory.vectRectGroupsByColor);
+    AddPolyDrawOrderDefs(sortedIdMpGroupList, aMapFactory.vectRectGroupsByColor);
   end
   else
     AddTypFileHeader(0, 0, 0);
@@ -2092,7 +2150,7 @@ end;
 constructor TColorGroupList.Create(aidMPGroup: Integer);
 begin
   Create;
-  idMPGroup := aidMPGroup+1;
+  idMPGroup := aidMPGroup{+1};
 end;
 
 procedure TColorGroupList.setColorPx(acolorPx: Integer);
@@ -2124,6 +2182,23 @@ begin
   borderWE := False;
   candidate := False;
   used := False;
+end;
+
+{ TRectGroupsByColorMap }
+
+function TRectGroupsByColorMap.GetRectGroupsMap(aidMPGroup: integer): TColorGroupList;
+var
+  it: IJclIterator;
+begin
+  it := self.values.First;
+  while it.HasNext do
+  begin
+    result := it.Next as TColorGroupList;
+    if result.idMPGroup = aidMPGroup then
+      break
+    else
+      result := nil;
+  end;
 end;
 
 end.
