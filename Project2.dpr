@@ -9,7 +9,8 @@ uses
   Main_Thread in 'Main_Thread.pas',
   Sys_Const in 'Sys_Const.pas',
   Register_Obj in 'Register_Obj.pas',
-  Main_Const in 'Main_Const.pas';
+  Main_CV in 'Main_CV.pas',
+  Ini_Obj in 'Ini_Obj.pas';
 
 {$R *.res}
 
