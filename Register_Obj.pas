@@ -3,7 +3,7 @@ unit Register_Obj;
 interface
 
 uses
-  Registry, Windows, Main_Const;
+  Registry, Windows, Main_CV;
 
 type
   TMainReg = class
@@ -27,11 +27,13 @@ type
     function GetGeo1Y: String;
     function GetGeo2X: String;
     function GetGeo2Y: String;
+    function GetLastSLPath: String;
     procedure SetFilePathName(aVal: String);
     procedure SetGeo1X(aVal: String);
     procedure SetGeo1Y(aVal: String);
     procedure SetGeo2X(aVal: String);
     procedure SetGeo2Y(aVal: String);
+    procedure SetLastSLPath(aVal: String);
   end;
 
 implementation
@@ -108,6 +110,11 @@ begin
   SetMain(GEO_2_Y, aVal);
 end;
 
+procedure TSrcReg.SetLastSLPath(aVal: String);
+begin
+  SetMain(LAST_SL_PATH, aVal);
+end;
+
 procedure TSrcReg.SetVal(aKey, aVal: String);
 begin
   if not reg.KeyExists(aKey) then
@@ -143,6 +150,11 @@ end;
 function TSrcReg.GetGeo2Y: String;
 begin
   result := GetMain(GEO_2_Y);
+end;
+
+function TSrcReg.GetLastSLPath: String;
+begin
+  result := GetMain(LAST_SL_PATH);
 end;
 
 function TSrcReg.GetVal(aKey: String): String;

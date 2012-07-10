@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtDlgs, ExtCtrls, ComCtrls, ToolWin, StdCtrls, Form_utl,
   Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus, Sys_utl, ActnList, Mask,
-  Register_Obj
+  Register_Obj, Main_CV, Ini_Obj
   {$IFNDEF VER185}
   ,OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
   ,Main_Thread,
@@ -72,6 +72,9 @@ type
     Button4: TButton;
     TEST: TMenuItem;
     test1: TMenuItem;
+    Save1: TMenuItem;
+    SaveAs1: TMenuItem;
+    Load2: TMenuItem;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -109,6 +112,9 @@ type
     procedure edtLeftUpYExit(Sender: TObject);
     procedure edtRightDownXExit(Sender: TObject);
     procedure edtRightDownYExit(Sender: TObject);
+    procedure Load2Click(Sender: TObject);
+    procedure Save1Click(Sender: TObject);
+    procedure SaveAs1Click(Sender: TObject);
   private
     { Private declarations }
     imageName: String;
@@ -132,6 +138,7 @@ type
     perf: TTimeInterval; //perf dla ca³ego R2V
 
     srcReg: TSrcReg; //obiekt czytania i pisania do rejestru - ostatni plik graficzny i koordynaty z kontrolek
+    iniSL: TIniSL; //obiekt zapamiêtywania istawieñ w plikach ini
     procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     //procedure setScrollPos(asbDest, asbSrc: TScrollBox);
@@ -147,6 +154,7 @@ type
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    destructor DEstroy; override;
     procedure InfoAkcja(aStr: String);
   end;
 
@@ -276,6 +284,7 @@ begin
   inherited;
   mapFactory := nil;
   srcReg := TSrcReg.Create;
+  iniSL := TIniSL.Create;
   //CreateSeperateThreadVectorGroupList;
   CreateMainThreadVectorGroupList;
   MPFile := TMPFile.Create;
@@ -291,6 +300,7 @@ begin
   edtLeftUpY.Text := srcReg.GetGeo1Y;
   edtRightDownX.Text := srcReg.GetGeo2X;
   edtRightDownY.Text := srcReg.GetGeo2Y;
+  lastSLPath := srcReg.GetLastSLPath;
 
   PaintBoxMain.Width := imgMain.Width;
   PaintBoxMain.Height := imgMain.Height;
@@ -334,6 +344,12 @@ begin
     imgMain.Picture.LoadFromFile(imageName);
     srcReg.SetFilePathName(imageName);
   end;
+end;
+
+procedure TMainForm.Load2Click(Sender: TObject);
+begin
+  iniSL.Load;
+  srcReg.SetLastSLPath(lastSLPath);
 end;
 
 procedure TMainForm.imgMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -476,6 +492,13 @@ begin
   ExtractStrings([','], [], chars, list);
   Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
 end;
+destructor TMainForm.DEstroy;
+begin
+  srcReg.Free;
+  iniSL.Free;
+  inherited;
+end;
+
 {$ENDIF}
 
 procedure TMainForm.R2V1Click(Sender: TObject);
@@ -525,6 +548,18 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TMainForm.Save1Click(Sender: TObject);
+begin
+  iniSL.SaveAs(lastSLPath);
+  srcReg.SetLastSLPath(lastSLPath);
+end;
+
+procedure TMainForm.SaveAs1Click(Sender: TObject);
+begin
+  iniSL.SaveAs;
+  srcReg.SetLastSLPath(lastSLPath);
 end;
 
 procedure TMainForm.tbZoomChange(Sender: TObject);
