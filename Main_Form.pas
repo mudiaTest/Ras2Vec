@@ -169,7 +169,7 @@ type
 implementation
 
 Uses
-  Math;
+  Math, Sys_Const;
 
 {$R *.dfm}
 
@@ -255,7 +255,7 @@ end;
 procedure TMainForm.Button3Click(Sender: TObject);
 begin
   inherited;
-  R2V1Click(nil);
+  R2V1Click(self);
 end;
 
 procedure TMainForm.Button4Click(Sender: TObject);
@@ -302,8 +302,16 @@ begin
   sbZoom.OnScroll := zoomImageScroll;
 
   stGraphFileNamePath := srcReg.GetFilePathName;
-  if stGraphFileNamePath <> '' then
-    imgMain.Picture.LoadFromFile(stGraphFileNamePath);
+  if FileExists(stGraphFileNamePath) then
+    if stGraphFileNamePath <> '' then
+      try
+        imgMain.Picture.LoadFromFile(stGraphFileNamePath);
+      except
+        on e: Exception do
+        begin
+          ShowMessage('Wyst¹pi³ b³¹d '+e.Message+NL+'Obraz nie zosta³ wczytany.');
+        end;
+      end;
   edtLeftUpX.Text := srcReg.GetGeo1X;
   edtLeftUpY.Text := srcReg.GetGeo1Y;
   edtRightDownX.Text := srcReg.GetGeo2X;
@@ -535,7 +543,7 @@ begin
     InfoAkcja('Wczytywanie obrazka.');
     Screen.Cursor := crHourGlass;
     mapFactory.Clear;
-    mapFactory.ReadFromImg(imgMain);
+    mapFactory.ReadFromImgIntoRectArray(imgMain);
     mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
     mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
     mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
@@ -612,7 +620,7 @@ procedure TMainForm.Tylkoread1Click(Sender: TObject);
 begin
   inherited;
   Screen.Cursor := crHourGlass;
-  mapFactory.ReadFromImg(imgMain);
+  mapFactory.ReadFromImgIntoRectArray(imgMain);
   DoZoom;
   Screen.Cursor := crDefault;
 end;

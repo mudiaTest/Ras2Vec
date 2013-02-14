@@ -30,42 +30,42 @@ object MainForm: TMainForm
     Caption = 'lblTime'
   end
   object lbl1: TLabel
-    Left = 368
+    Left = 417
     Top = 110
     Width = 8
     Height = 13
     Caption = '>'
   end
   object lbl2: TLabel
-    Left = 368
+    Left = 417
     Top = 83
     Width = 8
     Height = 13
     Caption = '>'
   end
   object Label1: TLabel
-    Left = 258
+    Left = 307
     Top = 83
     Width = 19
     Height = 13
     Caption = 'UpX'
   end
   object Label2: TLabel
-    Left = 258
+    Left = 307
     Top = 110
     Width = 19
     Height = 13
     Caption = 'UpY'
   end
   object Label3: TLabel
-    Left = 383
+    Left = 432
     Top = 83
     Width = 33
     Height = 13
     Caption = 'DownX'
   end
   object Label4: TLabel
-    Left = 383
+    Left = 432
     Top = 110
     Width = 33
     Height = 13
@@ -164,24 +164,24 @@ object MainForm: TMainForm
   end
   object chkGrid: TCheckBox
     Left = 16
-    Top = 32
-    Width = 97
+    Top = 50
+    Width = 179
     Height = 17
-    Caption = 'Grid / Edge'
+    Caption = 'Edge (polygons) / Grid (rectangles)'
     Color = clGrayText
     ParentColor = False
     TabOrder = 6
   end
   object chkTestColor: TCheckBox
     Left = 16
-    Top = 64
+    Top = 82
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
     TabOrder = 7
   end
   object btn1: TButton
-    Left = 224
+    Left = 306
     Top = 8
     Width = 102
     Height = 25
@@ -191,10 +191,10 @@ object MainForm: TMainForm
   end
   object chkPolyRect: TCheckBox
     Left = 16
-    Top = 96
-    Width = 177
+    Top = 16
+    Width = 268
     Height = 17
-    Caption = 'polygons (yes) / rectangles (no)'
+    Caption = 'polygons - po R2V (yes) / rectangles - z Rastra (no)'
     TabOrder = 9
   end
   object btnZoomIn: TButton
@@ -228,7 +228,7 @@ object MainForm: TMainForm
     OnClick = btnZoomOutClick
   end
   object Button1: TButton
-    Left = 431
+    Left = 513
     Top = 8
     Width = 75
     Height = 25
@@ -237,7 +237,7 @@ object MainForm: TMainForm
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 224
+    Left = 306
     Top = 39
     Width = 102
     Height = 25
@@ -246,7 +246,7 @@ object MainForm: TMainForm
     OnClick = Button2Click
   end
   object btnStopR2V: TButton
-    Left = 343
+    Left = 425
     Top = 39
     Width = 75
     Height = 25
@@ -254,16 +254,17 @@ object MainForm: TMainForm
     TabOrder = 14
   end
   object Button3: TButton
-    Left = 343
+    Left = 425
     Top = 8
     Width = 75
     Height = 25
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
+    OnClick = Button3Click
   end
   object btnSave: TButton
-    Left = 590
+    Left = 657
     Top = 8
     Width = 75
     Height = 25
@@ -272,7 +273,7 @@ object MainForm: TMainForm
     OnClick = btnSaveClick
   end
   object edtLeftUpX: TMaskEdit
-    Left = 282
+    Left = 331
     Top = 80
     Width = 80
     Height = 21
@@ -283,7 +284,7 @@ object MainForm: TMainForm
     OnExit = edtLeftUpXExit
   end
   object edtLeftUpY: TMaskEdit
-    Left = 281
+    Left = 330
     Top = 107
     Width = 81
     Height = 21
@@ -294,7 +295,7 @@ object MainForm: TMainForm
     OnExit = edtLeftUpYExit
   end
   object edtRightDownX: TMaskEdit
-    Left = 418
+    Left = 467
     Top = 80
     Width = 75
     Height = 21
@@ -305,7 +306,7 @@ object MainForm: TMainForm
     OnExit = edtRightDownXExit
   end
   object edtRightDownY: TMaskEdit
-    Left = 418
+    Left = 467
     Top = 107
     Width = 74
     Height = 21
@@ -316,7 +317,7 @@ object MainForm: TMainForm
     OnExit = edtRightDownYExit
   end
   object Button4: TButton
-    Left = 576
+    Left = 643
     Top = 104
     Width = 75
     Height = 25
@@ -333,8 +334,8 @@ object MainForm: TMainForm
     Top = 88
   end
   object mmToolBar1: TMainMenu
-    Left = 128
-    Top = 24
+    Left = 40
+    Top = 152
     object N1: TMenuItem
       Caption = '-'
     end
@@ -399,7 +400,7 @@ object MainForm: TMainForm
     end
   end
   object SaveDialog: TSaveDialog
-    Left = 608
+    Left = 675
     Top = 48
   end
 end

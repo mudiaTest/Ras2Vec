@@ -176,7 +176,7 @@ public
     constructor Create; override;
     procedure put(x, y: Integer; o: TVectObj); reintroduce;
     function get(x, y: Integer): TVectObj; reintroduce;
-    procedure ReadFromImg(aimg: TImage);
+    procedure ReadFromImgIntoRectArray(aimg: TImage);
     procedure FillImgWithRect(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor);
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
   end;
@@ -257,8 +257,8 @@ public
   TMapFactory = class(TIntList)
   private
     fvectArr: TDynamicPointArray; //tablica z obektami wektorowymi
-    fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
-    fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
+    fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImgIntoRectArray) obrazka
+    fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImgIntoRectArray) obrazka
     //wsp. geo. lewego górnego rogu
     fgeoLeftUpX: Double;
     fgeoLeftUpY: Double;
@@ -292,7 +292,7 @@ public
     stTime: String;
     //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
     //pixele obrazka
-    procedure ReadFromImg(aimg: TImage);
+    procedure ReadFromImgIntoRectArray(aimg: TImage);
     //oddaje bitmapê - wype³nia obraz "rectanglami"
     function FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                      agrid: boolean; agridColor: TColor): TBitmap;
@@ -419,16 +419,16 @@ begin
   bmp.Height := srcHeight * azoom;
   //zamykamy p³ótno
   aimg.Canvas.Lock;
-
+  //Stara wersja
   //jeœli ma byæ malowana siatka/grid
-  if agrid then
+  {if agrid then
     bmp.Canvas.Pen.Color := agridColor;
   bmp.Canvas.Pen.Style := psSolid;
-  {jeœli rectangle ma mieæ np. 10x10 to œrodkowe osiem bêdzie wype³nione z bmp.Canvas.Brush.Color
-   a ramka bêdzie bmp.Canvas.Pen.Style i bmp.Canvas.Pen.Color}
-   {rectangle robi ramkê - musi byæ conajmniej 2x2 - przy zoomie ponizej x4 nic nie widac
-    fillrect wype³nia kolorem - mo¿e byæ 1x1
-    Bounds}
+  //jeœli rectangle ma mieæ np. 10x10 to œrodkowe osiem bêdzie wype³nione z bmp.Canvas.Brush.Color
+  //a ramka bêdzie bmp.Canvas.Pen.Style i bmp.Canvas.Pen.Color
+  //rectangle robi ramkê - musi byæ conajmniej 2x2 - przy zoomie ponizej x4 nic nie widac
+  //fillrect wype³nia kolorem - mo¿e byæ 1x1
+  //Bounds
   //wype³niamy bitmapê
   for y:=0 to srcHeight-1 do
     for x:=0 to srcWidth-1 do
@@ -441,13 +441,48 @@ begin
         else
           Brush.Color := vectObj.vectGroup.testColor;
         //jeœli ma byæ grid
+        FillRect(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
+                        (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom));
         if agrid then
-          Rectangle(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
-                         (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom))
+        begin
+          MoveTo((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom);
+          LineTo((vectObj.p2.X+1)*azoom, (vectObj.p2.Y)*azoom);
+          MoveTo((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom);
+          LineTo((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
+        end
         //jeœli rysujemy bez grida
         else
           FillRect(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
                         (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom));
+      end;
+    end;     }
+
+  {if agrid then
+    bmp.Canvas.Pen.Color := agridColor;
+  bmp.Canvas.Pen.Style := psSolid;}
+  //wype³niamy bitmapê
+  for y:=0 to srcHeight-1 do
+    for x:=0 to srcWidth-1 do
+    begin
+      vectObj := vectArr[x, y] as TVectRectangle;
+      with bmp.Canvas do
+      begin
+        if not atestColor then
+          Brush.Color := vectObj.color
+        else
+          Brush.Color := vectObj.vectGroup.testColor;
+        //Wype³niamy odpowiednim kolorem kwadrat
+        FillRect(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
+                        (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom));
+        //nadrysowujemy na nim lew¹ i górn¹ œciankê grida
+        if agrid then
+        begin
+          Brush.Color := agridColor;
+          MoveTo((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom);
+          LineTo((vectObj.p2.X+1)*azoom, (vectObj.p2.Y)*azoom);
+          MoveTo((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom);
+          LineTo((vectObj.p2.X)*azoom, (vectObj.p2.Y+1)*azoom);
+        end
       end;
     end;
   Result := bmp;
@@ -794,7 +829,7 @@ begin
   Objects[index] := avectObj;
 end;
 
-procedure TMapFactory.ReadFromImg(aimg: TImage);
+procedure TMapFactory.ReadFromImgIntoRectArray(aimg: TImage);
 var
   x, y: integer;
   rec: TVectRectangle;
@@ -970,7 +1005,7 @@ begin
   addObject(x, listaY);
 end;
 
-procedure TVectByCoordList.ReadFromImg(aimg: TImage);
+procedure TVectByCoordList.ReadFromImgIntoRectArray(aimg: TImage);
 var
   x, y: integer;
 begin
