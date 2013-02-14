@@ -30,18 +30,46 @@ object MainForm: TMainForm
     Caption = 'lblTime'
   end
   object lbl1: TLabel
-    Left = 315
-    Top = 112
+    Left = 368
+    Top = 110
     Width = 8
     Height = 13
     Caption = '>'
   end
   object lbl2: TLabel
-    Left = 315
+    Left = 368
     Top = 83
     Width = 8
     Height = 13
     Caption = '>'
+  end
+  object Label1: TLabel
+    Left = 258
+    Top = 83
+    Width = 19
+    Height = 13
+    Caption = 'UpX'
+  end
+  object Label2: TLabel
+    Left = 258
+    Top = 110
+    Width = 19
+    Height = 13
+    Caption = 'UpY'
+  end
+  object Label3: TLabel
+    Left = 383
+    Top = 83
+    Width = 33
+    Height = 13
+    Caption = 'DownX'
+  end
+  object Label4: TLabel
+    Left = 383
+    Top = 110
+    Width = 33
+    Height = 13
+    Caption = 'DownY'
   end
   object sbMain: TScrollBox
     Left = 520
@@ -244,7 +272,7 @@ object MainForm: TMainForm
     OnClick = btnSaveClick
   end
   object edtLeftUpX: TMaskEdit
-    Left = 229
+    Left = 282
     Top = 80
     Width = 80
     Height = 21
@@ -255,7 +283,7 @@ object MainForm: TMainForm
     OnExit = edtLeftUpXExit
   end
   object edtLeftUpY: TMaskEdit
-    Left = 225
+    Left = 281
     Top = 107
     Width = 81
     Height = 21
@@ -266,7 +294,7 @@ object MainForm: TMainForm
     OnExit = edtLeftUpYExit
   end
   object edtRightDownX: TMaskEdit
-    Left = 347
+    Left = 418
     Top = 80
     Width = 75
     Height = 21
@@ -277,7 +305,7 @@ object MainForm: TMainForm
     OnExit = edtRightDownXExit
   end
   object edtRightDownY: TMaskEdit
-    Left = 347
+    Left = 418
     Top = 107
     Width = 74
     Height = 21

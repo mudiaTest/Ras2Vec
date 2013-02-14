@@ -11,7 +11,13 @@ type
     constructor Create;
     procedure SaveAs(aFileNamePath: String); overload;
     procedure SaveAs; overload;
-    procedure Load;
+    procedure Load(var alastSLPath: String);
+    procedure Init(astGeo1X,
+                   astGeo1Y,
+                   astGeo2X,
+                   astGeo2Y,
+                   astGraphFileNamePath,
+                   astMPFilePathName: String);
   end;
 
 
@@ -51,7 +57,23 @@ begin
   stMPFilePathName := '';
 end;
 
-procedure TIniSL.Load;
+procedure TIniSL.Init(astGeo1X,
+                      astGeo1Y,
+                      astGeo2X,
+                      astGeo2Y,
+                      astGraphFileNamePath,
+                      astMPFilePathName: String);
+
+begin
+  stGeo1X := astGeo1X;
+  stGeo1Y := astGeo1Y;
+  stGeo2X := astGeo2X;
+  stGeo2Y := astGeo2Y;
+  stGraphFileNamePath := astGraphFileNamePath;
+  stMPFilePathName := astGraphFileNamePath;
+end;
+
+procedure TIniSL.Load(var alastSLPath: String);
 var
   od: TOpenDialog;
   ini: TIniFile;
@@ -67,14 +89,19 @@ begin
     if not FileExists(od.FileName) then
       Assert(false, 'Nie odnaleziono pliku konfiguracyjnego: ' + od.FileName);
     ini := TIniFile.Create(od.FileName);
-    stTitle := ini.ReadString('Main', 'Title', '');
-    Assert(stTitle <> '', 'Btak Tytu³u - niepoprawny plik konfiguracyjny.');
-    stGraphFileNamePath := ini.ReadString('Main', 'GraphFile', '');
-    stGeo1X := ini.ReadString('Main', 'Geo1X', '');
-    stGeo1Y := ini.ReadString('Main', 'Geo1Y', '');
-    stGeo2X := ini.ReadString('Main', 'Geo2X', '');
-    stGeo2Y := ini.ReadString('Main', 'Geo2Y', '');
-    stMPFilePathName := ini.ReadString('Main', 'MPFilePathName', '');
+    alastSLPath := od.FileName;
+    try
+      stTitle := ini.ReadString('Main', 'Title', '');
+      Assert(stTitle <> '', 'Btak Tytu³u - niepoprawny plik konfiguracyjny.');
+      stGraphFileNamePath := ini.ReadString('Main', 'GraphFile', '');
+      stGeo1X := ini.ReadString('Main', 'Geo1X', '');
+      stGeo1Y := ini.ReadString('Main', 'Geo1Y', '');
+      stGeo2X := ini.ReadString('Main', 'Geo2X', '');
+      stGeo2Y := ini.ReadString('Main', 'Geo2Y', '');
+      stMPFilePathName := ini.ReadString('Main', 'MPFilePathName', '');
+    finally
+      ini.free;
+    end;
   finally
     od.Free;
   end;

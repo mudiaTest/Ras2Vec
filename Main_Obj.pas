@@ -136,7 +136,7 @@ type
     stTypBody: String;
     path: String;
     name: String;
-    mpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
+    stmpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
     typFileName: String; //plik typ ma tak¹ sam¹ œcie¿kê i nazwê, ale inne rozszerzenie
     procedure SavePathToReg(aPath: String);
     procedure LoadPathFromReg;
@@ -309,7 +309,7 @@ public
     procedure UpdateColorArr;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
     procedure makeEdgesForGroups;
-    //wybudowanie granic wewnêtrznych. Przechodzimy po tablicy colorArr i dla 
+    //wybudowanie granic wewnêtrznych. Przechodzimy po tablicy colorArr i dla
     //kandydatów dodajemy do ich grup nowe granice wewnêtrzne - dlo listy
     procedure makeInnerEdgesForGroups;
     constructor Create; override;
@@ -381,6 +381,7 @@ public
     //function getVectObj(x, y: integer): TVectObj; override;
   public
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
+    destructor Destroy; override;
     property p1: TOPoint read getP1;
     property p2: TOPoint read getP2;
     class procedure zintegruj(aobj1, aobj2: TVectRectangle;
@@ -763,7 +764,7 @@ var
   colorPxDown: TColorPx;
   vectGroup: TVectRectGroup;
   vectGroupDown: TVectRectGroup;
-  list: TIntList; 
+  list: TIntList;
 begin
   for y:=0 to srcHeight-2 do
     for x:=0 to srcWidth-1 do
@@ -822,6 +823,13 @@ begin
   color := acolor;
   fpoints.AddObject(0, p1);
   fpoints.AddObject(1, p2);
+end;
+
+destructor TVectRectangle.Destroy;
+begin
+  p1.free;
+  p2.free;
+  inherited;
 end;
 
 function TVectRectangle.getP1: TOPoint;
@@ -1647,7 +1655,7 @@ end;
 constructor TMPFile.Create;
 begin
   reg := TRegistry.Create;
-  mpFileName := '';
+  stmpFileName := '';
   typFileName := '';
   mpLineList := TStringList.Create;
   stTypBody := '';
@@ -1913,7 +1921,7 @@ begin
   //d³ugoœæ ca³ego bloku data dla Line
   AddInt2StrHex(lpPolyDataBlockLength , 4, stTypBody); //0x4d
 
-  
+
   //offste Poly data
   AddInt2StrHex(lpPolyDrawOff , 4, stTypBody); //0x51
   //d³ugoœæ pojedynczego data dla Poly
@@ -1936,7 +1944,7 @@ begin
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[1] + colorGroupList.colorTyp[2]));
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[3] + colorGroupList.colorTyp[4]));
     stTypBody := stTypBody + AnsiChar(strToInt('$' + colorGroupList.colorTyp[5] + colorGroupList.colorTyp[6]));
-  end;  
+  end;
 end;
 
 procedure TMPFile.AddPolyDataDefs(asortedIdMpGroupList: TStringList; avectRectGroupsByColor: TRectGroupsByColorMap);
@@ -1982,7 +1990,7 @@ end;
 
 procedure TMPFile.MPFileOpen;
 begin
-  AssignFile(mpFile, mpFileName);
+  AssignFile(mpFile, stmpFileName);
   ReWrite(mpFile);
 end;
 
@@ -2009,7 +2017,7 @@ begin
                                    aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
                                    aMapFactory.vectRectGroupsByColor.GetValue(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList,
                                    aMapFactory.colorArr);
-  mpLineList.SaveToFile(mpFileName);
+  mpLineList.SaveToFile(stmpFileName);
   TypFileSave(aMapFactory);
  // MPFileClose;
 end;
@@ -2064,15 +2072,15 @@ end;
 
 procedure TMPFile.TypPathFromMpPath;
 begin
-  typFileName := Copy(mpFileName, 1, Length(mpFileName)-2) + 'typ';
+  typFileName := Copy(stmpFileName, 1, Length(stmpFileName)-2) + 'typ';
 end;
 
 procedure TMPFile.SavePathToReg(aPath: String);
 begin
-  mpFileName := aPath;
+  stmpFileName := aPath;
   TypPathFromMpPath;
   reg.OpenKey(REGSOFT + progName, true);
-  reg.WriteString('MPFilePathName', mpFileName);
+  reg.WriteString('MPFilePathName', stmpFileName);
   reg.CloseKey;
 end;
 
@@ -2084,7 +2092,7 @@ end;
 procedure TMPFile.LoadPathFromReg;
 begin
   reg.OpenKey(REGSOFT + progName, true);
-  mpFileName := reg.ReadString('MPFilePathName');
+  stmpFileName := reg.ReadString('MPFilePathName');
   TypPathFromMpPath;
   reg.CloseKey;
 end;

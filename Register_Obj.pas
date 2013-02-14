@@ -11,8 +11,8 @@ type
     reg: TRegistry;
   public
     constructor Create;
-    destructor Destroy;
-    function GetMain(aKey: String): String;
+    destructor Destroy; override;
+    function GetMain(aKey: String; default: String=''): String;
     procedure SetMain(aKey, aVal: String);
     function GetVal(aKey: String): String; virtual; abstract;
     procedure SetVal(aKey, aVal: String); virtual; abstract;
@@ -42,22 +42,28 @@ implementation
 
 constructor TMainReg.Create;
 begin
-  reg := TRegistry.Create;
+  reg := TRegistry.Create; //zwalniane w TMainReg.Destroy
   reg.rootKey := HKEY_CURRENT_USER;
 end;
 
 destructor TMainReg.Destroy;
 begin
+  inherited;
   reg.Free;
 end;
 
-function TMainReg.GetMain(aKey: String): String;
+function TMainReg.GetMain(aKey: String; default: String=''): String;
 begin
   if reg.OpenKey(PROGRAM_REG_PATH, true) then
   begin
     try
       result := GetVal(aKey);
     finally
+      if (result = '') and (default <> '') then
+      begin
+        SetMain(aKey, default);
+        result := default;
+      end;
       reg.CloseKey;
     end;
   end else
@@ -154,7 +160,7 @@ end;
 
 function TSrcReg.GetLastSLPath: String;
 begin
-  result := GetMain(LAST_SL_PATH);
+  result := GetMain(LAST_SL_PATH, 'C:/');
 end;
 
 function TSrcReg.GetVal(aKey: String): String;

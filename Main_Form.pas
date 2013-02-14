@@ -8,15 +8,16 @@ uses
   Main_Obj, ActnMan, ActnColorMaps, TeCanvas, Menus, Sys_utl, ActnList, Mask,
   Register_Obj, Main_CV, Ini_Obj
   {$IFNDEF VER185}
-  ,OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool,
-  ,Main_Thread,
-  ,Vcl.ActnList, Vcl.Mask
+  ,OtlEventMonitor, OtlTaskControl, OtlComm, OtlThreadPool
+  ,Main_Thread
+  {,Vcl.ActnList, Vcl.Mask}
   {$ENDIF}
   ;
 
 const
   c_mainImage = 1;
   c_zoomImage = 2;
+  c_EmptyGeoText = '  ,  ,  ,  ';
 
 type
 
@@ -53,9 +54,6 @@ type
     GridColor1: TMenuItem;
     lblAkcja: TLabel;
     lblTime: TLabel;
-    {$IFNDEF VER185}
-    oemR3V: TOmniEventMonitor;
-    {$ENDIF}
     btnStopR2V: TButton;
     MainActionList: TActionList;
     actR2VBtnStop: TAction;
@@ -75,6 +73,10 @@ type
     Save1: TMenuItem;
     SaveAs1: TMenuItem;
     Load2: TMenuItem;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
     procedure PaintBoxMainPaint(Sender: TObject);
     procedure imgMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -117,7 +119,7 @@ type
     procedure SaveAs1Click(Sender: TObject);
   private
     { Private declarations }
-    imageName: String;
+    stGraphFileNamePath: String;
     bmp, bmp2: TBitMap;
     color: Tcolor;
 
@@ -134,6 +136,7 @@ type
     gridColor: TColor; //kolor siatki/otoczki polygonów
     {$IFNDEF VER185}
     taskR2V: IOmniTaskControl; //omni task grupowania pixeli i wyznaczania granic dla rectangli
+    oemR3V: TOmniEventMonitor;
     {$ENDIF}
     perf: TTimeInterval; //perf dla ca³ego R2V
 
@@ -151,10 +154,12 @@ type
     procedure CreateMainThreadVectorGroupList;
     procedure CreateSeperateThreadVectorGroupList;
     function  DecodeGeoStr(aGeoPointStr: String): Double;
+    procedure FillFromIni(ainiSL: TIniSL);
+    procedure AktReg;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
-    destructor DEstroy; override;
+    destructor Destroy; override;
     procedure InfoAkcja(aStr: String);
   end;
 
@@ -177,13 +182,17 @@ end;
 procedure TMainForm.btnSaveClick(Sender: TObject);
 begin
   inherited;
-  SaveDialog.FileName := MPFile.mpFileName;
+  SaveDialog.FileName := MPFile.stmpFileName;
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
   MPFile.SavePathToReg(SaveDialog.FileName);
   if SaveDialog.FileName <> '' then
   begin
-    mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
+    Assert(edtLeftUpX.text<>c_EmptyGeoText, 'UpX nie jest poprawnie wype³niony.');
+    Assert(edtLeftUpY.text<>c_EmptyGeoText, 'UpY nie jest poprawnie wype³niony.');
+    Assert(edtRightDownX.text<>c_EmptyGeoText, 'DownX nie jest poprawnie wype³niony.');
+    Assert(edtRightDownY.text<>c_EmptyGeoText, 'DownY nie jest poprawnie wype³niony.');
+    mapFactory.geoLeftUpX :=  DecodeGeoStr(edtLeftUpX.text);
     mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
     mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
     mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
@@ -259,7 +268,7 @@ procedure TMainForm.CreateMainThreadVectorGroupList;
 begin
   if mapFactory <> nil then
     mapFactory.Free;
-  mapFactory := TMainThreadVectList.Create;
+  mapFactory := TMainThreadVectList.Create; //zwealniane w TMainForm.Destroy
   {$IFNDEF VER185}
   mapFactory.OwnsObjects := true;
   {$ENDIF}
@@ -272,19 +281,18 @@ begin
   {$IFNDEF VER185}
   if mapFactory <> nil then
     mapFactory.Free;
-  mapFactory := TSeparateThreadVectList.Create;
+  mapFactory := TSeparateThreadVectList.Create; //zwalniane w TMainForm.Destroy
   mapFactory.OwnsObjects := true;
   {$ENDIF}
 end;
 
 constructor TMainForm.Create(AOwner: TComponent);
-var
-  filePathName: String;
 begin
   inherited;
+  oemR3V := TOmniEventMonitor.Create(nil); //zwalniane w TMainForm.Destroy
   mapFactory := nil;
-  srcReg := TSrcReg.Create;
-  iniSL := TIniSL.Create;
+  srcReg := TSrcReg.Create; //zwalniane w TMainForm.Destroy
+  iniSL := TIniSL.Create; //zwalniane w TMainForm.Destroy
   //CreateSeperateThreadVectorGroupList;
   CreateMainThreadVectorGroupList;
   MPFile := TMPFile.Create;
@@ -293,9 +301,9 @@ begin
   sbMain.OnScroll := mainImageScroll;
   sbZoom.OnScroll := zoomImageScroll;
 
-  filePathName := srcReg.GetFilePathName;
-  if filePathName <> '' then
-    imgMain.Picture.LoadFromFile(filePathName);
+  stGraphFileNamePath := srcReg.GetFilePathName;
+  if stGraphFileNamePath <> '' then
+    imgMain.Picture.LoadFromFile(stGraphFileNamePath);
   edtLeftUpX.Text := srcReg.GetGeo1X;
   edtLeftUpY.Text := srcReg.GetGeo1Y;
   edtRightDownX.Text := srcReg.GetGeo2X;
@@ -340,15 +348,16 @@ begin
   inherited;
   if dlgPicture.Execute then
   begin
-    imageName := dlgPicture.FileName;
-    imgMain.Picture.LoadFromFile(imageName);
-    srcReg.SetFilePathName(imageName);
+    stGraphFileNamePath := dlgPicture.FileName;
+    imgMain.Picture.LoadFromFile(stGraphFileNamePath);
+    srcReg.SetFilePathName(stGraphFileNamePath);
   end;
 end;
 
 procedure TMainForm.Load2Click(Sender: TObject);
 begin
-  iniSL.Load;
+  iniSL.Load(lastSLPath);
+  FillFromIni(iniSL);
   srcReg.SetLastSLPath(lastSLPath);
 end;
 
@@ -457,14 +466,14 @@ end;
 
 procedure TMainForm.SetControls(atask: integer);
 begin
-  {$IFNDEF VER185}
+{$IFNDEF VER185}
   if atask = OW_DO_R2V then
   begin
     //OtherMG.Enabled := not assigned(taskR2V);
     //MainMG.Enabled := not assigned(taskR2V);
     //btnStopR2V.Enabled := assigned(taskR2V);
   end;
-  {$ENDIF}
+{$ENDIF}
 end;
 
 {$IFNDEF VER185}
@@ -474,10 +483,14 @@ var
   wideChars : PWideChar;
 begin
   list := TStringList.Create;
-  New(wideChars);
-  StringToWideChar(aGeoPointStr, wideChars, Length(aGeoPointStr) + 1);
-  ExtractStrings([','], [], wideChars, list);
-  Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+  try
+    New(wideChars);
+    StringToWideChar(aGeoPointStr, wideChars, Length(aGeoPointStr) + 1);
+    ExtractStrings([','], [], wideChars, list);
+    Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+  finally
+    list.free;
+  end;
 end;
 {$ELSE}
 function TMainForm.DecodeGeoStr(aGeoPointStr: String): Double;
@@ -486,20 +499,30 @@ var
   chars : PAnsiChar;
 begin
   list := TStringList.Create;
-  New(chars);
-  chars := PChar(aGeoPointStr);
-  //StringToWideChar(aGeoPointStr, chars, Length(aGeoPointStr) + 1);
-  ExtractStrings([','], [], chars, list);
-  Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+  try
+    New(chars);
+    chars := PChar(aGeoPointStr);
+    //StringToWideChar(aGeoPointStr, chars, Length(aGeoPointStr) + 1);
+    ExtractStrings([','], [], chars, list);
+    Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
+  finally
+    list.free;
+  end;
 end;
-destructor TMainForm.DEstroy;
+{$ENDIF}
+
+destructor TMainForm.Destroy;
 begin
-  srcReg.Free;
-  iniSL.Free;
+  mapFactory.free;
+  MPFile.free;
+{$IFNDEF VER185}
+  oemR3V.free;
+{$ENDIF}
+  perf.free;
+  srcReg.free;
+  iniSL.free;
   inherited;
 end;
-
-{$ENDIF}
 
 procedure TMainForm.R2V1Click(Sender: TObject);
 {$IFNDEF VER185}
@@ -522,16 +545,20 @@ begin
     mapFactory.CalculateGeoPx;
 
     //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
-    perf := TTimeInterval.Create;
+    perf := TTimeInterval.Create; //zwalniane w TMainForm.Destroy
     perf.Start;
     {$IFNDEF VER185}
     if mapFactory is TSeparateThreadVectList then
     begin
       workerR2V := TR2VOmniWorker.Create;
-      workerR2V.mapFactory := mapFactory as TSeparateThreadVectList;
-      taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
-        .SetTimer(1, 1, OW_DO_R2V)
-        .Run;
+      try
+        workerR2V.mapFactory := mapFactory as TSeparateThreadVectList;
+        taskR2V := oemR3V.Monitor(CreateTask(workerR2V, 'R2V'))
+          .SetTimer(1, 1, OW_DO_R2V)
+          .Run;
+      finally
+        workerR2V.free;
+      end;
     end
     else
     {$ENDIF}
@@ -552,6 +579,14 @@ end;
 
 procedure TMainForm.Save1Click(Sender: TObject);
 begin
+  Assert(lastSLPath <> '', 'lastSLPath jest puste');
+  Assert(FileExists(lastSLPath), 'lastSLPath ="'+lastSLPath+'" nie jest plikiem');
+  iniSL.Init(edtLeftUpX.Text,
+             edtLeftUpY.Text,
+             edtRightDownX.Text,
+             edtRightDownY.Text,
+             stGraphFileNamePath,
+             MPFile.stmpFileName);
   iniSL.SaveAs(lastSLPath);
   srcReg.SetLastSLPath(lastSLPath);
 end;
@@ -674,6 +709,20 @@ begin
   Close;
 end;
 
+procedure TMainForm.FillFromIni(ainiSL: TIniSL);
+begin
+  edtLeftUpX.Text := ainiSL.stGeo1X;
+  edtLeftUpY.Text := ainiSL.stGeo1Y;
+  edtRightDownX.Text := ainiSL.stGeo2X;
+  edtRightDownY.Text := ainiSL.stGeo2Y;
+  stGraphFileNamePath := ainiSL.stGraphFileNamePath;
+  MPFile.stmpFileName := ainiSL.stGraphFileNamePath;
+
+
+  imgMain.Picture.LoadFromFile(stGraphFileNamePath);
+  AktReg;
+end;
+
 procedure TMainForm.GridColor1Click(Sender: TObject);
 begin
   inherited;
@@ -685,6 +734,15 @@ procedure TMainForm.actR2VMenuExecute(Sender: TObject);
 begin
 //  OtherMG.Enabled := not assigned(taskR2V);
 //  MainMG.Enabled := not assigned(taskR2V);
+end;
+
+procedure TMainForm.AktReg;
+begin
+  srcReg.SetFilePathName(stGraphFileNamePath);
+  srcReg.SetGeo1X(edtLeftUpX.Text);
+  srcReg.SetGeo1Y(edtLeftUpY.Text);
+  srcReg.SetGeo2X(edtRightDownX.Text);
+  srcReg.SetGeo2Y(edtRightDownY.Text);
 end;
 
 procedure TMainForm.actR2VBtnStopExecute(Sender: TObject);

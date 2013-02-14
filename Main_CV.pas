@@ -9,7 +9,7 @@ const
   GEO_1_Y = 'Geo1Y';
   GEO_2_X = 'Geo2X';
   GEO_2_Y = 'Geo2Y';
-  LAST_SL_PATH = 'C:\';
+  LAST_SL_PATH = 'LastSLPath'; //œcie¿ka ostatnio odczyty
 var
   lastSLPath: String;
 
