@@ -37,8 +37,8 @@ end;
 procedure TR2VOmniWorker.OMDoWork(var msg: TOmniMessage);
 begin
   Task.ClearTimer(1);
-  mapFactory.groupRect;
-  mapFactory.makeEdgesForGroups;
+  mapFactory.GroupRect;
+  mapFactory.MakeEdgesForGroups;
 end;
 
 procedure TR2VOmniWorker.OMSendMessage(msg: String);

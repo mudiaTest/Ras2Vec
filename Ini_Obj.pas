@@ -100,7 +100,7 @@ begin
       stGeo2Y := ini.ReadString('Main', 'Geo2Y', '');
       stMPFilePathName := ini.ReadString('Main', 'MPFilePathName', '');
     finally
-      ini.free;
+      ini.Free;
     end;
   finally
     od.Free;

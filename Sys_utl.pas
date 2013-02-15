@@ -24,7 +24,7 @@ type
   protected
     fnextKey: Integer;
   public
-    function nextKey: Integer;
+    function NextKey: Integer;
     constructor Create; overload; virtual;
   end;
 
@@ -75,7 +75,7 @@ type
   function Hex2Int(astHex: String): integer;
 
   //funkcja sortuj¹ca dla TStringList porównuj¹ca inrwgwery zapisane jako stringi
-  function sortIntStr(aList: TStringList; id1, id2: Integer): integer;
+  function SortIntStr(aList: TStringList; id1, id2: Integer): integer;
 
 implementation
 
@@ -101,7 +101,7 @@ implementation
     Result := aPath1 + aPath2;
   end;
 
-  procedure addInt2StrHex(aInt: integer; aBytesLen: integer; var aStr: String);
+  procedure AddInt2StrHex(aInt: integer; aBytesLen: integer; var aStr: String);
   var
     i: integer;
     stMain: String;
@@ -216,7 +216,7 @@ begin
   fnextKey := 0;
 end;
 
-function TAdvList.nextKey: Integer;
+function TAdvList.NextKey: Integer;
 begin
   Result := fnextKey;
 end;
@@ -250,10 +250,12 @@ begin
   fnextKey := Math.max(fnextKey, Math.Ceil(s+1));
 end;
 
-function sortIntStr(aList: TStringList; id1, id2: Integer): integer;
+function SortIntStr(aList: TStringList; id1, id2: Integer): integer;
 var
   val1, val2: integer;
 begin
+  val1 := 0;
+  val2 := 0;
   try
     val1 := strToInt(aList[id1]);
   except

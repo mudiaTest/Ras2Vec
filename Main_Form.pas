@@ -142,10 +142,13 @@ type
 
     srcReg: TSrcReg; //obiekt czytania i pisania do rejestru - ostatni plik graficzny i koordynaty z kontrolek
     iniSL: TIniSL; //obiekt zapamiêtywania istawieñ w plikach ini
-    procedure mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
-    procedure zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+    procedure MainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+    procedure ZoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
     //procedure setScrollPos(asbDest, asbSrc: TScrollBox);
-    procedure saveZoomPos;
+    procedure SaveZoomPos;
+    //wyœwietla wynikow¹ grafikê zgodnie z ustawieniami (polygons/rectangle, gryd/edges etc)
+    //Samo wype³nienie bmp jest wykonywane przez wywo³ywan¹ funkcjê, ale ustawianie
+    //zooma, przesuniêie grafiki i wszystkie sztuczki czysto techniczne s¹ wykonywane w³aœnie tutaj
     procedure DoZoom;
     procedure SetControls(atask: integer);
     {$IFNDEF VER185}
@@ -298,8 +301,8 @@ begin
   MPFile := TMPFile.Create;
   MPFile.LoadPathFromReg;
 
-  sbMain.OnScroll := mainImageScroll;
-  sbZoom.OnScroll := zoomImageScroll;
+  sbMain.OnScroll := MainImageScroll;
+  sbZoom.OnScroll := ZoomImageScroll;
 
   stGraphFileNamePath := srcReg.GetFilePathName;
   if FileExists(stGraphFileNamePath) then
@@ -324,7 +327,7 @@ begin
   bmp := imgMain.Picture.Bitmap;
   color := bmp.canvas.Pixels[1,1];
 
-  bmp2:=TBitmap.create;
+  bmp2:=TBitmap.Create;
   bmp2.width:=200;(*Assign dimensions*)
   bmp2.height:=200;
   imgZoom.Picture.Graphic:=bmp2;(*Assign the bitmap to the image component*)
@@ -385,7 +388,7 @@ begin
 end;
 
 //zapamiêtuje po³o¿enie obrazka tak, aby powiêszanie nie przesuwa³o go
-procedure TMainForm.saveZoomPos;
+procedure TMainForm.SaveZoomPos;
 var
   tmpZoom: integer;
 begin
@@ -419,7 +422,7 @@ begin
     src := c_mainImage;
 end;}
 
-procedure TMainForm.mainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+procedure TMainForm.MainImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
   //ustaw zoomImage wg main image
   //setScrollPos(sbZoom, sbMain);
@@ -456,7 +459,7 @@ begin
   PaintBoxMain.Repaint;
 end;
 
-procedure TMainForm.zoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
+procedure TMainForm.ZoomImageScroll(Sender: TObject; HorzScroll: Boolean; OldPos, CurrentPos: Integer);
 begin
 end;
 
@@ -497,7 +500,7 @@ begin
     ExtractStrings([','], [], wideChars, list);
     Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
   finally
-    list.free;
+    list.Free;
   end;
 end;
 {$ELSE}
@@ -514,25 +517,44 @@ begin
     ExtractStrings([','], [], chars, list);
     Result := StrToFloat(list[0]) + StrToFloat(list[1])/60+StrToFloat(list[2])/3600+StrToFloat(list[3])/360000;
   finally
-    list.free;
+    list.Free;
   end;
 end;
 {$ENDIF}
 
 destructor TMainForm.Destroy;
 begin
-  mapFactory.free;
-  MPFile.free;
+  mapFactory.Free;
+  MPFile.Free;
 {$IFNDEF VER185}
-  oemR3V.free;
+  oemR3V.Free;
 {$ENDIF}
-  perf.free;
-  srcReg.free;
-  iniSL.free;
+  perf.Free;
+  srcReg.Free;
+  iniSL.Free;
   inherited;
 end;
 
 procedure TMainForm.R2V1Click(Sender: TObject);
+  procedure PrzygotujMapFactory;
+  begin
+    mapFactory.Clear;
+    mapFactory.ReadFromImgIntoRectArray(imgMain);
+    mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
+    mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
+    mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
+    mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
+    mapFactory.CalculateGeoPx;
+  end;
+
+  procedure UruchomKonwersjeDlaMainThread;
+  begin
+    mapFactory.GroupRect;
+    mapFactory.FillColorArr;
+    mapFactory.MakeEdgesForGroups;
+    mapFactory.UpdateColorArr;
+    mapFactory.MakeInnerEdgesForGroups;
+  end;
 {$IFNDEF VER185}
 var
   workerR2V: TR2VOmniWorker;//omni worker grupowania pixeli i wyznaczania granic dla rectangli
@@ -542,15 +564,9 @@ begin
   try
     InfoAkcja('Wczytywanie obrazka.');
     Screen.Cursor := crHourGlass;
-    mapFactory.Clear;
-    mapFactory.ReadFromImgIntoRectArray(imgMain);
-    mapFactory.geoLeftUpX := DecodeGeoStr(edtLeftUpX.text);
-    mapFactory.geoLeftUpY := DecodeGeoStr(edtLeftUpY.text);
-    mapFactory.geoRightDownX := DecodeGeoStr(edtRightDownX.text);
-    mapFactory.geoRightDownY := DecodeGeoStr(edtRightDownY.text);
+    PrzygotujMapFactory;
     imgZoom.Width := imgMain.Width;
     imgZoom.Height := imgMain.Height;
-    mapFactory.CalculateGeoPx;
 
     //vectorList2.FillImgWithRect(imgZoom, lpZoom, chkGrid.Checked, gridColor);
     perf := TTimeInterval.Create; //zwalniane w TMainForm.Destroy
@@ -565,21 +581,16 @@ begin
           .SetTimer(1, 1, OW_DO_R2V)
           .Run;
       finally
-        workerR2V.free;
+        workerR2V.Free;
       end;
     end
     else
     {$ENDIF}
     if mapFactory is TMainThreadVectList then
     begin
-      mapFactory.groupRect;
-      mapFactory.FillColorArr;
-      mapFactory.makeEdgesForGroups;
-      mapFactory.UpdateColorArr;
-      mapFactory.makeInnerEdgesForGroups;
+      UruchomKonwersjeDlaMainThread
     end else
       Assert(False, 'Klasa mapFactory rózna od TSeparateThreadVectList i TMainThreadVectList');
-
   finally
     Screen.Cursor := crDefault;
   end;
@@ -633,10 +644,10 @@ begin
 
   Screen.Cursor := crHourGlass;
   try
-    saveZoomPos;
+    SaveZoomPos;
     //scrollHorPos := sbZoom.HorzScrollBar.Position;
     //scrollVerPos := sbZoom.VertScrollBar.Position;
-    //zapisyje do zmiennej glob. nowy poziom zoomu 2^x
+    //zapisuje do zmiennej glob. nowy poziom zoomu 2^x
     lpZoom := round(Math.Power(2.0, tbZoom.Position-1));
     lpActImgZoom := lpZoom;
 
