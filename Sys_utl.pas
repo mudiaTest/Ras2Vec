@@ -35,8 +35,8 @@ type
     function GetObjByVal(val: Integer): TObject;
     function IndexOf(const val: integer): Integer; reintroduce; overload;
   public
-    property Value[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
-    property ObjByVal[val: integer]: TObject read GetObjByVal;
+    property value[Index: Integer]: Integer read GetInt write PutInt; default; //reintroduce; default;
+    property objByVal[val: integer]: TObject read GetObjByVal;
   end;
 
   TDoubleList = class (TAdvList)
@@ -46,8 +46,8 @@ type
     function GetObjByVal(val: Double): TObject;
     function IndexOf(const val: double): Integer; reintroduce; overload;
   public
-    property Value[Index: Integer]: Double read GetDouble write PutDouble; default; //reintroduce; default;
-    property ObjByVal[val: Double]: TObject read GetObjByVal;
+    property value[Index: Integer]: Double read GetDouble write PutDouble; default; //reintroduce; default;
+    property objByVal[val: Double]: TObject read GetObjByVal;
   end;
 
   TOPoint = class

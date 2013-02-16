@@ -48,11 +48,11 @@ type
     OtherMG: TMenuItem;
     Open1: TMenuItem;
     Load1: TMenuItem;
-    Tylkoread1: TMenuItem;
+    ItmOnlyRead1: TMenuItem;
     R2V1: TMenuItem;
     Exit1: TMenuItem;
     GridColor1: TMenuItem;
-    lblAkcja: TLabel;
+    lblAction: TLabel;
     lblTime: TLabel;
     btnStopR2V: TButton;
     MainActionList: TActionList;
@@ -93,7 +93,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure Open1Click(Sender: TObject);
     procedure Load1Click(Sender: TObject);
-    procedure Tylkoread1Click(Sender: TObject);
+    procedure ItmOnlyRead1Click(Sender: TObject);
     procedure R2V1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure GridColor1Click(Sender: TObject);
@@ -158,12 +158,12 @@ type
     procedure CreateSeperateThreadVectorGroupList;
     function  DecodeGeoStr(aGeoPointStr: String): Double;
     procedure FillFromIni(ainiSL: TIniSL);
-    procedure AktReg;
+    procedure UpdateRegObj;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure InfoAkcja(aStr: String);
+    procedure UpdateInfoAction(aStr: String);
   end;
 
   var
@@ -185,7 +185,7 @@ end;
 procedure TMainForm.btnSaveClick(Sender: TObject);
 begin
   inherited;
-  SaveDialog.FileName := MPFile.stmpFileName;
+  SaveDialog.FileName := MPFile.stMpFileName;
   SaveDialog.Filter := 'MP files (*.mp)|*.MP|Any file (*.*)|*.*';
   SaveDialog.Execute;
   MPFile.SavePathToReg(SaveDialog.FileName);
@@ -275,7 +275,7 @@ begin
   {$IFNDEF VER185}
   mapFactory.OwnsObjects := true;
   {$ENDIF}
-  (mapFactory as TMainThreadVectList).lblAkcja := lblAkcja;
+  (mapFactory as TMainThreadVectList).lblAkcja := lblAction;
   (mapFactory as TMainThreadVectList).lblTime := lblTime;
 end;
 
@@ -349,9 +349,9 @@ begin
   imgStartPos := Point(x, y);
 end;
 
-procedure TMainForm.InfoAkcja(aStr: String);
+procedure TMainForm.UpdateInfoAction(aStr: String);
 begin
-  lblAkcja.Caption := aStr;
+  lblAction.Caption := aStr;
 end;
 
 procedure TMainForm.Load1Click(Sender: TObject);
@@ -432,7 +432,7 @@ end;
 procedure TMainForm.oemR3VTaskMessage(const task: IOmniTaskControl;
   const msg: TOmniMessage);
 begin
-  lblAkcja.Caption := msg.MsgData;
+  lblAction.Caption := msg.MsgData;
   //lblAkcja.Repaint;
 end;
 
@@ -443,7 +443,7 @@ begin
   SetControls(OW_DO_R2V);
   Screen.Cursor := crDefault;
   perf.Stop;
-  lblAkcja.Caption := perf.InterSt;
+  lblAction.Caption := perf.InterSt;
   perf.Free;
 end;
 
@@ -562,7 +562,7 @@ var
 begin
   inherited;
   try
-    InfoAkcja('Wczytywanie obrazka.');
+    UpdateInfoAction('Wczytywanie obrazka.');
     Screen.Cursor := crHourGlass;
     PrzygotujMapFactory;
     imgZoom.Width := imgMain.Width;
@@ -605,7 +605,7 @@ begin
              edtRightDownX.Text,
              edtRightDownY.Text,
              stGraphFileNamePath,
-             MPFile.stmpFileName);
+             MPFile.stMpFileName);
   iniSL.SaveAs(lastSLPath);
   srcReg.SetLastSLPath(lastSLPath);
 end;
@@ -627,7 +627,7 @@ begin
   DoZoom;
 end;
 
-procedure TMainForm.Tylkoread1Click(Sender: TObject);
+procedure TMainForm.ItmOnlyRead1Click(Sender: TObject);
 begin
   inherited;
   Screen.Cursor := crHourGlass;
@@ -735,11 +735,11 @@ begin
   edtRightDownX.Text := ainiSL.stGeo2X;
   edtRightDownY.Text := ainiSL.stGeo2Y;
   stGraphFileNamePath := ainiSL.stGraphFileNamePath;
-  MPFile.stmpFileName := ainiSL.stGraphFileNamePath;
+  MPFile.stMpFileName := ainiSL.stGraphFileNamePath;
 
 
   imgMain.Picture.LoadFromFile(stGraphFileNamePath);
-  AktReg;
+  UpdateRegObj;
 end;
 
 procedure TMainForm.GridColor1Click(Sender: TObject);
@@ -755,7 +755,7 @@ begin
 //  MainMG.Enabled := not assigned(taskR2V);
 end;
 
-procedure TMainForm.AktReg;
+procedure TMainForm.UpdateRegObj;
 begin
   srcReg.SetFilePathName(stGraphFileNamePath);
   srcReg.SetGeo1X(edtLeftUpX.Text);

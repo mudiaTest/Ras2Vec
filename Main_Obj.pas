@@ -145,8 +145,8 @@ type
     stTypBody: String;
     path: String;
     name: String;
-    stmpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
-    typFileName: String; //plik typ ma tak¹ sam¹ œcie¿kê i nazwê, ale inne rozszerzenie
+    stMpFileName: String; //przechowywana w reg ¹cie¿ka i nazwa pliku MP
+    stTypFileName: String; //plik typ ma tak¹ sam¹ œcie¿kê i nazwê, ale inne rozszerzenie
     procedure SavePathToReg(aPath: String);
     procedure LoadPathFromReg;
     procedure MPFileOpen;
@@ -210,7 +210,7 @@ public
     //kolor oryginalny
     fcolor: TColor;
     //lp utworzonej grupy. PóŸniej utworzona ma wy¿szy numer
-    lpGrupa: integer;
+    lpGroup: integer;
 
     fMapFactory: TMapFactory; //rodzic
     //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
@@ -280,7 +280,7 @@ public
     fcolorArr: TDynamicPxColorPointArray;
     function GetObjByIdx(index: Integer): TVectObj;
     procedure SetObjByIdx(index: Integer; avectObj: TVectObj);
-    procedure InfoAkcja(aStr: String); virtual;
+    procedure UpdateInfoAction(aStr: String); virtual;
     procedure InfoTime(aStr: String); virtual;
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
@@ -331,7 +331,7 @@ public
   TSeparateThreadVectList = class(TMapFactory)
   private
     fotWorker: TOmniWorker;
-    procedure InfoAkcja(aStr: String); override;
+    procedure UpdateInfoAction(aStr: String); override;
     procedure InfoTime(aStr: String); override;
   published
     property otWorker: TOmniWorker read fotWorker write fotWorker;
@@ -342,7 +342,7 @@ public
 
   TMainThreadVectList = class(TMapFactory)
   private
-    procedure InfoAkcja(aStr: String); override;
+    procedure UpdateInfoAction(aStr: String); override;
     procedure InfoTime(aStr: String); override;
   public
     lblAkcja: TLabel;
@@ -574,7 +574,7 @@ var
   x, y: Integer;
   vectObj: TVectRectangle;
   key: integer;
-  lpGrupa: integer;
+  lpGroup: integer;
   perf: TTimeInterval;
   perf2, perf3: TTimeInterval;
   colorGroupList: TColorGroupList;
@@ -583,7 +583,7 @@ begin
   perf2 := TTimeInterval.Create;
   perf3 := TTimeInterval.Create;
   Clear;
-  lpGrupa := 0;
+  lpGroup := 0;
   for y:=0 to srcHeight-1 do
   begin
     perf.Start;
@@ -596,8 +596,8 @@ begin
       begin
         vectObj.vectGroup := TVectRectGroup.Create;
         vectObj.vectGroup.mapFactory := Self;
-        vectObj.vectGroup.lpGrupa := lpGrupa;
-        inc(lpGrupa);
+        vectObj.vectGroup.lpGroup := lpGroup;
+        inc(lpGroup);
         vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
         vectObj.vectGroup.color := vectObj.color;
         vectObj.vectGroup.rectList.AddObject(0, vectObj);
@@ -625,7 +625,7 @@ begin
       perf3.Stop;
     end;
     perf.Stop;
-    InfoAkcja('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
+    UpdateInfoAction('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
     InfoTime('Time: ' + perf.InterSt + ' / ' + perf2.InterSt + ' / ' + perf3.InterSt);
     perf2.Reset;
     perf3.Reset;
@@ -742,7 +742,7 @@ begin
 end;
 
 
-procedure TMapFactory.InfoAkcja(aStr: String);
+procedure TMapFactory.UpdateInfoAction(aStr: String);
 begin
   stMessage := aStr;
 end;
@@ -763,7 +763,7 @@ begin
     vectGroup := Objects[i] as TVectRectGroup;
     DivMod(i, inMod, wrRes, wrDiv);
     if wrDiv = 0 then
-      InfoAkcja('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
+      UpdateInfoAction('Tworzenie granicy dla grupy ' + IntToStr(i) + '/' + IntToStr(Count-1) );
     vectGroup.MakeEdges(vectGroup.edgePxList);
   end;
 end;
@@ -866,7 +866,7 @@ var
   colorGruopList: TIntList;
   colorGruopListIdx: Integer;
 begin
-  if (aobj2.vectGroup = nil) or (aobj1.vectGroup.lpGrupa < aobj2.vectGroup.lpGrupa) then
+  if (aobj2.vectGroup = nil) or (aobj1.vectGroup.lpGroup < aobj2.vectGroup.lpGroup) then
   begin
     obj1 := aobj1;
     obj2 := aobj2;
@@ -883,7 +883,7 @@ begin
   begin
     obj2.vectGroup := obj1.vectGroup;
     obj2.vectGroupId := obj1.vectGroupId;
-    obj2.vectGroup.lpGrupa := obj1.vectGroup.lpGrupa;
+    obj2.vectGroup.lpGroup := obj1.vectGroup.lpGroup;
     obj1.vectGroup.rectList.AddObject(obj1.vectGroup.rectList.Count, obj2);
   //jeœli s¹siad jest ma grupê, ale ta grupa ma takisam kolor, to
   end else
@@ -1620,7 +1620,7 @@ begin
   inMod := 10;
 end;
 
-procedure TSeparateThreadVectList.InfoAkcja(aStr: String);
+procedure TSeparateThreadVectList.UpdateInfoAction(aStr: String);
 begin
   inherited;
   (otWorker as TR2VOmniWorker).OMSendMessage(aStr);
@@ -1641,7 +1641,7 @@ begin
   inMod := 1;
 end;
 
-procedure TMainThreadVectList.InfoAkcja(aStr: String);
+procedure TMainThreadVectList.UpdateInfoAction(aStr: String);
 begin
   lblAkcja.Caption := aStr;
   lblAkcja.Repaint;
@@ -1666,8 +1666,8 @@ end;
 constructor TMPFile.Create;
 begin
   reg := TRegistry.Create;
-  stmpFileName := '';
-  typFileName := '';
+  stMpFileName := '';
+  stTypFileName := '';
   mpLineList := TStringList.Create;
   stTypBody := '';
 end;
@@ -2000,7 +2000,7 @@ end;
 
 procedure TMPFile.MPFileOpen;
 begin
-  AssignFile(mpFile, stmpFileName);
+  AssignFile(mpFile, stMpFileName);
   ReWrite(mpFile);
 end;
 
@@ -2027,7 +2027,7 @@ begin
                                    aMapFactory.geoLeftUpX, aMapFactory.geoLeftUpY,
                                    aMapFactory.vectRectGroupsByColor.GetValue(TVectRectGroup(aMapFactory.Objects[i]).color) as TColorGroupList,
                                    aMapFactory.colorArr);
-  mpLineList.SaveToFile(stmpFileName);
+  mpLineList.SaveToFile(stMpFileName);
   TypFileSave(aMapFactory);
  // MPFileClose;
 end;
@@ -2039,7 +2039,7 @@ end;
 
 procedure TMPFile.TypFileOpen;
 begin
-  AssignFile(typFile, typFileName);
+  AssignFile(typFile, stTypFileName);
   ReWrite(typFile);
 end;
 
@@ -2073,7 +2073,7 @@ begin
   end
   else
     AddTypFileHeader(0, 0, 0);
-  AssignFile(typFile, typFileName);
+  AssignFile(typFile, stTypFileName);
   ReWrite(typFile);
 
   Write(typFile, stTypBody);
@@ -2082,15 +2082,15 @@ end;
 
 procedure TMPFile.TypPathFromMpPath;
 begin
-  typFileName := Copy(stmpFileName, 1, Length(stmpFileName)-2) + 'typ';
+  stTypFileName := Copy(stMpFileName, 1, Length(stMpFileName)-2) + 'typ';
 end;
 
 procedure TMPFile.SavePathToReg(aPath: String);
 begin
-  stmpFileName := aPath;
+  stMpFileName := aPath;
   TypPathFromMpPath;
   reg.OpenKey(REGSOFT + progName, true);
-  reg.WriteString('MPFilePathName', stmpFileName);
+  reg.WriteString('MPFilePathName', stMpFileName);
   reg.CloseKey;
 end;
 
@@ -2102,7 +2102,7 @@ end;
 procedure TMPFile.LoadPathFromReg;
 begin
   reg.OpenKey(REGSOFT + progName, true);
-  stmpFileName := reg.ReadString('MPFilePathName');
+  stMpFileName := reg.ReadString('MPFilePathName');
   TypPathFromMpPath;
   reg.CloseKey;
 end;

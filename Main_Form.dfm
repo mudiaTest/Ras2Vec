@@ -15,12 +15,12 @@ object MainForm: TMainForm
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object lblAkcja: TLabel
+  object lblAction: TLabel
     Left = 40
     Top = 504
-    Width = 36
+    Width = 40
     Height = 13
-    Caption = 'lblAkcja'
+    Caption = 'lblAction'
   end
   object lblTime: TLabel
     Left = 40
@@ -261,7 +261,6 @@ object MainForm: TMainForm
     Action = actR2VBtnStop
     Caption = 'R2V'
     TabOrder = 15
-    OnClick = Button3Click
   end
   object btnSave: TButton
     Left = 657
@@ -364,9 +363,9 @@ object MainForm: TMainForm
         Caption = 'Load'
         OnClick = Load1Click
       end
-      object Tylkoread1: TMenuItem
+      object ItmOnlyRead1: TMenuItem
         Caption = 'Tylko read'
-        OnClick = Tylkoread1Click
+        OnClick = ItmOnlyRead1Click
       end
       object R2V1: TMenuItem
         Caption = 'R2V'
