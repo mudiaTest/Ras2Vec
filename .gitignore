@@ -47,3 +47,6 @@ CVS
 *.res
 *.groupproj
 dunit.ini
+Project2.res
+Project2.identcache
+Project2.exe

@@ -11,9 +11,8 @@ object MainForm: TMainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
+  Menu = mmToolBar1
   OldCreateOrder = False
-  OnPaint = FormShow
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object sbMain: TScrollBox
@@ -48,16 +47,18 @@ object MainForm: TMainForm
     Top = 504
     Width = 281
     Height = 29
+    Max = 8
     Min = 1
     Position = 1
     TabOrder = 1
     OnChange = tbZoomChange
+    OnKeyPress = tbZoomKeyPress
   end
   object sbZoom: TScrollBox
     Left = 144
     Top = 184
-    Width = 281
-    Height = 273
+    Width = 221
+    Height = 221
     TabOrder = 2
     OnMouseWheel = sbZoomMouseWheel
     object imgZoom: TImage
@@ -81,16 +82,16 @@ object MainForm: TMainForm
     end
   end
   object Panel1: TPanel
-    Left = 284
-    Top = 168
+    Left = 243
+    Top = 164
     Width = 1
     Height = 313
     Caption = 'Panel1'
     TabOrder = 4
   end
   object Panel2: TPanel
-    Left = 120
-    Top = 320
+    Left = 119
+    Top = 284
     Width = 337
     Height = 1
     Caption = 'Panel2'
@@ -105,24 +106,15 @@ object MainForm: TMainForm
     TabOrder = 3
     Text = ' '
   end
-  object ToolBar1: TToolBar
-    Left = 0
-    Top = 25
-    Width = 877
-    Height = 29
-    Caption = 'ToolBar1'
-    TabOrder = 6
-  end
   object chkGrid: TCheckBox
     Left = 16
     Top = 72
     Width = 97
     Height = 17
-    Caption = 'Grid'
+    Caption = 'Grid / Edge'
     Color = clGrayText
     ParentColor = False
-    TabOrder = 7
-    OnClick = chkGridClick
+    TabOrder = 6
   end
   object chkTestColor: TCheckBox
     Left = 16
@@ -130,11 +122,67 @@ object MainForm: TMainForm
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
-    TabOrder = 11
+    TabOrder = 7
   end
   object btn1: TButton
     Left = 472
     Top = 104
+    Width = 75
+    Height = 25
+    Caption = 'btn1'
+    TabOrder = 8
+    OnClick = btn1Click
+  end
+  object chkPolyRect: TCheckBox
+    Left = 16
+    Top = 136
+    Width = 177
+    Height = 17
+    Caption = 'polygons (yes) / rectangles (no)'
+    TabOrder = 9
+  end
+  object btnZoomIn: TButton
+    Left = 104
+    Top = 489
+    Width = 25
+    Height = 25
+    Caption = '+'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 11
+    OnClick = btnZoomInClick
+  end
+  object btnZoomOut: TButton
+    Left = 104
+    Top = 520
+    Width = 25
+    Height = 25
+    Caption = '-'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 10
+    OnClick = btnZoomOutClick
+  end
+  object Button1: TButton
+    Left = 208
+    Top = 68
+    Width = 75
+    Height = 25
+    Caption = 'DoZoom'
+    TabOrder = 12
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 584
+    Top = 80
     Width = 75
     Height = 25
     Caption = 'btn1'
@@ -145,146 +193,45 @@ object MainForm: TMainForm
     Left = 804
     Top = 44
   end
-  object dxBarManager1: TdxBarManager
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    Bars = <
-      item
-        Caption = 'main'
-        DockedDockingStyle = dsTop
-        DockedLeft = 0
-        DockedTop = 0
-        DockingStyle = dsTop
-        FloatLeft = 347
-        FloatTop = 173
-        FloatClientWidth = 23
-        FloatClientHeight = 22
-        ItemLinks = <
-          item
-            Item = sbiPlik
-            Visible = True
-          end
-          item
-            BeginGroup = True
-            Item = sbiImage
-            Visible = True
-          end
-          item
-            BeginGroup = True
-            Item = btnView
-            Visible = True
-          end>
-        Name = 'mainTB'
-        OneOnRow = True
-        Row = 0
-        UseOwnFont = False
-        Visible = True
-        WholeRow = False
-      end>
-    Categories.Strings = (
-      'Default'
-      'File'
-      'Image'
-      'View')
-    Categories.ItemsVisibles = (
-      2
-      2
-      2
-      2)
-    Categories.Visibles = (
-      True
-      True
-      True
-      True)
-    PopupMenuLinks = <>
-    UseSystemFont = True
-    Left = 760
-    Top = 40
-    DockControlHeights = (
-      0
-      0
-      25
-      0)
-    object sbiPlik: TdxBarSubItem
-      Caption = 'File'
-      Category = 1
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = btnOpen
-          Visible = True
-        end
-        item
-          BeginGroup = True
-          Item = btnExit
-          Visible = True
-        end>
-    end
-    object btnOpen: TdxBarButton
-      Caption = 'Open'
-      Category = 1
-      Hint = 'Open'
-      Visible = ivAlways
-      OnClick = btnOpenClick
-    end
-    object btnExit: TdxBarButton
-      Caption = 'Exit'
-      Category = 1
-      Hint = 'Exit'
-      Visible = ivAlways
-      OnClick = btnExitClick
-    end
-    object sbiImage: TdxBarSubItem
-      Caption = 'Image'
-      Category = 2
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = dlgLoad
-          Visible = True
-        end
-        item
-          Item = btmR2V
-          Visible = True
-        end>
-    end
-    object dlgLoad: TdxBarButton
-      Caption = 'Load'
-      Category = 2
-      Hint = 'Load'
-      Visible = ivAlways
-      OnClick = dlgLoadClick
-    end
-    object btmR2V: TdxBarButton
-      Caption = 'R2V'
-      Category = 2
-      Hint = 'R2V'
-      Visible = ivAlways
-      OnClick = btmR2VClick
-    end
-    object btnView: TdxBarSubItem
-      Caption = 'View'
-      Category = 3
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Item = btnGridColor
-          Visible = True
-        end>
-    end
-    object btnGridColor: TdxBarButton
-      Caption = 'Grid color'
-      Category = 3
-      Hint = 'Grid color'
-      Visible = ivAlways
-      OnClick = btnGridColorClick
-    end
-  end
   object cdGrid: TColorDialog
     Left = 800
     Top = 88
+  end
+  object mmToolBar1: TMainMenu
+    Left = 120
+    Top = 32
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Main1: TMenuItem
+      Caption = 'Main'
+    end
+    object Other1: TMenuItem
+      Caption = 'Other'
+      object Open1: TMenuItem
+        Caption = 'Open'
+        OnClick = Open1Click
+      end
+      object Load1: TMenuItem
+        Caption = 'Load'
+        OnClick = Load1Click
+      end
+      object Tylkoread1: TMenuItem
+        Caption = 'Tylko read'
+        OnClick = Tylkoread1Click
+      end
+      object R2V1: TMenuItem
+        Caption = 'R2V'
+        OnClick = R2V1Click
+      end
+      object GridColor1: TMenuItem
+        Caption = 'Grid Color'
+        OnClick = GridColor1Click
+      end
+    end
+    object Exit1: TMenuItem
+      Caption = 'Exit'
+      OnClick = Exit1Click
+    end
   end
 end

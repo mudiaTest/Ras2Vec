@@ -3,7 +3,14 @@ unit Main_Obj;
 interface
 
 uses
-  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math;
+  Sys_utl, Windows, Graphics, ExtCtrls, Classes, Math,
+  OtlCommon,
+  OtlComm,
+  OtlSync,
+  OtlTask,
+  OtlTaskControl,
+  OtlCollections,
+  OtlParallel;
 
 const
     c_fromLeft = 0;
@@ -45,7 +52,7 @@ type
     procedure put(x, y: Integer; o: TVectObj); reintroduce;
     function get(x, y: Integer): TVectObj; reintroduce;
     procedure ReadFromImg(aimg: TImage);
-    procedure FillImg(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor);
+    procedure FillImgWithRect(aimg: TImage; azoom: Integer; agrid: boolean; agridColor: TColor);
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
   end;
 
@@ -54,49 +61,64 @@ type
   private
     //lista krawêdzi punktów-pixeli (kolejnych)
     fedgeList: TIntList;
+    //lista krawêdzi punktów-pixeli (kolejnych), które zosta³y poddane uproszczaniu
+    fsimpleEdgeList: TIntList;
     //lista 'kwadratów' nale¿¹cych do grupy
     frectList: TIntList;
     //kolor testowy - tym kolorem wype³niana jest grupa gdy w³¹czymy opcjê testu
     ftestColor: TColor;
-    //lista krawêdzi punktów-pixeli (kolejnych)
-    fedgePolyRawArr: array of TPoint;
+    //kolor oryginalny
+    fcolor: TColor;
+    //zadajemy dwa KOLEJNE punkty poruszaj¹ce siê po liniach Hor i Ver
+    //Dostajemy c_fromLeft, c_fromTop, c_fromRight, c_fromBottom
+    function direction(p1, p2: TOpoint): integer;
+    //tworzy krawêdŸ z 3 kolejnych punktów
+    procedure makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+    procedure getLine(p1, p2: TOPoint; var A, C, mian: Double);
   published
     property edgeList: TIntList read fedgeList write fedgeList;
+    property simpleEdgeList: TIntList read fsimpleEdgeList write fsimpleEdgeList;
     property rectList: TIntList read frectList write frectList;
     property testColor: TColor read ftestColor write ftestColor;
-    //property edgePolyRawArr: TVarArray read fedgePolyRawArr write fedgePolyRawArr;
+    property color: TColor read fcolor write fcolor;
   public
     constructor Create; overload;
-    function makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;//(vectArr: TVarArray);
+    //tworzy tablicê punktów z ponktów zawartych w EdgeList
+    function makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;//(vectArr: TVarArray);
+    function simplifyVectorEdge(arr: TDynamicEdgeArray): TDynamicEdgeArray;
   end;
 
   //lista obiektów wektorowych
   //obiekty wektorowe przechowywane s¹ w Objects
+
+  {
+  }
   TVectList = class(TIntList)
   private
-    vectArr: TDynamicPointArray;
-    fsrcWidth: Integer;
-    fsrcHeight: Integer;
-      function getObjById(index: Integer): TVectObj;
-      procedure setObjById(index: Integer; avectObj: TVectObj);
+    vectArr: TDynamicPointArray; //tablica z obektami wektorowymi
+    fsrcWidth: Integer; //szerokoœæ wczytanego (ReadFromImg) obrazka
+    fsrcHeight: Integer; //wysokoœæ wczytanego (ReadFromImg) obrazka
+    function getObjById(index: Integer): TVectObj;
+    procedure setObjById(index: Integer; avectObj: TVectObj);
   published
     property srcWidth: Integer read fsrcWidth write fsrcWidth;
     property srcHeight: Integer read fsrcHeight write fsrcHeight;
   public
-    //wype³nia self "Rectanglami" - pixelami z obrazka
+    //wype³nia vectArr obiektami TVectRectangle reprezentuj¹cymi poszczególne
+    //pixele obrazka
     procedure ReadFromImg(aimg: TImage);
-    //wype³nia obraz "rectanglami"
-    function FillImg(aimg: TImage; azoom: Integer; atestColor: Boolean;
+    //oddaje bitmapê - wype³nia obraz "rectanglami"
+    function FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                      agrid: boolean; agridColor: TColor): TBitmap;
-    //wype³nia obraz polygonami"
+    //oddaje bitmapê - wype³nia obraz polygonami"
     function FillImgWithPolygons(aimg: TImage; azoom: Integer; atestColor,
                      agrid: boolean; agridColor: TColor): TBitmap;
     //dostêp do obiektów u¿ywaj¹c getObjById i setObjById
     property vObj[index: integer]: TVectObj read getObjById write setObjById;
-    //tworzy grupy "rectangli" czyli przysz³e polygony
+    //tworzy grupy obiektów TVectRectangle czyli przysz³e polygony
     procedure groupRect;
     //dla wszystkich grup tworzone s¹ krawêdzie (mekeEdges)
-    procedure joinRect;
+    procedure makeEdgesForRect;
     constructor Create;
   end;
 
@@ -113,6 +135,7 @@ type
     //fvectArr: array of array of TVectObj;
     //przepisanie (do³¹czenie) obiektów z innej grupy do tej, która posiada obiekt self
     procedure dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
+    function getP(lp: Integer): TOPoint;
     //function getVectObj(x, y: integer): TVectObj; virtual;
   published
     //kolor wype³niaj¹cy obiekt
@@ -124,12 +147,13 @@ type
   public
     constructor Create; reintroduce;
     //property vectArr[x, y: integer]: TVectObj read getVectObj;
+    function distance(a, c: Integer; mian: Double): Double;
+    function inDistance(a, c: Integer; mian, dst: Double): Boolean;
   end;
 
   //obiekt wektorowego Rectangle
   TVectRectangle = class (TVectObj)
   private
-    function getP(lp: Integer): TOPoint;
     function getP1: TOPoint;
     function getP2: TOPoint;
   protected
@@ -138,7 +162,7 @@ type
     constructor Create(acolor: TColor; p1, p2: TOPoint); overload;
     property p1: TOPoint read getP1;
     property p2: TOPoint read getP2;
-    procedure zintegruj(avectObj: TVectRectangle; avectList: TVectList);
+    procedure zintegruj(aneigbour: TVectRectangle; avectList: TVectList);
   end;
 
 implementation
@@ -153,7 +177,7 @@ begin
   inherited;
 end;
 
-function TVectList.FillImg(aimg: TImage; azoom: Integer; atestColor: Boolean;
+function TVectList.FillImgWithRect(aimg: TImage; azoom: Integer; atestColor: Boolean;
                            agrid: boolean; agridColor: TColor): TBitmap;
 var
   x, y: Integer;
@@ -162,53 +186,49 @@ var
   p: Pointer;
   bmp: TBitmap;
 begin
+  //ustalamy wielkoœæ obrazu do wype³nienia bior¹c pod uwagê, ¿e jest zoom
+  //obrazek bêdzie sk³ada³ siê z grup pixeli u³o¿onych w kwadraty udaj¹cych
+  //"du¿e" pixele
   aimg.Width := srcWidth * azoom;
   aimg.Height := srcHeight * azoom;
   bmp := TBitmap.Create;
   bmp.Width := srcWidth * azoom;
   bmp.Height := srcHeight * azoom;
+  //zamykamy p³ótno
   aimg.Canvas.Lock;
 
+  //jeœli ma byæ malowana siatka/grid
   if agrid then
-  begin
-    bmp.Canvas.Pen.Style := psSolid;
     bmp.Canvas.Pen.Color := agridColor;
-  end
-  else
-    bmp.Canvas.Pen.Style := psClear;
+  bmp.Canvas.Pen.Style := psSolid;
+  {jeœli rectangle ma mieæ np. 10x10 to œrodkowe osiem bêdzie wype³nione z bmp.Canvas.Brush.Color
+   a ramka bêdzie bmp.Canvas.Pen.Style i bmp.Canvas.Pen.Color}
+   {rectangle robi ramkê - musi byæ conajmniej 2x2 - przy zoomie ponizej x4 nic nie widac
+    fillrect wype³nia kolorem - mo¿e byæ 1x1
+    Bounds}
+  //wype³niamy bitmapê
   for y:=0 to srcHeight-1 do
     for x:=0 to srcWidth-1 do
     begin
+      vectObj := vectArr[x, y] as TVectRectangle;
       with bmp.Canvas do
       begin
-        vectObj := vectArr[x, y] as TVectRectangle;
         if not atestColor then
           Brush.Color := vectObj.color
         else
           Brush.Color := vectObj.vectGroup.testColor;
-        Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
-                  (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
+        //jeœli ma byæ grid
+        if agrid then
+          Rectangle(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
+                         (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom))
+        //jeœli rysujemy bez grida
+        else
+          FillRect(Rect((vectObj.p1.X)*azoom,   (vectObj.p1.Y)*azoom,
+                        (vectObj.p2.X+1)*azoom, (vectObj.p2.Y+1)*azoom));
       end;
     end;
-  {
-  if agrid then
-  begin
-    aimg.Canvas.Pen.Style := psSolid;
-    aimg.Canvas.Pen.Color := agridColor;
-  end;
-  for y:=0 to srcHeight-1 do
-    for x:=0 to srcWidth-1 do
-    begin
-      with aimg.Canvas do
-      begin
-        vectObj := vectArr[x, y] as TVectRectangle;
-        Brush.Color := vectObj.color;
-        Rectangle(vectObj.p1.X*azoom, vectObj.p1.Y*azoom,
-                  (vectObj.p2.X+2)*azoom, (vectObj.p2.Y+2)*azoom);
-      end;
-    end;
-  }
   Result := bmp;
+  //otwieramy p³ótno
   aimg.Canvas.Unlock;
 end;
 
@@ -221,24 +241,33 @@ var
   p: Pointer;
   bmp: TBitmap;
   vectGroup: TVectGroup;
-  //lista punktów do przekazania, aby stworzyæ polygon
-  pointArr: TDynamicEdgeArray;
+  pointArr: TDynamicEdgeArray; //lista punktów do przekazania, aby stworzyæ polygon
   tmpPoint: TPoint;
 begin
+  //ustalamy wielkoœæ obrazu do wype³nienia bior¹c pod uwagê, ¿e jest zoom
+  //obrazek bêdzie sk³ada³ siê z grup pixeli u³o¿onych w kwadraty udaj¹cych
+  //"du¿e" pixele
   aimg.Width := srcWidth * azoom;
   aimg.Height := srcHeight * azoom;
   bmp := TBitmap.Create;
   bmp.Width := srcWidth * azoom;
   bmp.Height := srcHeight * azoom;
+  //zamykamy p³ótno
   aimg.Canvas.Lock;
 
-  if agrid then
-  begin
-    bmp.Canvas.Pen.Style := psSolid;
+ if agrid then
+ begin
     bmp.Canvas.Pen.Color := agridColor;
-  end
-  else
-    bmp.Canvas.Pen.Style := psClear;
+    bmp.Canvas.Pen.Style := psSolid;
+ end
+ else
+   bmp.Canvas.Pen.Style := psClear;
+
+
+  {//solid - jednolity kolor
+  bmp.Canvas.Pen.Style := psSolid;
+  //blead - brak koloru
+  bmp.Canvas.Pen.Style := psSolid;}
 
   if Count > 0 then
 //  vectobj.vectGroupId
@@ -248,15 +277,15 @@ begin
     for i:=0 to Count-1 do
     begin
       vectGroup := Objects[i] as TVectGroup;
-      SetLength(pointArr, vectGroup.edgeList.Count);
+      SetLength(pointArr, vectGroup.edgeList.Count*3);
 
       if not atestColor then
-        Brush.Color := vectGroup.testColor
+        Brush.Color := vectGroup.color
       else
         Brush.Color := vectGroup.testColor;
       brush.Style := bsSolid;
 
-      pointArr := vectGroup.makeVectorEdge(self.vectArr);
+      pointArr := vectGroup.makeVectorEdge(self.vectArr, azoom);
 
       {for j:=0 to vectGroup.edgeList.Count-1 do
       begin
@@ -285,29 +314,33 @@ var
   vectObj: TVectRectangle;
   key: integer;
 begin
-for y:=0 to srcHeight-1 do
-  for x:=0 to srcWidth-1 do
-  begin
-    vectObj := vectArr[x, y] as TVectRectangle;
-    if vectObj.vectGroup = nil then
+  Clear;
+  for y:=0 to srcHeight-1 do
+    for x:=0 to srcWidth-1 do
     begin
-      vectObj.vectGroup := TVectGroup.Create;
-      //vectObj.vectGroup.testColor := TColo;
-      vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
-      vectObj.vectGroup.rectList.AddObject(0, vectObj);
-      vectObj.vectGroup.edgeList.AddObject(0, vectObj);
-      key := nextKey;
-      addObject(key, vectObj.vectGroup);
-      vectObj.vectGroupId := key;
+
+      vectObj := vectArr[x, y] as TVectRectangle;
+
+      if vectObj.vectGroup = nil then
+      begin
+        vectObj.vectGroup := TVectGroup.Create;
+        //vectObj.vectGroup.testColor := TColo;
+        vectObj.vectGroup.testColor := Math.RandomRange(0, 99999);
+        vectObj.vectGroup.color := vectObj.color;
+        vectObj.vectGroup.rectList.AddObject(0, vectObj);
+        vectObj.vectGroup.edgeList.AddObject(0, vectObj);
+        key := nextKey;
+        addObject(key, vectObj.vectGroup);
+        vectObj.vectGroupId := key;
+      end;
+      if x < srcWidth-1 then
+        vectObj.zintegruj(vectArr[x+1, y] as TVectRectangle, self);
+      if y < srcHeight-1 then
+        vectObj.zintegruj(vectArr[x, y+1] as TVectRectangle, self);
     end;
-    if x < srcWidth-1 then
-      vectObj.zintegruj(vectArr[x+1, y] as TVectRectangle, self);
-    if y < srcHeight-1 then
-      vectObj.zintegruj(vectArr[x, y+1] as TVectRectangle, self);
-  end;
 end;
 
-procedure TVectList.joinRect;
+procedure TVectList.makeEdgesForRect;
   //buduje (wype³nia odpowiednie listy) krawêdz dla podanej grupy
   procedure mekeEdges(avectGroup: TVectGroup);
     function getNextEdge(aprevEdge: TVectRectangle; var arrDir: Integer): TVectRectangle;
@@ -392,24 +425,26 @@ procedure TVectList.joinRect;
       end;
     end;
   var
-    edgeStart, nextEdge, prevEdge: TVectRectangle;
+    startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
     arrivDir: integer;
   begin
-    edgeStart := avectGroup.rectList.Objects[0] as TVectRectangle;
-    prevEdge := edgeStart;
-    arrivDir := c_fromLeft;
-    while nextEdge <> edgeStart do
+    avectGroup.edgeList.Clear;
+    startEdgePoint := avectGroup.rectList.Objects[0] as TVectRectangle;
+    prevEdgePoint := startEdgePoint;
+    arrivDir := c_fromLeft; //jest to pewne oszustwo, bo przychodzimy z do³u, ale chodzi o to, aby szukaæ na prawo, bo nie ma punktów po³o¿onych wy¿ej
+    nextEdgePoint := nil;
+    //koñczymy jeœli trafiamy na pocz¹tek, lub na 1-pixelowy obiekt
+    while (nextEdgePoint <> startEdgePoint) and (prevEdgePoint <> nil) do
     begin
-      nextEdge := getNextEdge(prevEdge, arrivDir);
-      if nextEdge = nil then
-      begin
-        Assert(avectGroup.edgeList.Count = 1, 'Oddany edge jest nil (' + IntToStr(prevEdge.P1.x) +
-                              ',' + IntToStr(prevEdge.p1.y) + '), liczba znalezionych kreawêdzi:' +
-                              IntToStr(avectGroup.edgeList.Count));
-        Break;
-      end;
-      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdge);
-      prevEdge := nextEdge;
+      nextEdgePoint := getNextEdge(prevEdgePoint, arrivDir);
+      //powstanie gdy nie mo¿emy oddaæ nastêpnej krawêdzi, ale wyj¹tkikem jest gdy jest to pojedynczy pixel
+      if (nextEdgePoint = nil) and (avectGroup.edgeList.Count <> 0) then
+        Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.P1.x) +
+                                ',' + IntToStr(prevEdgePoint.p1.y) + '), liczba znalezionych kreawêdzi:' +
+                                IntToStr(avectGroup.edgeList.Count));
+
+      avectGroup.edgeList.AddObject(avectGroup.edgeList.nextKey, nextEdgePoint);
+      prevEdgePoint := nextEdgePoint;
     end;
   end;
 var
@@ -462,11 +497,6 @@ begin
   fpoints.AddObject(1, p2);
 end;
 
-function TVectRectangle.getP(lp: Integer): TOPoint;
-begin
-  Result := fpoints.Objects[lp] as TOpoint;
-end;
-
 function TVectRectangle.getP1: TOPoint;
 begin
   Result := getP(0);
@@ -482,18 +512,19 @@ begin
   Result := inherited getVectObj(x, y) as TVectRectangle
 end;}
 
-procedure TVectRectangle.zintegruj(avectObj: TVectRectangle; avectList: TVectList);
+procedure TVectRectangle.zintegruj(aneigbour: TVectRectangle; avectList: TVectList);
 begin
   //jeœli s¹siad jest niezintegrowany i ma taki sam kolor
-  if (avectObj.vectGroup = nil) and (avectObj.color = color) then
+  if (aneigbour.vectGroup = nil) and (aneigbour.color = color) then
   //dodajemy do grupy obj na którym jesteœmy
   begin
-    avectObj.vectGroup := vectGroup;
-    avectObj.vectGroupId := vectGroupId;
-    vectGroup.rectList.AddObject(vectGroup.rectList.Count, avectObj);
+    aneigbour.vectGroup := vectGroup;
+    aneigbour.vectGroupId := vectGroupId;
+    vectGroup.rectList.AddObject(vectGroup.rectList.Count, aneigbour);
+  //jeœli s¹siad jest ma grupê, ale ta grupa ma takisam kolor, to
   end else
-  if (avectObj.vectGroup <> vectGroup) and (avectObj.color = color) then
-    dopiszGrupe(avectObj.vectGroup, avectList);
+  if (aneigbour.vectGroup <> vectGroup) and (aneigbour.color = color) then
+    dopiszGrupe(aneigbour.vectGroup, avectList);
 end;
 
 { TVectorObj }
@@ -511,7 +542,7 @@ begin
   
 end;
 
-procedure TVectByCoordList.FillImg(aimg: TImage; azoom: Integer; agrid: boolean;
+procedure TVectByCoordList.FillImgWithRect(aimg: TImage; azoom: Integer; agrid: boolean;
   agridColor: TColor);
 var
   x, y: Integer;
@@ -603,6 +634,14 @@ begin
   Objects[index] := avectObj;
 end;
 
+function TVectObj.distance(a, c: Integer; mian: Double): Double;
+var
+  p: TOPoint;
+begin
+  p := getP(0);
+  Result := Abs(a*p.x - p.y + c) / mian;
+end;
+
 procedure TVectObj.dopiszGrupe(agroupList: TVectGroup; avectList: TVectList);
 var
   I: Integer;
@@ -622,6 +661,18 @@ begin
   avectList.delete(avectList.indexOf(delIdx));
 end;
 
+function TVectObj.getP(lp: Integer): TOPoint;
+begin
+  Result := fpoints.Objects[lp] as TOpoint;
+end;
+
+function TVectObj.inDistance(a, c: Integer; mian, dst: Double): Boolean;
+begin
+  Result := True;
+  if distance(a, c, mian) > dst then
+    Result := False;
+end;
+
 {function TVectObj.getVectObj(x, y: integer): TVectObj;
 begin
   Result := fvectArr[x, y] as TVectObj;
@@ -636,9 +687,185 @@ begin
   frectList := TIntList.Create;
 end;
 
-function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray): TDynamicEdgeArray;
+function TVectGroup.direction(p1, p2: TOpoint): integer;
 begin
+  if p1.X > p2.X then
+    result := c_fromRight
+  else if p1.X < p2.X then
+    result := c_fromLeft
+  else if p1.Y > p2.Y then
+    result := c_fromBottom
+  else
+    result := c_fromTop;
+end;
 
+procedure TVectGroup.getLine(p1, p2: TOPoint; var A, C, mian: Double);
+  function getLineA(p1, p2: TOpoint): Double;
+  begin
+    Result := (p2.y - p1.y) / (p2.x - p1.x);
+  end;
+  function getLineC(p1: TOpoint; A: Double): Double;
+  begin
+    Result := p1.y - A*p1.x;
+  end;
+  function getMianownik(A: Double): Double;
+  begin
+    Result := Sqrt(Sqr(A) + 1);
+  end;
+begin
+  A := getLineA(p1, p2);
+  C := getLineC(p1, A);
+  mian := getMianownik(A);
+end;
+
+function TVectGroup.makeVectorEdge(vectArr: TDynamicPointArray; azoom: integer): TDynamicEdgeArray;
+var
+  i: integer;
+  o1, o2, o3: TOPoint;
+  counter: integer;
+begin
+  counter := 0;
+
+  if edgeList.Count > 1 then
+  begin
+
+    o1 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
+    o2 := (edgeList.Objects[0] as TVectObj).getP(0);
+    o3 := (edgeList.Objects[1] as TVectObj).getP(0);
+    makePartEdge(o1, o2, o3, counter, result, azoom);
+
+    for i:=1 to edgeList.Count-2 do
+    begin
+      o1 := (edgeList.Objects[i-1] as TVectObj).getP(0);
+      o2 := (edgeList.Objects[i] as TVectObj).getP(0);
+      o3 := (edgeList.Objects[i+1] as TVectObj).getP(0);
+      makePartEdge(o1, o2, o3, counter, result, azoom);
+      //zadanie
+    end;
+
+    o1 := (edgeList.Objects[edgeList.Count-2] as TVectObj).getP(0);
+    o2 := (edgeList.Objects[edgeList.Count-1] as TVectObj).getP(0);
+    o3 := (edgeList.Objects[0] as TVectObj).getP(0);
+    makePartEdge(o1, o2, o3, counter, result, azoom);
+  end else
+  begin
+
+  end;
+
+  SetLength(result, counter);
+end;
+
+function TVectGroup.simplifyVectorEdge(
+  arr: TDynamicEdgeArray): TDynamicEdgeArray;
+begin
+  //to do
+end;
+
+procedure TVectGroup.makePartEdge(prvPoint, actPoint, nextPoint: TOPoint; var counter: integer; aarr: TDynamicEdgeArray; azoom: integer);
+begin
+  if direction(prvPoint, actPoint) = c_fromLeft then
+  begin
+    if direction(actPoint, nextPoint) = c_fromBottom then
+    begin
+      //nic
+    end
+    else if direction(actPoint, nextPoint) = c_fromTop then
+    begin
+      aarr[counter] := Point(actPoint.x*azoom, actPoint.y*azoom);
+      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      counter := counter + 2;
+    end
+    else if direction(actPoint, nextPoint) = c_fromLeft then
+    begin
+      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((actPoint.x)*azoom, (actPoint.y)*azoom);
+      aarr[counter+1] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aarr[counter+2] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else if direction(prvPoint, actPoint) = c_fromRight then
+  begin
+    if direction(actPoint, nextPoint) = c_fromBottom then
+    begin
+      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      counter := counter + 2;
+    end
+    else if direction(actPoint, nextPoint) = c_fromTop then
+    begin
+      //nic
+    end
+    else if direction(actPoint, nextPoint) = c_fromRight then
+    begin
+      aarr[counter] := Point((actPoint.x + 1)*azoom, (actPoint.y + 1)*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+1] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else if direction(prvPoint, actPoint) = c_fromTop then
+  begin
+    if direction(actPoint, nextPoint) = c_fromLeft then
+    begin
+      //nic
+    end
+    else if direction(actPoint, nextPoint) = c_fromRight then
+    begin
+      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      counter := counter + 2;
+    end
+    else if direction(actPoint, nextPoint) = c_fromTop then
+    begin
+      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      aarr[counter+1] := Point((actPoint.x+1)*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+2] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      counter := counter + 3;
+    end;
+  end
+
+  else //from bottom
+  begin
+    if direction(actPoint, nextPoint) = c_fromLeft then
+    begin
+      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
+      counter := counter + 2;
+    end
+    else if direction(actPoint, nextPoint) = c_fromRight then
+    begin
+      //nic
+    end
+    else if direction(actPoint, nextPoint) = c_fromBottom then
+    begin
+      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      counter := counter + 1;
+    end
+    else
+    begin
+      aarr[counter] := Point(actPoint.x*azoom, (actPoint.y+1)*azoom);
+      aarr[counter+1] := Point(actPoint.x*azoom, actPoint.y*azoom);
+      aarr[counter+2] := Point((actPoint.x+1)*azoom, actPoint.y*azoom);
+      counter := counter + 3;
+    end;
+  end
 end;
 
 end.
