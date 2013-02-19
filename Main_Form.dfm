@@ -2,7 +2,7 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'Ras2Vec'
-  ClientHeight = 635
+  ClientHeight = 558
   ClientWidth = 877
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,9 +15,65 @@ object MainForm: TMainForm
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object lblAction: TLabel
+    Left = 40
+    Top = 504
+    Width = 40
+    Height = 13
+    Caption = 'lblAction'
+  end
+  object lblTime: TLabel
+    Left = 40
+    Top = 523
+    Width = 32
+    Height = 13
+    Caption = 'lblTime'
+  end
+  object lbl1: TLabel
+    Left = 417
+    Top = 110
+    Width = 8
+    Height = 13
+    Caption = '>'
+  end
+  object lbl2: TLabel
+    Left = 417
+    Top = 83
+    Width = 8
+    Height = 13
+    Caption = '>'
+  end
+  object Label1: TLabel
+    Left = 307
+    Top = 83
+    Width = 19
+    Height = 13
+    Caption = 'UpX'
+  end
+  object Label2: TLabel
+    Left = 307
+    Top = 110
+    Width = 19
+    Height = 13
+    Caption = 'UpY'
+  end
+  object Label3: TLabel
+    Left = 432
+    Top = 83
+    Width = 33
+    Height = 13
+    Caption = 'DownX'
+  end
+  object Label4: TLabel
+    Left = 432
+    Top = 110
+    Width = 33
+    Height = 13
+    Caption = 'DownY'
+  end
   object sbMain: TScrollBox
     Left = 520
-    Top = 184
+    Top = 144
     Width = 289
     Height = 273
     TabOrder = 0
@@ -44,7 +100,7 @@ object MainForm: TMainForm
   end
   object tbZoom: TTrackBar
     Left = 144
-    Top = 504
+    Top = 464
     Width = 281
     Height = 29
     Max = 8
@@ -56,9 +112,9 @@ object MainForm: TMainForm
   end
   object sbZoom: TScrollBox
     Left = 144
-    Top = 184
-    Width = 221
-    Height = 221
+    Top = 144
+    Width = 281
+    Height = 273
     TabOrder = 2
     OnMouseWheel = sbZoomMouseWheel
     object imgZoom: TImage
@@ -83,7 +139,7 @@ object MainForm: TMainForm
   end
   object Panel1: TPanel
     Left = 243
-    Top = 164
+    Top = 124
     Width = 1
     Height = 313
     Caption = 'Panel1'
@@ -91,7 +147,7 @@ object MainForm: TMainForm
   end
   object Panel2: TPanel
     Left = 119
-    Top = 284
+    Top = 244
     Width = 337
     Height = 1
     Caption = 'Panel2'
@@ -99,7 +155,7 @@ object MainForm: TMainForm
   end
   object edtZoom: TEdit
     Left = 431
-    Top = 504
+    Top = 464
     Width = 25
     Height = 21
     MaxLength = 1
@@ -108,42 +164,42 @@ object MainForm: TMainForm
   end
   object chkGrid: TCheckBox
     Left = 16
-    Top = 72
-    Width = 97
+    Top = 50
+    Width = 179
     Height = 17
-    Caption = 'Grid / Edge'
+    Caption = 'Edge (polygons) / Grid (rectangles)'
     Color = clGrayText
     ParentColor = False
     TabOrder = 6
   end
   object chkTestColor: TCheckBox
     Left = 16
-    Top = 104
+    Top = 82
     Width = 97
     Height = 17
     Caption = 'kolor testowy'
     TabOrder = 7
   end
   object btn1: TButton
-    Left = 472
-    Top = 104
-    Width = 75
+    Left = 306
+    Top = 8
+    Width = 102
     Height = 25
-    Caption = 'btn1'
+    Caption = 'MainThread'
     TabOrder = 8
     OnClick = btn1Click
   end
   object chkPolyRect: TCheckBox
     Left = 16
-    Top = 136
-    Width = 177
+    Top = 16
+    Width = 268
     Height = 17
-    Caption = 'polygons (yes) / rectangles (no)'
+    Caption = 'polygons - po R2V (yes) / rectangles - z Rastra (no)'
     TabOrder = 9
   end
   object btnZoomIn: TButton
     Left = 104
-    Top = 489
+    Top = 449
     Width = 25
     Height = 25
     Caption = '+'
@@ -158,7 +214,7 @@ object MainForm: TMainForm
   end
   object btnZoomOut: TButton
     Left = 104
-    Top = 520
+    Top = 480
     Width = 25
     Height = 25
     Caption = '-'
@@ -172,8 +228,8 @@ object MainForm: TMainForm
     OnClick = btnZoomOutClick
   end
   object Button1: TButton
-    Left = 208
-    Top = 68
+    Left = 513
+    Top = 8
     Width = 75
     Height = 25
     Caption = 'DoZoom'
@@ -181,13 +237,92 @@ object MainForm: TMainForm
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 584
-    Top = 80
+    Left = 306
+    Top = 39
+    Width = 102
+    Height = 25
+    Caption = 'SeparateThread'
+    TabOrder = 13
+    OnClick = Button2Click
+  end
+  object btnStopR2V: TButton
+    Left = 425
+    Top = 39
     Width = 75
     Height = 25
-    Caption = 'btn1'
-    TabOrder = 13
-    OnClick = btn1Click
+    Action = actR2VBtnStop
+    TabOrder = 14
+  end
+  object Button3: TButton
+    Left = 425
+    Top = 8
+    Width = 75
+    Height = 25
+    Action = actR2VBtnStop
+    Caption = 'R2V'
+    TabOrder = 15
+  end
+  object btnSave: TButton
+    Left = 657
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Save'
+    TabOrder = 16
+    OnClick = btnSaveClick
+  end
+  object edtLeftUpX: TMaskEdit
+    Left = 331
+    Top = 80
+    Width = 80
+    Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
+    TabOrder = 17
+    Text = '18,22,44,75'
+    OnExit = edtLeftUpXExit
+  end
+  object edtLeftUpY: TMaskEdit
+    Left = 330
+    Top = 107
+    Width = 81
+    Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
+    TabOrder = 18
+    Text = '54,33,37,37'
+    OnExit = edtLeftUpYExit
+  end
+  object edtRightDownX: TMaskEdit
+    Left = 467
+    Top = 80
+    Width = 75
+    Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
+    TabOrder = 19
+    Text = '18,23,35,60'
+    OnExit = edtRightDownXExit
+  end
+  object edtRightDownY: TMaskEdit
+    Left = 467
+    Top = 107
+    Width = 74
+    Height = 21
+    EditMask = '00,00,00,00;1;_'
+    MaxLength = 11
+    TabOrder = 20
+    Text = '54,33,16,68'
+    OnExit = edtRightDownYExit
+  end
+  object Button4: TButton
+    Left = 643
+    Top = 104
+    Width = 75
+    Height = 25
+    Caption = 'Button4'
+    TabOrder = 21
+    OnClick = Button4Click
   end
   object dlgPicture: TOpenPictureDialog
     Left = 804
@@ -198,15 +333,27 @@ object MainForm: TMainForm
     Top = 88
   end
   object mmToolBar1: TMainMenu
-    Left = 120
-    Top = 32
+    Left = 40
+    Top = 152
     object N1: TMenuItem
       Caption = '-'
     end
-    object Main1: TMenuItem
+    object MainMG: TMenuItem
       Caption = 'Main'
+      object Load2: TMenuItem
+        Caption = 'Load'
+        OnClick = Load2Click
+      end
+      object Save1: TMenuItem
+        Caption = 'Save'
+        OnClick = Save1Click
+      end
+      object SaveAs1: TMenuItem
+        Caption = 'Save As'
+        OnClick = SaveAs1Click
+      end
     end
-    object Other1: TMenuItem
+    object OtherMG: TMenuItem
       Caption = 'Other'
       object Open1: TMenuItem
         Caption = 'Open'
@@ -216,9 +363,9 @@ object MainForm: TMainForm
         Caption = 'Load'
         OnClick = Load1Click
       end
-      object Tylkoread1: TMenuItem
+      object ItmOnlyRead1: TMenuItem
         Caption = 'Tylko read'
-        OnClick = Tylkoread1Click
+        OnClick = ItmOnlyRead1Click
       end
       object R2V1: TMenuItem
         Caption = 'R2V'
@@ -233,5 +380,26 @@ object MainForm: TMainForm
       Caption = 'Exit'
       OnClick = Exit1Click
     end
+    object TEST: TMenuItem
+      Caption = 'test'
+      object test1: TMenuItem
+        Caption = 'test'
+      end
+    end
+  end
+  object MainActionList: TActionList
+    Left = 40
+    Top = 208
+    object actR2VBtnStop: TAction
+      Caption = 'R2V Stop'
+      OnUpdate = actR2VBtnStopExecute
+    end
+    object actR2VMenu: TAction
+      Caption = 'actR2VMenu'
+    end
+  end
+  object SaveDialog: TSaveDialog
+    Left = 675
+    Top = 48
   end
 end

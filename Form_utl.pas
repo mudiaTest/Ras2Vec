@@ -11,11 +11,11 @@ type
 
   TScrollBox = class(Forms.TScrollBox)
   private
-  FOnScroll: TOnScroll;
-  procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
-  procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
+    FOnScroll: TOnScroll;
+    procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
+    procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
   public
-  property OnScroll: TOnScroll read FOnScroll write FOnScroll;
+    property OnScroll: TOnScroll read FOnScroll write FOnScroll;
   end;
 
 implementation
