@@ -1,0 +1,8 @@
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\bin\Debug\Ras2Vec.exe.config
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\bin\Debug\Ras2Vec.exe
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\bin\Debug\Ras2Vec.pdb
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.Properties.Resources.resources
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.csproj.GenerateResource.Cache
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.exe
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.pdb
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.MainWindow.resources
