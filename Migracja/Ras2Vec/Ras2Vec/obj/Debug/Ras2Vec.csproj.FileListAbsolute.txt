@@ -6,3 +6,4 @@ D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.csproj.GenerateResou
 D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.exe
 D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.pdb
 D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.MainWindow.resources
+D:\Praca\Ras2Vec\Migracja\Ras2Vec\Ras2Vec\obj\Debug\Ras2Vec.csprojResolveAssemblyReference.cache
