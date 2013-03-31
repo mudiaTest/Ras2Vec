@@ -43,13 +43,15 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.destinationPanel = new System.Windows.Forms.Panel();
+            this.destinationPB = new System.Windows.Forms.PictureBox();
             this.ZoomOutBtn = new System.Windows.Forms.Button();
             this.ZoomInBtn = new System.Windows.Forms.Button();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.pictureBoxSrc = new System.Windows.Forms.PictureBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.sourcePanel = new System.Windows.Forms.Panel();
+            this.sourcePB = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.panel5 = new System.Windows.Forms.Panel();
@@ -61,6 +63,7 @@
             this.maskedTextBox3 = new System.Windows.Forms.MaskedTextBox();
             this.maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
             this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.chkBoxTestOptions = new System.Windows.Forms.CheckedListBox();
             this.btnRefreshResultImg = new System.Windows.Forms.Button();
             this.btnMainThread = new System.Windows.Forms.Button();
@@ -72,11 +75,12 @@
             this.btnSeparateThread = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.btnMenuHide = new System.Windows.Forms.Button();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.menuMain.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.panel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSrc)).BeginInit();
+            this.destinationPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
+            this.sourcePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -178,16 +182,34 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.destinationPanel);
             this.panel1.Controls.Add(this.ZoomOutBtn);
             this.panel1.Controls.Add(this.ZoomInBtn);
-            this.panel1.Controls.Add(this.panel6);
-            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.sourcePanel);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(797, 506);
             this.panel1.TabIndex = 11;
+            // 
+            // destinationPanel
+            // 
+            this.destinationPanel.AutoScroll = true;
+            this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.destinationPanel.Controls.Add(this.destinationPB);
+            this.destinationPanel.Location = new System.Drawing.Point(367, 280);
+            this.destinationPanel.Name = "destinationPanel";
+            this.destinationPanel.Size = new System.Drawing.Size(380, 214);
+            this.destinationPanel.TabIndex = 18;
+            // 
+            // destinationPB
+            // 
+            this.destinationPB.Location = new System.Drawing.Point(0, 0);
+            this.destinationPB.Name = "destinationPB";
+            this.destinationPB.Size = new System.Drawing.Size(152, 98);
+            this.destinationPB.TabIndex = 14;
+            this.destinationPB.TabStop = false;
             // 
             // ZoomOutBtn
             // 
@@ -213,37 +235,27 @@
             this.ZoomInBtn.UseVisualStyleBackColor = true;
             this.ZoomInBtn.Click += new System.EventHandler(this.ZoomInBtn_Click);
             // 
-            // panel6
+            // sourcePanel
             // 
-            this.panel6.AutoScroll = true;
-            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel6.Controls.Add(this.pictureBoxSrc);
-            this.panel6.Location = new System.Drawing.Point(367, 48);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(380, 214);
-            this.panel6.TabIndex = 15;
+            this.sourcePanel.AutoScroll = true;
+            this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.sourcePanel.Controls.Add(this.sourcePB);
+            this.sourcePanel.Location = new System.Drawing.Point(367, 48);
+            this.sourcePanel.Name = "sourcePanel";
+            this.sourcePanel.Size = new System.Drawing.Size(380, 214);
+            this.sourcePanel.TabIndex = 15;
             // 
-            // pictureBoxSrc
+            // sourcePB
             // 
-            this.pictureBoxSrc.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxSrc.Name = "pictureBoxSrc";
-            this.pictureBoxSrc.Size = new System.Drawing.Size(152, 98);
-            this.pictureBoxSrc.TabIndex = 14;
-            this.pictureBoxSrc.TabStop = false;
-            this.pictureBoxSrc.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseDown);
-            this.pictureBoxSrc.MouseLeave += new System.EventHandler(this.pictureBoxSrc_MouseLeave);
-            this.pictureBoxSrc.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseMove);
-            this.pictureBoxSrc.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseUp);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(355, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "loadImage";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.sourcePB.Location = new System.Drawing.Point(0, 0);
+            this.sourcePB.Name = "sourcePB";
+            this.sourcePB.Size = new System.Drawing.Size(152, 98);
+            this.sourcePB.TabIndex = 14;
+            this.sourcePB.TabStop = false;
+            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseDown);
+            this.sourcePB.MouseLeave += new System.EventHandler(this.pictureBoxSrc_MouseLeave);
+            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseMove);
+            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseUp);
             // 
             // panel2
             // 
@@ -262,6 +274,7 @@
             this.panel4.Controls.Add(this.checkBox1);
             this.panel4.Controls.Add(this.textBox1);
             this.panel4.Controls.Add(this.panel5);
+            this.panel4.Controls.Add(this.button1);
             this.panel4.Controls.Add(this.chkBoxTestOptions);
             this.panel4.Controls.Add(this.btnRefreshResultImg);
             this.panel4.Controls.Add(this.btnMainThread);
@@ -275,6 +288,14 @@
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(299, 506);
             this.panel4.TabIndex = 26;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(112, 297);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(179, 196);
+            this.richTextBox1.TabIndex = 25;
+            this.richTextBox1.Text = "";
             // 
             // checkBox1
             // 
@@ -295,7 +316,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(79, 20);
             this.textBox1.TabIndex = 22;
-            this.textBox1.Text = "3";
+            this.textBox1.Text = "1";
             // 
             // panel5
             // 
@@ -391,6 +412,16 @@
             this.maskedTextBox1.Name = "maskedTextBox1";
             this.maskedTextBox1.Size = new System.Drawing.Size(68, 20);
             this.maskedTextBox1.TabIndex = 21;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(8, 415);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "loadImage";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // chkBoxTestOptions
             // 
@@ -508,14 +539,6 @@
             this.btnMenuHide.UseVisualStyleBackColor = true;
             this.btnMenuHide.Click += new System.EventHandler(this.btnMenuHide_Click);
             // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(112, 297);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(179, 196);
-            this.richTextBox1.TabIndex = 25;
-            this.richTextBox1.Text = "";
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -529,8 +552,10 @@
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.panel1.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSrc)).EndInit();
+            this.destinationPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
+            this.sourcePanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
@@ -585,11 +610,13 @@
         private System.Windows.Forms.Button btnSeparateThread;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.PictureBox pictureBoxSrc;
+        private System.Windows.Forms.Panel sourcePanel;
+        private System.Windows.Forms.PictureBox sourcePB;
         private System.Windows.Forms.Button ZoomOutBtn;
         private System.Windows.Forms.Button ZoomInBtn;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Panel destinationPanel;
+        private System.Windows.Forms.PictureBox destinationPB;
     }
 }
 

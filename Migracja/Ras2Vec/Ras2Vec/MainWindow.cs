@@ -16,10 +16,16 @@ namespace Ras2Vec
         Image srcImg;
         Graphics graphics;
         Bitmap bmp;
+        //Image bmp;
         float dpScale;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
+        ImageProjector p;
+        int horChange;
+        int verChange;
+        int mouseDownSourcePBLeft;
+        int mouseDownSourcePBTop;
 
         public MainWindow()
         {
@@ -68,32 +74,65 @@ namespace Ras2Vec
 
         }
 
-        private void DrawScaledImage()
+        private bool DrawCroppedScaledImage(float aDpScale)
         {
-            if (checkBox1.Checked)
-                dpScale = float.Parse(textBox1.Text);
-            else
-                dpScale = 1;
-            bmp = new Bitmap((int)Math.Round(srcImg.Width * dpScale), (int)Math.Round(srcImg.Height * dpScale));
-            graphics = Graphics.FromImage(bmp);
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            graphics.DrawImage(srcImg, 0, 0, srcImg.Width * dpScale, srcImg.Height * dpScale);
-            Image myImg2 = srcImg.GetThumbnailImage((int)Math.Round(srcImg.Width * dpScale), (int)Math.Round(srcImg.Height * dpScale), null, IntPtr.Zero);
-            //Bitmap b = new System.Drawing.Bitmap(myImg, new Size((int)Math.Round(myImg.Width * scale), (int)Math.Round(myImg.Height * scale)));
-            pictureBoxSrc.Height = myImg2.Height;
-            pictureBoxSrc.Width = myImg2.Width;
-            pictureBoxSrc.Refresh();
-            pictureBoxSrc.Image = bmp;
+            Bitmap croppedBmp = p.GetCroppedImage(bmp, aDpScale);
+            sourcePB.Height = croppedBmp.Height;
+            sourcePB.Width = croppedBmp.Width;
+            sourcePB.Image = croppedBmp;
+            sourcePB.Left = -Math.Min(p.shiftX, sourcePanel.Width);
+            sourcePB.Top = -Math.Min(p.shiftY, sourcePanel.Height);
+
+            destinationPB.Height = croppedBmp.Height;
+            destinationPB.Width = croppedBmp.Width;
+            destinationPB.Image = croppedBmp;
+            destinationPB.Left = -Math.Min(p.shiftX, destinationPanel.Width);
+            destinationPB.Top = -Math.Min(p.shiftY, destinationPanel.Height);
+            return true;
+        }
+
+        private bool DrawScaledImage(float adpScale)
+        {
+            int maxImgPx = 83000000; 
+            if (!checkBox1.Checked)
+                adpScale = 1;
+
+            if ((int)Math.Round(srcImg.Width * adpScale) * (int)Math.Round(srcImg.Height * adpScale) > maxImgPx)
+            {
+                return false;
+            }
+            //bmp = new Bitmap((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale));
+            //graphics = Graphics.FromImage(bmp);
+            //graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            //graphics.DrawImage(srcImg, 0, 0, srcImg.Width * adpScale, srcImg.Height * adpScale);
+            //bmp = srcImg.GetThumbnailImage((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale), null, IntPtr.Zero);
+            bmp = new Bitmap(srcImg, new Size((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale)));
+            sourcePB.Height = bmp.Height;
+            sourcePB.Width = bmp.Width;
+            //sourcePB.Refresh();
+            sourcePB.Image = bmp;
+
+            destinationPB.Height = bmp.Height;
+            destinationPB.Width = bmp.Width;
+            //destinationPB.Refresh();
+            destinationPB.Image = bmp;
+            return true;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             dpScale = new float();
-            srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\Untitled-1.bmp");
-            DrawScaledImage();
+            //srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\Untitled-1.bmp");
+            srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\kop1b.jpg"); 
+            //DrawScaledImage(float.Parse(textBox1.Text));
+            bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\kop1b.jpg");
+            p = new ImageProjector(new Size(sourcePanel.Width, sourcePanel.Height));
+            
+            DrawCroppedScaledImage(float.Parse(textBox1.Text));
             ZoomInBtn.Enabled = true;
             ZoomOutBtn.Enabled = true;
-  
+
+
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -105,8 +144,9 @@ namespace Ras2Vec
         {
             if (int.Parse(textBox1.Text) < 5) 
             { 
-                textBox1.Text = (int.Parse(textBox1.Text) + 1).ToString();
-                DrawScaledImage();
+                
+                if (DrawScaledImage(float.Parse(textBox1.Text)+1))
+                    textBox1.Text = (int.Parse(textBox1.Text) + 1).ToString();
             }
         }
 
@@ -114,18 +154,23 @@ namespace Ras2Vec
         {
             if (int.Parse(textBox1.Text) > 1)
             {
-                textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
-                DrawScaledImage();
+                if (DrawScaledImage(float.Parse(textBox1.Text)-1))
+                    textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
             }
         }
 
         private void pictureBoxSrc_MouseDown(object sender, MouseEventArgs e)
         {
             blMouseInMoveMode = true;
+            mouseDownSourcePBLeft = sourcePB.Left;
+            mouseDownSourcePBTop = sourcePB.Top; 
         }
 
         private void pictureBoxSrc_MouseUp(object sender, MouseEventArgs e)
         {
+            p.shiftX += mouseDownSourcePBLeft - sourcePB.Left;
+            p.shiftY += mouseDownSourcePBTop - sourcePB.Top;
+            DrawCroppedScaledImage(float.Parse(textBox1.Text));
             blMouseInMoveMode = false;
         }
 
@@ -136,14 +181,14 @@ namespace Ras2Vec
 
         private void MovePictures(MouseEventArgs e)
         {
-            int horChange ;
-            int verChange ;
             if (blMouseInMoveMode)
             {
                 horChange = e.X - startingX;
                 verChange = e.Y - startingY;
-                pictureBoxSrc.Left = Math.Min(0, Math.Max(pictureBoxSrc.Left + horChange, panel6.Width-pictureBoxSrc.Image.Width));
-                pictureBoxSrc.Top = Math.Min(0, Math.Max(pictureBoxSrc.Top + verChange, panel6.Height - pictureBoxSrc.Image.Height)); ;
+                sourcePB.Left = Math.Min(0, Math.Max(sourcePB.Left + horChange, sourcePanel.Width-sourcePB.Image.Width));
+                sourcePB.Top = Math.Min(0, Math.Max(sourcePB.Top + verChange, sourcePanel.Height - sourcePB.Image.Height));
+                destinationPB.Left = Math.Min(0, Math.Max(destinationPB.Left + horChange, destinationPanel.Width - destinationPB.Image.Width));
+                destinationPB.Top = Math.Min(0, Math.Max(destinationPB.Top + verChange, destinationPanel.Height - destinationPB.Image.Height)); ;
                 UpdateInfoBox("horChange: " + horChange.ToString() + "\n" + "verChange" + verChange.ToString());
             }
             else
@@ -157,7 +202,7 @@ namespace Ras2Vec
 
         private void pictureBoxSrc_MouseLeave(object sender, EventArgs e)
         {
-            //blMouseInMoveMode = false;
+            blMouseInMoveMode = false;
         }
 
         private void UpdateInfoBox(string atext = ""){
