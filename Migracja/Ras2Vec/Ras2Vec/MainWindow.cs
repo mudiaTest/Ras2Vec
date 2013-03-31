@@ -77,11 +77,15 @@ namespace Ras2Vec
         private bool DrawCroppedScaledImage(float aDpScale)
         {
             Bitmap croppedBmp = p.GetCroppedImage(bmp, aDpScale);
+            UpdateInfoBox("bmp: " + croppedBmp.Width.ToString() + " x " + croppedBmp.Height.ToString());
             sourcePB.Height = croppedBmp.Height;
             sourcePB.Width = croppedBmp.Width;
             sourcePB.Image = croppedBmp;
+            UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
+                          "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
             sourcePB.Left = -Math.Min(p.shiftX, sourcePanel.Width);
             sourcePB.Top = -Math.Min(p.shiftY, sourcePanel.Height);
+            UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
             destinationPB.Height = croppedBmp.Height;
             destinationPB.Width = croppedBmp.Width;
@@ -185,17 +189,23 @@ namespace Ras2Vec
             {
                 horChange = e.X - startingX;
                 verChange = e.Y - startingY;
+
                 sourcePB.Left = Math.Min(0, Math.Max(sourcePB.Left + horChange, sourcePanel.Width-sourcePB.Image.Width));
                 sourcePB.Top = Math.Min(0, Math.Max(sourcePB.Top + verChange, sourcePanel.Height - sourcePB.Image.Height));
                 destinationPB.Left = Math.Min(0, Math.Max(destinationPB.Left + horChange, destinationPanel.Width - destinationPB.Image.Width));
                 destinationPB.Top = Math.Min(0, Math.Max(destinationPB.Top + verChange, destinationPanel.Height - destinationPB.Image.Height)); ;
-                UpdateInfoBox("horChange: " + horChange.ToString() + "\n" + "verChange" + verChange.ToString());
+                UpdateInfoBox("startingX: " + startingX.ToString() + "\n" +
+                              "startingY: " + startingY.ToString() + "\n" + 
+                              "horChange: " + horChange.ToString() + "\n" +
+                              "verChange" + verChange.ToString() + "\n" +
+                              "e.X" + e.X.ToString() + "\n" +
+                              "e.Y" + e.Y.ToString());
             }
             else
             {
                 startingX = e.X;
                 startingY = e.Y;
-                UpdateInfoBox();
+                //UpdateInfoBox();
             }
             
         }
@@ -205,10 +215,13 @@ namespace Ras2Vec
             blMouseInMoveMode = false;
         }
 
-        private void UpdateInfoBox(string atext = ""){
-            richTextBox1.Text = "startingX: "+startingX.ToString()+"\n"+
-                                "startingY: "+startingY.ToString()+"\n"+
-                                atext;
+        private void UpdateInfoBox(string atext = "", bool aBlNewLine = true){
+            richTextBox1.Text = richTextBox1.Text + '\n';
+            if (aBlNewLine) 
+                richTextBox1.Text = richTextBox1.Text + '\n';
+            richTextBox1.Text = richTextBox1.Text + atext;
+            richTextBox1.SelectionStart = richTextBox1.Text.Length;
+            richTextBox1.ScrollToCaret();
         }
     }
 }
