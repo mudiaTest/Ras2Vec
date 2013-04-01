@@ -24,23 +24,24 @@ namespace Ras2Vec
 
         private void StopMovingPictures(MovedPicture picture)
         {
+            float dpShift = float.Parse(textBox1.Text);
             switch (picture)
             {
                 case MovedPicture.source:
                     {
 
-                        p.shiftX += mouseDownSourcePBLeft - sourcePB.Left;
-                        p.shiftY += mouseDownSourcePBTop - sourcePB.Top;
+                        p.shiftX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
+                        p.shiftY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
                         break;
                     }
                 case MovedPicture.desination:
                     {
-                        p.shiftX += mouseDownDesinationPBLeft - destinationPB.Left;
-                        p.shiftY += mouseDownDesinationPBTop - destinationPB.Top;
+                        p.shiftX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
+                        p.shiftY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
                         break;
                     }
             }
-            DrawCroppedScaledImage(float.Parse(textBox1.Text));
+            DrawCroppedScaledImage(dpShift);
             blMouseInMoveMode = false;
         }
 
@@ -70,29 +71,9 @@ namespace Ras2Vec
 
         }
 
-        private void ZoomInBtn_Click(object sender, EventArgs e)
-        {
-            if (int.Parse(textBox1.Text) < 5)
-            {
-
-                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) + 1))
-                    textBox1.Text = (int.Parse(textBox1.Text) + 1).ToString();
-            }
-        }
-
-        private void ZoomOutBtn_Click(object sender, EventArgs e)
-        {
-            if (int.Parse(textBox1.Text) > 1)
-            {
-                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) - 1))
-                    textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
-            }
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             dpScale = new float();
-            //srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\Untitled-1.bmp");
             srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\kop1b.jpg");
             //DrawScaledImage(float.Parse(textBox1.Text));
             bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\kop1b.jpg");
@@ -103,24 +84,44 @@ namespace Ras2Vec
             ZoomOutBtn.Enabled = true;
         }
 
-        private bool DrawCroppedScaledImage(float aDpScale)
+        private bool DrawCroppedScaledImage(float aDpScale, float? aDpScalePrev = null)
         {
+            if (aDpScalePrev != null)
+            {
+                if (aDpScale > aDpScalePrev)
+                {
+                    p.shiftX = p.shiftX - (int)Math.Round( sourcePanel.Width *  ((1 / 2) - (1 / Math.Pow(2, aDpScale))) );
+                    p.shiftY = p.shiftY - (int)Math.Round( sourcePanel.Height * ((1 / 2) - (1 / Math.Pow(2, aDpScale))) );
+                }
+                else
+                {
+                    p.shiftX = p.shiftX + (int)Math.Round(sourcePanel.Width * ((1 / 2) - (1 / Math.Pow(2, (float)aDpScalePrev))));
+                    p.shiftY = p.shiftY + (int)Math.Round(sourcePanel.Height * ((1 / 2) - (1 / Math.Pow(2, (float)aDpScalePrev))));
+                    p.shiftX = Math.Max(0, p.shiftX);
+                    p.shiftY = Math.Max(0, p.shiftY);
+                    p.shiftX = (int)Math.Round(Math.Min(bmp.Width - (sourcePanel.Width / aDpScale), p.shiftX));
+                    p.shiftY =  (int)Math.Round(Math.Min(bmp.Height - (sourcePanel.Height / aDpScale), p.shiftY));
+                }
+                
+            }
             Bitmap croppedBmp = p.GetCroppedImage(bmp, aDpScale);
+            int scaledShiftX = (int)Math.Round(p.shiftX * aDpScale);
+            int scaledShiftY = (int)Math.Round(p.shiftY * aDpScale);
             UpdateInfoBox("bmp: " + croppedBmp.Width.ToString() + " x " + croppedBmp.Height.ToString());
             sourcePB.Height = croppedBmp.Height;
             sourcePB.Width = croppedBmp.Width;
             sourcePB.Image = croppedBmp;
             UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
                           "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
-            sourcePB.Left = -Math.Min(p.shiftX, sourcePanel.Width);
-            sourcePB.Top = -Math.Min(p.shiftY, sourcePanel.Height);
+            sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
+            sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);
             UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
             destinationPB.Height = croppedBmp.Height;
             destinationPB.Width = croppedBmp.Width;
             destinationPB.Image = croppedBmp;
-            destinationPB.Left = -Math.Min(p.shiftX, destinationPanel.Width);
-            destinationPB.Top = -Math.Min(p.shiftY, destinationPanel.Height);
+            destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
+            destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);
             return true;
         }
 

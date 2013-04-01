@@ -43,12 +43,14 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel7 = new System.Windows.Forms.Panel();
             this.destinationPanel = new System.Windows.Forms.Panel();
             this.destinationPB = new System.Windows.Forms.PictureBox();
-            this.ZoomOutBtn = new System.Windows.Forms.Button();
-            this.ZoomInBtn = new System.Windows.Forms.Button();
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.ZoomOutBtn = new System.Windows.Forms.Button();
+            this.ZoomInBtn = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
@@ -77,10 +79,12 @@
             this.btnMenuHide = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel7.SuspendLayout();
             this.destinationPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
             this.sourcePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
+            this.panel6.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -98,7 +102,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuMain.Size = new System.Drawing.Size(797, 24);
+            this.menuMain.Size = new System.Drawing.Size(807, 24);
             this.menuMain.TabIndex = 0;
             // 
             // mainToolStripMenuItem
@@ -182,25 +186,34 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.destinationPanel);
-            this.panel1.Controls.Add(this.ZoomOutBtn);
-            this.panel1.Controls.Add(this.ZoomInBtn);
-            this.panel1.Controls.Add(this.sourcePanel);
+            this.panel1.Controls.Add(this.panel7);
+            this.panel1.Controls.Add(this.panel6);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(797, 506);
+            this.panel1.Size = new System.Drawing.Size(807, 471);
             this.panel1.TabIndex = 11;
+            // 
+            // panel7
+            // 
+            this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel7.Controls.Add(this.destinationPanel);
+            this.panel7.Controls.Add(this.sourcePanel);
+            this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel7.Location = new System.Drawing.Point(333, 28);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(474, 443);
+            this.panel7.TabIndex = 14;
             // 
             // destinationPanel
             // 
             this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Location = new System.Drawing.Point(367, 280);
+            this.destinationPanel.Location = new System.Drawing.Point(6, 223);
             this.destinationPanel.Name = "destinationPanel";
-            this.destinationPanel.Size = new System.Drawing.Size(380, 214);
-            this.destinationPanel.TabIndex = 18;
+            this.destinationPanel.Size = new System.Drawing.Size(400, 200);
+            this.destinationPanel.TabIndex = 22;
             // 
             // destinationPB
             // 
@@ -210,42 +223,17 @@
             this.destinationPB.TabIndex = 14;
             this.destinationPB.TabStop = false;
             this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
-            this.destinationPB.MouseLeave += new System.EventHandler(this.destinationPB_MouseLeave);
             this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
             this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
-            // 
-            // ZoomOutBtn
-            // 
-            this.ZoomOutBtn.Enabled = false;
-            this.ZoomOutBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.ZoomOutBtn.Location = new System.Drawing.Point(492, 8);
-            this.ZoomOutBtn.Name = "ZoomOutBtn";
-            this.ZoomOutBtn.Size = new System.Drawing.Size(28, 32);
-            this.ZoomOutBtn.TabIndex = 17;
-            this.ZoomOutBtn.Text = "-";
-            this.ZoomOutBtn.UseVisualStyleBackColor = true;
-            this.ZoomOutBtn.Click += new System.EventHandler(this.ZoomOutBtn_Click);
-            // 
-            // ZoomInBtn
-            // 
-            this.ZoomInBtn.Enabled = false;
-            this.ZoomInBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.ZoomInBtn.Location = new System.Drawing.Point(458, 8);
-            this.ZoomInBtn.Name = "ZoomInBtn";
-            this.ZoomInBtn.Size = new System.Drawing.Size(28, 32);
-            this.ZoomInBtn.TabIndex = 16;
-            this.ZoomInBtn.Text = "+";
-            this.ZoomInBtn.UseVisualStyleBackColor = true;
-            this.ZoomInBtn.Click += new System.EventHandler(this.ZoomInBtn_Click);
             // 
             // sourcePanel
             // 
             this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sourcePanel.Controls.Add(this.sourcePB);
-            this.sourcePanel.Location = new System.Drawing.Point(367, 48);
+            this.sourcePanel.Location = new System.Drawing.Point(6, 8);
             this.sourcePanel.Name = "sourcePanel";
-            this.sourcePanel.Size = new System.Drawing.Size(380, 214);
-            this.sourcePanel.TabIndex = 15;
+            this.sourcePanel.Size = new System.Drawing.Size(400, 200);
+            this.sourcePanel.TabIndex = 19;
             // 
             // sourcePB
             // 
@@ -259,6 +247,41 @@
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
+            // panel6
+            // 
+            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.ZoomOutBtn);
+            this.panel6.Controls.Add(this.ZoomInBtn);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel6.Location = new System.Drawing.Point(333, 0);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(474, 28);
+            this.panel6.TabIndex = 13;
+            // 
+            // ZoomOutBtn
+            // 
+            this.ZoomOutBtn.Enabled = false;
+            this.ZoomOutBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.ZoomOutBtn.Location = new System.Drawing.Point(86, -1);
+            this.ZoomOutBtn.Name = "ZoomOutBtn";
+            this.ZoomOutBtn.Size = new System.Drawing.Size(28, 26);
+            this.ZoomOutBtn.TabIndex = 23;
+            this.ZoomOutBtn.Text = "-";
+            this.ZoomOutBtn.UseVisualStyleBackColor = true;
+            this.ZoomOutBtn.Click += new System.EventHandler(this.ZoomOutBtn_Click);
+            // 
+            // ZoomInBtn
+            // 
+            this.ZoomInBtn.Enabled = false;
+            this.ZoomInBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.ZoomInBtn.Location = new System.Drawing.Point(52, -1);
+            this.ZoomInBtn.Name = "ZoomInBtn";
+            this.ZoomInBtn.Size = new System.Drawing.Size(28, 26);
+            this.ZoomInBtn.TabIndex = 22;
+            this.ZoomInBtn.Text = "+";
+            this.ZoomInBtn.UseVisualStyleBackColor = true;
+            this.ZoomInBtn.Click += new System.EventHandler(this.ZoomInBtn_Click);
+            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.panel4);
@@ -266,7 +289,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(333, 506);
+            this.panel2.Size = new System.Drawing.Size(333, 471);
             this.panel2.TabIndex = 12;
             // 
             // panel4
@@ -288,14 +311,15 @@
             this.panel4.Location = new System.Drawing.Point(34, 0);
             this.panel4.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(299, 506);
+            this.panel4.Size = new System.Drawing.Size(299, 471);
             this.panel4.TabIndex = 26;
+            this.panel4.Click += new System.EventHandler(this.w);
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(112, 297);
+            this.richTextBox1.Location = new System.Drawing.Point(112, 299);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(179, 196);
+            this.richTextBox1.Size = new System.Drawing.Size(179, 167);
             this.richTextBox1.TabIndex = 25;
             this.richTextBox1.Text = "";
             // 
@@ -525,7 +549,7 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(34, 506);
+            this.panel3.Size = new System.Drawing.Size(34, 471);
             this.panel3.TabIndex = 25;
             // 
             // btnMenuHide
@@ -535,7 +559,7 @@
             this.btnMenuHide.Location = new System.Drawing.Point(0, 0);
             this.btnMenuHide.Margin = new System.Windows.Forms.Padding(0);
             this.btnMenuHide.Name = "btnMenuHide";
-            this.btnMenuHide.Size = new System.Drawing.Size(30, 506);
+            this.btnMenuHide.Size = new System.Drawing.Size(30, 471);
             this.btnMenuHide.TabIndex = 0;
             this.btnMenuHide.Text = "<<";
             this.btnMenuHide.UseVisualStyleBackColor = true;
@@ -545,7 +569,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(797, 530);
+            this.ClientSize = new System.Drawing.Size(807, 495);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;
@@ -554,10 +578,12 @@
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.panel1.ResumeLayout(false);
+            this.panel7.ResumeLayout(false);
             this.destinationPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
             this.sourcePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
+            this.panel6.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
@@ -612,13 +638,15 @@
         private System.Windows.Forms.Button btnSeparateThread;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.Panel sourcePanel;
-        private System.Windows.Forms.PictureBox sourcePB;
-        private System.Windows.Forms.Button ZoomOutBtn;
-        private System.Windows.Forms.Button ZoomInBtn;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Panel destinationPanel;
         private System.Windows.Forms.PictureBox destinationPB;
+        private System.Windows.Forms.Panel sourcePanel;
+        private System.Windows.Forms.PictureBox sourcePB;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Button ZoomOutBtn;
+        private System.Windows.Forms.Button ZoomInBtn;
     }
 }
 

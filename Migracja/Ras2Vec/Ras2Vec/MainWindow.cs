@@ -129,5 +129,29 @@ namespace Ras2Vec
         {
             StopMovingPictures(MovedPicture.desination);
         }
+
+        private void w(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ZoomInBtn_Click(object sender, EventArgs e)
+        {
+            if (int.Parse(textBox1.Text) < 5)
+            {
+
+                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) + 1, float.Parse(textBox1.Text)))
+                    textBox1.Text = (int.Parse(textBox1.Text) + 1).ToString();
+            }
+        }
+
+        private void ZoomOutBtn_Click(object sender, EventArgs e)
+        {
+            if (int.Parse(textBox1.Text) > 1)
+            {
+                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) - 1, float.Parse(textBox1.Text)))
+                    textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
+            }
+        }
     }
 }

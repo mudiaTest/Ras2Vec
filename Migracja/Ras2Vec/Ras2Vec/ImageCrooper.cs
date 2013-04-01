@@ -35,13 +35,16 @@ namespace Ras2Vec
             //ustalanie rozmiaru, tak aby dla mocnego prrzesuniącia wycinka w prawo nie pobierał 
             //wycinka z poza oryginalnego obrazu, co spowoduje wyjątek
             int rectWidth = Math.Min((int)Math.Ceiling(3 * panelSize.Width / aScale), 
-                                     (int)Math.Ceiling((aSrcBmp.Width - x) * aScale));
+                                     aSrcBmp.Width - x);
             int rectHeight = Math.Min((int)Math.Ceiling(3 * panelSize.Height / aScale), 
-                                      (int)Math.Ceiling((aSrcBmp.Height - y) * aScale));
+                                      aSrcBmp.Height - y);
 
-            //Bitmap result = new Bitmap(1,1);
             Rectangle rect = new Rectangle(x, y, rectWidth, rectHeight);
+            //utworzenie przyciętej bitmapy
             Bitmap result = (Bitmap)aSrcBmp.Clone(rect, aSrcBmp.PixelFormat);
+            //rozciągnięie przycientej bitmapy zgodnie ze skalą
+            if (aScale!= 1)
+                result = new Bitmap(result, (int)Math.Round(result.Width * aScale), (int)Math.Round(result.Height * aScale));
             return result;
         }
     }
