@@ -195,7 +195,6 @@
             // 
             // destinationPanel
             // 
-            this.destinationPanel.AutoScroll = true;
             this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.destinationPanel.Controls.Add(this.destinationPB);
             this.destinationPanel.Location = new System.Drawing.Point(367, 280);
@@ -210,6 +209,10 @@
             this.destinationPB.Size = new System.Drawing.Size(152, 98);
             this.destinationPB.TabIndex = 14;
             this.destinationPB.TabStop = false;
+            this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
+            this.destinationPB.MouseLeave += new System.EventHandler(this.destinationPB_MouseLeave);
+            this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
+            this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
             // 
             // ZoomOutBtn
             // 
@@ -237,7 +240,6 @@
             // 
             // sourcePanel
             // 
-            this.sourcePanel.AutoScroll = true;
             this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sourcePanel.Controls.Add(this.sourcePB);
             this.sourcePanel.Location = new System.Drawing.Point(367, 48);
@@ -252,10 +254,10 @@
             this.sourcePB.Size = new System.Drawing.Size(152, 98);
             this.sourcePB.TabIndex = 14;
             this.sourcePB.TabStop = false;
-            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseDown);
-            this.sourcePB.MouseLeave += new System.EventHandler(this.pictureBoxSrc_MouseLeave);
-            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseMove);
-            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBoxSrc_MouseUp);
+            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseDown);
+            this.sourcePB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
+            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
+            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
             // panel2
             // 
