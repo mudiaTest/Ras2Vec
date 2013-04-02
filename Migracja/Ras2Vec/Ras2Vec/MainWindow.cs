@@ -159,7 +159,7 @@ namespace Ras2Vec
             int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
-            p.panelSize = new Size(sourcePanel.Width, sourcePanel.Height);
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height));
             DrawCroppedScaledImage(float.Parse(textBox1.Text));
         }
     }

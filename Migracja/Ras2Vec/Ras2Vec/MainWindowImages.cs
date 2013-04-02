@@ -27,17 +27,17 @@ namespace Ras2Vec
             float dpShift = float.Parse(textBox1.Text);
             switch (picture)
             {
+                //centrum oglądanego obszaru przesówamy o przesunięcię myszą z uwzględnieniem sklai
                 case MovedPicture.source:
                     {
-
-                        p.shiftX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
-                        p.shiftY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
+                        p.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
+                        p.centerY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
                         break;
                     }
                 case MovedPicture.desination:
                     {
-                        p.shiftX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
-                        p.shiftY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
+                        p.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
+                        p.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
                         break;
                     }
             }
@@ -86,12 +86,12 @@ namespace Ras2Vec
 
         private bool DrawCroppedScaledImage(float aDpScale, float? aDpScalePrev = null)
         {
-            if (aDpScalePrev != null)
+            /*if (aDpScalePrev != null)
             {
                 if (aDpScale > aDpScalePrev)
                 {
-                    p.shiftX = p.shiftX + (int)Math.Round( sourcePanel.Width *  (1 / Math.Pow(2, aDpScale)) );
-                    p.shiftY = p.shiftY + (int)Math.Round( sourcePanel.Height * (1 / Math.Pow(2, aDpScale)) );
+                    p.centerX = p.centerX + (int)Math.Round(sourcePanel.Width * (1 / Math.Pow(2, aDpScale)));
+                    p.centerY = p.centerY + (int)Math.Round(sourcePanel.Height * (1 / Math.Pow(2, aDpScale)));
                 }
                 else
                 {
@@ -103,10 +103,14 @@ namespace Ras2Vec
                     p.shiftY =  (int)Math.Round(Math.Min(bmp.Height - (sourcePanel.Height / aDpScale), p.shiftY));
                 }
                 
-            }
+            }*/
             Bitmap croppedBmp = p.GetCroppedImage(bmp, aDpScale);
-            int scaledShiftX = (int)Math.Round(p.shiftX * aDpScale);
-            int scaledShiftY = (int)Math.Round(p.shiftY * aDpScale);
+            
+            /*int scaledShiftX = sourcePanel.Width;
+            int scaledShiftY = sourcePanel.Height;*/
+            int scaledShiftX = (int)Math.Round(p.centerX * aDpScale);
+            int scaledShiftY = (int)Math.Round(p.centerY * aDpScale);
+
             UpdateInfoBox("bmp: " + croppedBmp.Width.ToString() + " x " + croppedBmp.Height.ToString());
             sourcePB.Height = croppedBmp.Height;
             sourcePB.Width = croppedBmp.Width;
