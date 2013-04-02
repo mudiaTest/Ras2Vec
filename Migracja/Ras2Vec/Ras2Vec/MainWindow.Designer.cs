@@ -102,7 +102,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuMain.Size = new System.Drawing.Size(807, 24);
+            this.menuMain.Size = new System.Drawing.Size(817, 24);
             this.menuMain.TabIndex = 0;
             // 
             // mainToolStripMenuItem
@@ -192,7 +192,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(807, 471);
+            this.panel1.Size = new System.Drawing.Size(817, 472);
             this.panel1.TabIndex = 11;
             // 
             // panel7
@@ -203,16 +203,19 @@
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel7.Location = new System.Drawing.Point(333, 28);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(474, 443);
+            this.panel7.Size = new System.Drawing.Size(484, 444);
             this.panel7.TabIndex = 14;
+            this.panel7.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
             // 
             // destinationPanel
             // 
+            this.destinationPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Location = new System.Drawing.Point(6, 223);
+            this.destinationPanel.Location = new System.Drawing.Point(6, 224);
             this.destinationPanel.Name = "destinationPanel";
-            this.destinationPanel.Size = new System.Drawing.Size(400, 200);
+            this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
+            this.destinationPanel.Size = new System.Drawing.Size(470, 210);
             this.destinationPanel.TabIndex = 22;
             // 
             // destinationPB
@@ -228,11 +231,13 @@
             // 
             // sourcePanel
             // 
+            this.sourcePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sourcePanel.Controls.Add(this.sourcePB);
             this.sourcePanel.Location = new System.Drawing.Point(6, 8);
             this.sourcePanel.Name = "sourcePanel";
-            this.sourcePanel.Size = new System.Drawing.Size(400, 200);
+            this.sourcePanel.Size = new System.Drawing.Size(470, 210);
             this.sourcePanel.TabIndex = 19;
             // 
             // sourcePB
@@ -255,7 +260,7 @@
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel6.Location = new System.Drawing.Point(333, 0);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(474, 28);
+            this.panel6.Size = new System.Drawing.Size(484, 28);
             this.panel6.TabIndex = 13;
             // 
             // ZoomOutBtn
@@ -289,7 +294,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(333, 471);
+            this.panel2.Size = new System.Drawing.Size(333, 472);
             this.panel2.TabIndex = 12;
             // 
             // panel4
@@ -311,7 +316,7 @@
             this.panel4.Location = new System.Drawing.Point(34, 0);
             this.panel4.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(299, 471);
+            this.panel4.Size = new System.Drawing.Size(299, 472);
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
             // 
@@ -549,7 +554,7 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(34, 471);
+            this.panel3.Size = new System.Drawing.Size(34, 472);
             this.panel3.TabIndex = 25;
             // 
             // btnMenuHide
@@ -559,7 +564,7 @@
             this.btnMenuHide.Location = new System.Drawing.Point(0, 0);
             this.btnMenuHide.Margin = new System.Windows.Forms.Padding(0);
             this.btnMenuHide.Name = "btnMenuHide";
-            this.btnMenuHide.Size = new System.Drawing.Size(30, 471);
+            this.btnMenuHide.Size = new System.Drawing.Size(30, 472);
             this.btnMenuHide.TabIndex = 0;
             this.btnMenuHide.Text = "<<";
             this.btnMenuHide.UseVisualStyleBackColor = true;
@@ -569,7 +574,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(807, 495);
+            this.ClientSize = new System.Drawing.Size(817, 496);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;

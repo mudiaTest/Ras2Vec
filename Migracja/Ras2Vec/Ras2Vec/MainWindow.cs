@@ -64,7 +64,7 @@ namespace Ras2Vec
             if (panel4.Visible)
             {
                 panel4.Visible = false;
-                panel2.Width = 314;
+                panel2.Width = 34;
                 btnMenuHide.Text = ">>";
             }
             else
@@ -137,7 +137,7 @@ namespace Ras2Vec
 
         private void ZoomInBtn_Click(object sender, EventArgs e)
         {
-            if (int.Parse(textBox1.Text) < 5)
+            if (int.Parse(textBox1.Text) <= 10)
             {
 
                 if (DrawCroppedScaledImage(float.Parse(textBox1.Text) + 1, float.Parse(textBox1.Text)))
@@ -152,6 +152,15 @@ namespace Ras2Vec
                 if (DrawCroppedScaledImage(float.Parse(textBox1.Text) - 1, float.Parse(textBox1.Text)))
                     textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
             }
+        }
+
+        private void panel7_SizeChanged(object sender, EventArgs e)
+        {
+            int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
+            sourcePanel.Height = panelSize;
+            destinationPanel.Height = panelSize;
+            p.panelSize = new Size(sourcePanel.Width, sourcePanel.Height);
+            DrawCroppedScaledImage(float.Parse(textBox1.Text));
         }
     }
 }

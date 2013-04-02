@@ -90,13 +90,13 @@ namespace Ras2Vec
             {
                 if (aDpScale > aDpScalePrev)
                 {
-                    p.shiftX = p.shiftX - (int)Math.Round( sourcePanel.Width *  ((1 / 2) - (1 / Math.Pow(2, aDpScale))) );
-                    p.shiftY = p.shiftY - (int)Math.Round( sourcePanel.Height * ((1 / 2) - (1 / Math.Pow(2, aDpScale))) );
+                    p.shiftX = p.shiftX + (int)Math.Round( sourcePanel.Width *  (1 / Math.Pow(2, aDpScale)) );
+                    p.shiftY = p.shiftY + (int)Math.Round( sourcePanel.Height * (1 / Math.Pow(2, aDpScale)) );
                 }
                 else
                 {
-                    p.shiftX = p.shiftX + (int)Math.Round(sourcePanel.Width * ((1 / 2) - (1 / Math.Pow(2, (float)aDpScalePrev))));
-                    p.shiftY = p.shiftY + (int)Math.Round(sourcePanel.Height * ((1 / 2) - (1 / Math.Pow(2, (float)aDpScalePrev))));
+                    p.shiftX = p.shiftX - (int)Math.Round(sourcePanel.Width * (1 / Math.Pow(2, (float)aDpScalePrev)));
+                    p.shiftY = p.shiftY - (int)Math.Round(sourcePanel.Height * (1 / Math.Pow(2, (float)aDpScalePrev)));
                     p.shiftX = Math.Max(0, p.shiftX);
                     p.shiftY = Math.Max(0, p.shiftY);
                     p.shiftX = (int)Math.Round(Math.Min(bmp.Width - (sourcePanel.Width / aDpScale), p.shiftX));
