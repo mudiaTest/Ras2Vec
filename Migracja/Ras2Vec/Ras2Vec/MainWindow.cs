@@ -13,11 +13,7 @@ namespace Ras2Vec
 {
     public partial class MainWindow : Form
     {
-        Image srcImg;
-        Graphics graphics;
         Bitmap bmp;
-        //Image bmp;
-        float dpScale;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
@@ -159,7 +155,7 @@ namespace Ras2Vec
             int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height));
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
             DrawCroppedScaledImage(float.Parse(textBox1.Text));
         }
     }

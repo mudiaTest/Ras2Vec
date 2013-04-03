@@ -73,11 +73,10 @@ namespace Ras2Vec
 
         private void button1_Click(object sender, EventArgs e)
         {
-            dpScale = new float();
-            srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\kop1b.jpg");
+            //srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp");
             //DrawScaledImage(float.Parse(textBox1.Text));
-            bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\kop1b.jpg");
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height));
+            bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp"); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
 
             DrawCroppedScaledImage(float.Parse(textBox1.Text));
             ZoomInBtn.Enabled = true;
@@ -104,7 +103,7 @@ namespace Ras2Vec
                 }
                 
             }*/
-            Bitmap croppedBmp = p.GetCroppedImage(bmp, aDpScale);
+            Bitmap croppedBmp = p.GetCroppedImage(aDpScale);
             
             /*int scaledShiftX = sourcePanel.Width;
             int scaledShiftY = sourcePanel.Height;*/
@@ -117,43 +116,19 @@ namespace Ras2Vec
             sourcePB.Image = croppedBmp;
             UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
                           "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
-            sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
-            sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);
+            /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
+            sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);*/
+            sourcePB.Left = -sourcePanel.Width;
+            sourcePB.Top = -sourcePanel.Height;
             UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
             destinationPB.Height = croppedBmp.Height;
             destinationPB.Width = croppedBmp.Width;
             destinationPB.Image = croppedBmp;
-            destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
-            destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);
-            return true;
-        }
-
-        private bool DrawScaledImage(float adpScale)
-        {
-            int maxImgPx = 83000000;
-            if (!checkBox1.Checked)
-                adpScale = 1;
-
-            if ((int)Math.Round(srcImg.Width * adpScale) * (int)Math.Round(srcImg.Height * adpScale) > maxImgPx)
-            {
-                return false;
-            }
-            //bmp = new Bitmap((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale));
-            //graphics = Graphics.FromImage(bmp);
-            //graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            //graphics.DrawImage(srcImg, 0, 0, srcImg.Width * adpScale, srcImg.Height * adpScale);
-            //bmp = srcImg.GetThumbnailImage((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale), null, IntPtr.Zero);
-            bmp = new Bitmap(srcImg, new Size((int)Math.Round(srcImg.Width * adpScale), (int)Math.Round(srcImg.Height * adpScale)));
-            sourcePB.Height = bmp.Height;
-            sourcePB.Width = bmp.Width;
-            //sourcePB.Refresh();
-            sourcePB.Image = bmp;
-
-            destinationPB.Height = bmp.Height;
-            destinationPB.Width = bmp.Width;
-            //destinationPB.Refresh();
-            destinationPB.Image = bmp;
+            /*destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
+            destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
+            destinationPB.Left = -destinationPanel.Width;
+            destinationPB.Top = -destinationPanel.Height;
             return true;
         }
     }
