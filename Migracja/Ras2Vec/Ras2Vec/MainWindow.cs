@@ -24,10 +24,14 @@ namespace Ras2Vec
         int mouseDownSourcePBTop;
         int mouseDownDesinationPBLeft;
         int mouseDownDesinationPBTop;
+        MainWindowSettings windowSettings;
 
         public MainWindow()
         {
             InitializeComponent();
+            windowSettings = new MainWindowSettings();
+            windowSettings.dpScale = 1;
+            ScaleRefresh();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -131,22 +135,39 @@ namespace Ras2Vec
 
         }
 
+        private void SettingsToScr(MainWindowSettings aSettings)
+        {
+            maskedTextBox1.Text = aSettings.leftXCoord;
+            maskedTextBox2.Text = aSettings.leftYCoord;
+            maskedTextBox3.Text = aSettings.rightXCoord;
+            maskedTextBox4.Text = aSettings.rightYCoord;
+            ScaleRefresh();
+            //center
+        }
+
+        private void ScaleRefresh(){
+            ScaleTB.Text = windowSettings.dpScale.ToString();
+            ScaleTrB.Value = (int)windowSettings.dpScale;
+        }
+
         private void ZoomInBtn_Click(object sender, EventArgs e)
         {
-            if (int.Parse(textBox1.Text) <= 10)
+            if (windowSettings.dpScale < 10)
             {
 
-                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) + 1, float.Parse(textBox1.Text)))
-                    textBox1.Text = (int.Parse(textBox1.Text) + 1).ToString();
+                if (DrawCroppedScaledImage(windowSettings.dpScale + 1, windowSettings.dpScale))
+                    windowSettings.dpScale += 1;
+                    ScaleRefresh();
             }
         }
 
         private void ZoomOutBtn_Click(object sender, EventArgs e)
         {
-            if (int.Parse(textBox1.Text) > 1)
+            if (windowSettings.dpScale > 1)
             {
-                if (DrawCroppedScaledImage(float.Parse(textBox1.Text) - 1, float.Parse(textBox1.Text)))
-                    textBox1.Text = (int.Parse(textBox1.Text) - 1).ToString();
+                if (DrawCroppedScaledImage(windowSettings.dpScale - 1, windowSettings.dpScale))
+                windowSettings.dpScale -= 1;
+                ScaleRefresh();
             }
         }
 
@@ -156,7 +177,87 @@ namespace Ras2Vec
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
             p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
-            DrawCroppedScaledImage(float.Parse(textBox1.Text));
+            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
+        }
+
+        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
+
+        }
+
+        private void maskedTextBox1_DragLeave(object sender, EventArgs e)
+        {
+        }
+
+        private void maskedTextBox1_Leave(object sender, EventArgs e)
+        {
+            windowSettings.leftXCoord = ((MaskedTextBox)sender).Text;
+        }
+
+        private void maskedTextBox2_Leave(object sender, EventArgs e)
+        {
+            windowSettings.leftYCoord = ((MaskedTextBox)sender).Text;
+        }
+
+        private void maskedTextBox3_Leave(object sender, EventArgs e)
+        {
+            windowSettings.rightXCoord = ((MaskedTextBox)sender).Text;
+        }
+
+        private void maskedTextBox4_Leave(object sender, EventArgs e)
+        {
+            windowSettings.rightYCoord = ((MaskedTextBox)sender).Text;
+        }
+
+        private void textBox1_Leave(object sender, EventArgs e)
+        {
+            windowSettings.dpScale = float.Parse(((TextBox)sender).Text);
+        }
+
+        private void ScaleTb_MouseDown(object sender, MouseEventArgs e)
+        {
+        }
+
+        private void ScaleTb_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (ScaleTrB.Value != windowSettings.dpScale)
+            {
+                if (DrawCroppedScaledImage(ScaleTrB.Value, windowSettings.dpScale))
+                windowSettings.dpScale = ScaleTrB.Value;
+                ScaleRefresh();
+            }
+        }
+
+        private void ScaleTb_MouseMove(object sender, MouseEventArgs e)
+        {
+            ScaleTB.Text = ScaleTrB.Value.ToString();
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = saveDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                windowSettings.Save(saveDialog.FileName);
+            }
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = loadDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                windowSettings.Load(loadDialog.FileName);
+                SettingsToScr(windowSettings);
+            }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (windowSettings.thisSettinsPath != "")
+                windowSettings.Save();
+            else
+                saveAsToolStripMenuItem_Click(sender, e);
         }
     }
 }

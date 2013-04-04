@@ -24,7 +24,7 @@ namespace Ras2Vec
 
         private void StopMovingPictures(MovedPicture picture)
         {
-            float dpShift = float.Parse(textBox1.Text);
+            float dpShift = float.Parse(ScaleTB.Text);
             switch (picture)
             {
                 //centrum oglądanego obszaru przesówamy o przesunięcię myszą z uwzględnieniem sklai
@@ -78,7 +78,7 @@ namespace Ras2Vec
             bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp"); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
             p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
 
-            DrawCroppedScaledImage(float.Parse(textBox1.Text));
+            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
             ZoomInBtn.Enabled = true;
             ZoomOutBtn.Enabled = true;
         }

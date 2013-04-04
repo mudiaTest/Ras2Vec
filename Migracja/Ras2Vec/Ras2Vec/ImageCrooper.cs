@@ -84,11 +84,13 @@ namespace Ras2Vec
             //prawdopodobnie postła wolna przestrzeń po lewej stronie do wypełnienia. Prawa soraona "wypełni" 
             //się automatycznie, bo mając przerwę z lewej strony i wklejony obrazek, przerwa po prawej stworzy się samoczynnie)
             if ((rectWidth * aScale < 3 * panelSize.Width) & (x == 0))
-                resultRectX = x - GetLeftAbsoluteOryg(aScale);
+                resultRectX = (int)Math.Ceiling(-GetLeftAbsoluteOryg(aScale) * aScale);//GetAbsolute... oddaje wartości dla oryginalnej wielkości/skala, a my 
+                                                                                       //obliczamy teraz przesunięcie na rozciągniętym obrazie, więc trzeba 
+                                                                                       //pomnożyć to przez skalę
             else
                 resultRectX = 0;
             if ((rectHeight * aScale < 3 * panelSize.Height) & (y == 0))
-                resultRectY = y - GetTopAbsoluteOryg(aScale);
+                resultRectY = (int)Math.Ceiling(-GetTopAbsoluteOryg(aScale) * aScale);
             else
                 resultRectY = 0;
 
