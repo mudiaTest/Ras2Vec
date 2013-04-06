@@ -146,5 +146,30 @@ namespace Ras2Vec
             destinationPB.Top = -destinationPanel.Height;
             return true;
         }
+
+        private void LoadImage()
+        {
+            if (loadDialog.ShowDialog() == DialogResult.OK)
+            {
+                LoadImage(loadDialog.FileName);
+                windowSettings.stSourceImagePath = loadDialog.FileName;
+            }
+        }
+
+        private void ReloadImage(){
+            if (windowSettings.stSourceImagePath != "")
+            {
+                if (File.Exists(windowSettings.stSourceImagePath))
+                    LoadImage(windowSettings.stSourceImagePath);
+                else
+                {
+
+                }
+            }
+            else
+            {
+                
+            }
+        }
     }
 }

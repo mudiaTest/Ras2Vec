@@ -26,10 +26,16 @@ namespace Ras2Vec
         int mouseDownDesinationPBLeft;
         int mouseDownDesinationPBTop;
         MainWindowSettings windowSettings;
+        private string lastSavePath;
 
         public MainWindow()
         {
             InitializeComponent();
+            //pobieranie informacji o ostatnim savie
+            MainWindowRegister reg = new MainWindowRegister();
+            lastSavePath = reg.GetLastSaveInfo();
+            RefreshLastSaveButton();
+
             windowSettings = new MainWindowSettings();
             windowSettings.dpScale = 1;
             ScaleRefresh();
@@ -143,10 +149,30 @@ namespace Ras2Vec
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
             ScaleRefresh();
-            p.centerX = aSettings.centerX;
-            p.centerY = aSettings.centerY;
-            DrawCroppedScaledImage(windowSettings.dpScale);
+            if (p != null)
+            {
+                p.centerX = aSettings.centerX;
+                p.centerY = aSettings.centerY;
+                DrawCroppedScaledImage(windowSettings.dpScale);
+            }
             SetScaleControlEnable(true);
+
+            chkBoxTestOptions.ClearSelected();
+            if (aSettings.testOptions != "")
+                foreach (string stIdx in aSettings.GetCheckegTestOptionsList())
+                {
+                    chkBoxTestOptions.SetItemCheckState( int.Parse(stIdx), CheckState.Checked);
+                }
+
+            string result = "";
+            foreach (int i in chkBoxTestOptions.CheckedIndices)
+            {
+                if (result != "")
+                    result += ",";
+                result += i.ToString();
+            }
+            windowSettings.testOptions = result;
+
             //center
         }
 
@@ -240,57 +266,44 @@ namespace Ras2Vec
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = saveDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                windowSettings.Save(saveDialog.FileName);
-            }
+            MenuSaveAs(sender, e);
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = loadDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                windowSettings.Load(loadDialog.FileName);
-                PrepareSourceImage(windowSettings.stSourceImagePath);
-                SettingsToScr(windowSettings);
-            }
+            MenuLoad(sender, e);
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (windowSettings.thisSettinsPath != "")
-                windowSettings.Save();
-            else
-                saveAsToolStripMenuItem_Click(sender, e);
+            MenuSave(sender, e);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (loadDialog.ShowDialog() == DialogResult.OK)
-            {
-                LoadImage(loadDialog.FileName);
-                windowSettings.stSourceImagePath = loadDialog.FileName;
-            }
+            LoadImage();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (windowSettings.stSourceImagePath != "")
-            {
-                if (File.Exists(windowSettings.stSourceImagePath))
-                    LoadImage(windowSettings.stSourceImagePath);
-                else
-                {
+            ReloadImage();
+        }
 
-                }
-            }
-            else
-            {
-                
-            }
+        private void loadLastSaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadLastSave();
+        }
 
+        private void chkBoxTestOptions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string result = "";
+            foreach (int i in chkBoxTestOptions.CheckedIndices)
+            {
+                if (result != "") 
+                    result += ",";
+                result += i.ToString();
+            }
+            windowSettings.testOptions = result;
         }
     }
 }

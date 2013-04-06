@@ -80,6 +80,7 @@
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.loadLastSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -115,6 +116,7 @@
             this.newToolStripMenuItem,
             this.toolStripSeparator1,
             this.loadToolStripMenuItem,
+            this.loadLastSaveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.toolStripSeparator2,
@@ -368,6 +370,7 @@
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
             this.chkBoxTestOptions.Size = new System.Drawing.Size(290, 49);
             this.chkBoxTestOptions.TabIndex = 10;
+            this.chkBoxTestOptions.SelectedIndexChanged += new System.EventHandler(this.chkBoxTestOptions_SelectedIndexChanged);
             // 
             // btnRefreshResultImg
             // 
@@ -599,6 +602,14 @@
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
+            // loadLastSaveToolStripMenuItem
+            // 
+            this.loadLastSaveToolStripMenuItem.Name = "loadLastSaveToolStripMenuItem";
+            this.loadLastSaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadLastSaveToolStripMenuItem.Text = "Load lastSave";
+            this.loadLastSaveToolStripMenuItem.Visible = false;
+            this.loadLastSaveToolStripMenuItem.Click += new System.EventHandler(this.loadLastSaveToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -685,6 +696,7 @@
         private System.Windows.Forms.PictureBox sourcePB;
         private System.Windows.Forms.SaveFileDialog saveDialog;
         private System.Windows.Forms.Button reloadSrcMapBtn;
+        private System.Windows.Forms.ToolStripMenuItem loadLastSaveToolStripMenuItem;
     }
 }
 
