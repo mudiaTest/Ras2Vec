@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Ras2Vec
 {
@@ -41,6 +42,8 @@ namespace Ras2Vec
                         break;
                     }
             }
+            windowSettings.centerX = p.centerX;
+            windowSettings.centerY = p.centerY;
             DrawCroppedScaledImage(dpShift);
             blMouseInMoveMode = false;
         }
@@ -71,16 +74,28 @@ namespace Ras2Vec
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp");
-            //DrawScaledImage(float.Parse(textBox1.Text));
-            bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp"); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
+        private void SetScaleControlEnable(bool aEnabled){
+            ZoomInBtn.Enabled = aEnabled;
+            ZoomOutBtn.Enabled = aEnabled;
+            ScaleTrB.Enabled = aEnabled;
+        }
 
-            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
-            ZoomInBtn.Enabled = true;
-            ZoomOutBtn.Enabled = true;
+        private void PrepareSourceImage(String aPath)
+        {
+            bmp = new Bitmap(aPath); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
+        }
+
+        private bool LoadImage(String aPath)
+        {
+            if (File.Exists(aPath))
+            {
+                PrepareSourceImage(aPath);
+                DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
+                SetScaleControlEnable(true);
+                return true;
+            }
+            return false;
         }
 
         private bool DrawCroppedScaledImage(float aDpScale, float? aDpScalePrev = null)

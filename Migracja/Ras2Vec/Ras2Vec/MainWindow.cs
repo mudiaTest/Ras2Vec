@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Ras2Vec
 {
@@ -142,6 +143,10 @@ namespace Ras2Vec
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
             ScaleRefresh();
+            p.centerX = aSettings.centerX;
+            p.centerY = aSettings.centerY;
+            DrawCroppedScaledImage(windowSettings.dpScale);
+            SetScaleControlEnable(true);
             //center
         }
 
@@ -248,6 +253,7 @@ namespace Ras2Vec
             if (result == DialogResult.OK)
             {
                 windowSettings.Load(loadDialog.FileName);
+                PrepareSourceImage(windowSettings.stSourceImagePath);
                 SettingsToScr(windowSettings);
             }
         }
@@ -258,6 +264,33 @@ namespace Ras2Vec
                 windowSettings.Save();
             else
                 saveAsToolStripMenuItem_Click(sender, e);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (loadDialog.ShowDialog() == DialogResult.OK)
+            {
+                LoadImage(loadDialog.FileName);
+                windowSettings.stSourceImagePath = loadDialog.FileName;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (windowSettings.stSourceImagePath != "")
+            {
+                if (File.Exists(windowSettings.stSourceImagePath))
+                    LoadImage(windowSettings.stSourceImagePath);
+                else
+                {
+
+                }
+            }
+            else
+            {
+                
+            }
+
         }
     }
 }
