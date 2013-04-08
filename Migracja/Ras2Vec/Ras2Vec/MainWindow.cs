@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 using System.Diagnostics;
 
 namespace Ras2Vec
@@ -26,10 +27,16 @@ namespace Ras2Vec
         int mouseDownDesinationPBLeft;
         int mouseDownDesinationPBTop;
         MainWindowSettings windowSettings;
+        private string lastSavePath;
 
         public MainWindow()
         {
             InitializeComponent();
+            //pobieranie informacji o ostatnim savie
+            MainWindowRegister reg = new MainWindowRegister();
+            lastSavePath = reg.GetLastSaveInfo();
+            RefreshLastSaveButton();
+
             windowSettings = new MainWindowSettings();
             windowSettings.dpScale = 1;
             ScaleRefresh();
@@ -143,6 +150,30 @@ namespace Ras2Vec
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
             ScaleRefresh();
+            if (p != null)
+            {
+                p.centerX = aSettings.centerX;
+                p.centerY = aSettings.centerY;
+                DrawCroppedScaledImage(windowSettings.dpScale);
+            }
+            SetScaleControlEnable(true);
+
+            chkBoxTestOptions.ClearSelected();
+            if (aSettings.testOptions != "")
+                foreach (string stIdx in aSettings.GetCheckegTestOptionsList())
+                {
+                    chkBoxTestOptions.SetItemCheckState( int.Parse(stIdx), CheckState.Checked);
+                }
+
+            string result = "";
+            foreach (int i in chkBoxTestOptions.CheckedIndices)
+            {
+                if (result != "")
+                    result += ",";
+                result += i.ToString();
+            }
+            windowSettings.testOptions = result;
+
             //center
         }
 
@@ -237,29 +268,44 @@ namespace Ras2Vec
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = saveDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                windowSettings.Save(saveDialog.FileName);
-            }
+            MenuSaveAs(sender, e);
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = loadDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                windowSettings.Load(loadDialog.FileName);
-                SettingsToScr(windowSettings);
-            }
+            MenuLoad(sender, e);
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (windowSettings.thisSettinsPath != "")
-                windowSettings.Save();
-            else
-                saveAsToolStripMenuItem_Click(sender, e);
+            MenuSave(sender, e);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LoadImage();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ReloadImage();
+        }
+
+        private void loadLastSaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadLastSave();
+        }
+
+        private void chkBoxTestOptions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string result = "";
+            foreach (int i in chkBoxTestOptions.CheckedIndices)
+            {
+                if (result != "") 
+                    result += ",";
+                result += i.ToString();
+            }
+            windowSettings.testOptions = result;
         }
 
         private void btnStartR2V_Click_1(object sender, EventArgs e)

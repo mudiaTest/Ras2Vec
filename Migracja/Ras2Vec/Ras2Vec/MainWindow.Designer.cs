@@ -45,8 +45,8 @@
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.reloadSrcMapBtn = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.panel5 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -56,7 +56,7 @@
             this.maskedTextBox3 = new System.Windows.Forms.MaskedTextBox();
             this.maskedTextBox2 = new System.Windows.Forms.MaskedTextBox();
             this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.loadSrcMapBtn = new System.Windows.Forms.Button();
             this.chkBoxTestOptions = new System.Windows.Forms.CheckedListBox();
             this.btnRefreshResultImg = new System.Windows.Forms.Button();
             this.btnMainThread = new System.Windows.Forms.Button();
@@ -80,6 +80,7 @@
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.loadLastSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -115,6 +116,7 @@
             this.newToolStripMenuItem,
             this.toolStripSeparator1,
             this.loadToolStripMenuItem,
+            this.loadLastSaveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.toolStripSeparator2,
@@ -208,10 +210,10 @@
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.reloadSrcMapBtn);
             this.panel4.Controls.Add(this.richTextBox1);
-            this.panel4.Controls.Add(this.checkBox1);
             this.panel4.Controls.Add(this.panel5);
-            this.panel4.Controls.Add(this.button1);
+            this.panel4.Controls.Add(this.loadSrcMapBtn);
             this.panel4.Controls.Add(this.chkBoxTestOptions);
             this.panel4.Controls.Add(this.btnRefreshResultImg);
             this.panel4.Controls.Add(this.btnMainThread);
@@ -227,26 +229,23 @@
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
             // 
+            // reloadSrcMapBtn
+            // 
+            this.reloadSrcMapBtn.Location = new System.Drawing.Point(3, 443);
+            this.reloadSrcMapBtn.Name = "reloadSrcMapBtn";
+            this.reloadSrcMapBtn.Size = new System.Drawing.Size(112, 23);
+            this.reloadSrcMapBtn.TabIndex = 26;
+            this.reloadSrcMapBtn.Text = "Reload source map";
+            this.reloadSrcMapBtn.UseVisualStyleBackColor = true;
+            this.reloadSrcMapBtn.Click += new System.EventHandler(this.button2_Click);
+            // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(112, 299);
+            this.richTextBox1.Location = new System.Drawing.Point(121, 299);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(179, 167);
+            this.richTextBox1.Size = new System.Drawing.Size(170, 167);
             this.richTextBox1.TabIndex = 25;
             this.richTextBox1.Text = "";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(11, 392);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(80, 17);
-            this.checkBox1.TabIndex = 24;
-            this.checkBox1.Text = "checkBox1";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // panel5
             // 
@@ -348,15 +347,15 @@
             this.maskedTextBox1.TabIndex = 21;
             this.maskedTextBox1.Leave += new System.EventHandler(this.maskedTextBox1_Leave);
             // 
-            // button1
+            // loadSrcMapBtn
             // 
-            this.button1.Location = new System.Drawing.Point(8, 415);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "loadImage";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.loadSrcMapBtn.Location = new System.Drawing.Point(3, 414);
+            this.loadSrcMapBtn.Name = "loadSrcMapBtn";
+            this.loadSrcMapBtn.Size = new System.Drawing.Size(98, 23);
+            this.loadSrcMapBtn.TabIndex = 14;
+            this.loadSrcMapBtn.Text = "Load source map";
+            this.loadSrcMapBtn.UseVisualStyleBackColor = true;
+            this.loadSrcMapBtn.Click += new System.EventHandler(this.button1_Click);
             // 
             // chkBoxTestOptions
             // 
@@ -371,6 +370,7 @@
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
             this.chkBoxTestOptions.Size = new System.Drawing.Size(290, 49);
             this.chkBoxTestOptions.TabIndex = 10;
+            this.chkBoxTestOptions.SelectedIndexChanged += new System.EventHandler(this.chkBoxTestOptions_SelectedIndexChanged);
             // 
             // btnRefreshResultImg
             // 
@@ -383,19 +383,18 @@
             // 
             // btnMainThread
             // 
-            this.btnMainThread.Location = new System.Drawing.Point(217, 149);
+            this.btnMainThread.Location = new System.Drawing.Point(8, 149);
             this.btnMainThread.Name = "btnMainThread";
             this.btnMainThread.Size = new System.Drawing.Size(75, 23);
             this.btnMainThread.TabIndex = 11;
             this.btnMainThread.Text = "MainThread";
             this.btnMainThread.UseVisualStyleBackColor = true;
-            this.btnMainThread.Click += new System.EventHandler(this.btnMainThread_Click);
             // 
             // btnStopR2V
             // 
-            this.btnStopR2V.Location = new System.Drawing.Point(11, 178);
+            this.btnStopR2V.Location = new System.Drawing.Point(112, 178);
             this.btnStopR2V.Name = "btnStopR2V";
-            this.btnStopR2V.Size = new System.Drawing.Size(75, 23);
+            this.btnStopR2V.Size = new System.Drawing.Size(99, 23);
             this.btnStopR2V.TabIndex = 15;
             this.btnStopR2V.Text = "Stop R2V";
             this.btnStopR2V.UseVisualStyleBackColor = true;
@@ -436,23 +435,21 @@
             // 
             // btnStartR2V
             // 
-            this.btnStartR2V.Location = new System.Drawing.Point(11, 149);
+            this.btnStartR2V.Location = new System.Drawing.Point(8, 178);
             this.btnStartR2V.Name = "btnStartR2V";
             this.btnStartR2V.Size = new System.Drawing.Size(75, 23);
             this.btnStartR2V.TabIndex = 14;
             this.btnStartR2V.Text = "Start R2V";
             this.btnStartR2V.UseVisualStyleBackColor = true;
-            this.btnStartR2V.Click += new System.EventHandler(this.btnStartR2V_Click_1);
             // 
             // btnSeparateThread
             // 
-            this.btnSeparateThread.Location = new System.Drawing.Point(192, 178);
+            this.btnSeparateThread.Location = new System.Drawing.Point(112, 149);
             this.btnSeparateThread.Name = "btnSeparateThread";
             this.btnSeparateThread.Size = new System.Drawing.Size(99, 23);
             this.btnSeparateThread.TabIndex = 13;
             this.btnSeparateThread.Text = "SeparateThread";
             this.btnSeparateThread.UseVisualStyleBackColor = true;
-            this.btnSeparateThread.Click += new System.EventHandler(this.btnSeparateThread_Click);
             // 
             // panel3
             // 
@@ -492,6 +489,7 @@
             // 
             // ScaleTrB
             // 
+            this.ScaleTrB.Enabled = false;
             this.ScaleTrB.Location = new System.Drawing.Point(120, 3);
             this.ScaleTrB.Minimum = 1;
             this.ScaleTrB.Name = "ScaleTrB";
@@ -604,6 +602,14 @@
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
+            // loadLastSaveToolStripMenuItem
+            // 
+            this.loadLastSaveToolStripMenuItem.Name = "loadLastSaveToolStripMenuItem";
+            this.loadLastSaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadLastSaveToolStripMenuItem.Text = "Load lastSave";
+            this.loadLastSaveToolStripMenuItem.Visible = false;
+            this.loadLastSaveToolStripMenuItem.Click += new System.EventHandler(this.loadLastSaveToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -618,7 +624,6 @@
             this.menuMain.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             this.gbThreadChoice.ResumeLayout(false);
@@ -657,7 +662,6 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -667,7 +671,7 @@
         private System.Windows.Forms.MaskedTextBox maskedTextBox3;
         private System.Windows.Forms.MaskedTextBox maskedTextBox2;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button loadSrcMapBtn;
         private System.Windows.Forms.CheckedListBox chkBoxTestOptions;
         private System.Windows.Forms.Button btnRefreshResultImg;
         private System.Windows.Forms.Button btnMainThread;
@@ -691,6 +695,8 @@
         private System.Windows.Forms.Panel sourcePanel;
         private System.Windows.Forms.PictureBox sourcePB;
         private System.Windows.Forms.SaveFileDialog saveDialog;
+        private System.Windows.Forms.Button reloadSrcMapBtn;
+        private System.Windows.Forms.ToolStripMenuItem loadLastSaveToolStripMenuItem;
     }
 }
 
