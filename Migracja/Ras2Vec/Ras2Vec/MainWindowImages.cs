@@ -75,8 +75,8 @@ namespace Ras2Vec
         {
             //srcImg = Image.FromFile("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp");
             //DrawScaledImage(float.Parse(textBox1.Text));
-            bmp = new Bitmap("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp"); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
+            sourceBmp = new Bitmap("C:\\Users\\mudia\\Desktop\\R2VImg\\t33.bmp"); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
 
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
             ZoomInBtn.Enabled = true;

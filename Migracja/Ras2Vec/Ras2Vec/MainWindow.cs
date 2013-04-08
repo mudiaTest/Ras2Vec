@@ -8,12 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Ras2Vec
 {
     public partial class MainWindow : Form
     {
-        Bitmap bmp;
+        Bitmap sourceBmp;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
@@ -176,7 +177,7 @@ namespace Ras2Vec
             int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), bmp);
+            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 
@@ -187,6 +188,7 @@ namespace Ras2Vec
 
         private void maskedTextBox1_DragLeave(object sender, EventArgs e)
         {
+
         }
 
         private void maskedTextBox1_Leave(object sender, EventArgs e)
@@ -258,6 +260,39 @@ namespace Ras2Vec
                 windowSettings.Save();
             else
                 saveAsToolStripMenuItem_Click(sender, e);
+        }
+
+        private void btnStartR2V_Click_1(object sender, EventArgs e)
+        {
+            Debug.Assert(sourceBmp != null, "Nie wgrano obrazu źródłowego.");
+            RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings{ sourceBmp = sourceBmp
+                                                                                        
+            };
+            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
+            if (rbMainThread.Checked)
+            {   
+                RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+            }
+            else if (rbSeparateThread.Checked)
+            {
+                RasterToVectorRunner.RunRasterToVectorSeparateThread();
+            }
+            else
+            {
+                Debug.Assert(false, "Oba: Main i Separate = false");
+            }
+        }
+
+        private void btnMainThread_Click(object sender, EventArgs e)
+        {
+            RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings();
+            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
+            RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+        }
+
+        private void btnSeparateThread_Click(object sender, EventArgs e)
+        {
+           RasterToVectorRunner. RunRasterToVectorSeparateThread();
         }
     }
 }
