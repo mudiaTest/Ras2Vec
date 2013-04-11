@@ -74,6 +74,7 @@ namespace Ras2Vec
         private float fgeoLeftUpY;
         private float fgeoRightDownX;
         private float fgeoRightDownY;*/
+        private Vector_Gen[][] vectorArray; //tablica z obektami wektorowymi
         RasterToVectorSettings settings;
 
         public void Init(RasterToVectorSettings aSettings)
