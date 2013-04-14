@@ -18,7 +18,7 @@ namespace Ras2Vec
         //odnośnik do grupy, która posiada dany obiekt vektorowy
         protected VectoredRectangleGroup parentVectorGroup{get; set;}
         //numer grupy (w liście grup), która posiada dany obiekt vektorowy
-        protected int parentVectorGroupId { get; set; }
+        public int parentVectorGroupId { get; set; }
 
         public Vector_Gen()
         {

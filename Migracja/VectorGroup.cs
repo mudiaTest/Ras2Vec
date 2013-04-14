@@ -364,30 +364,198 @@ namespace Ras2Vec
         }
 
         //buduje krawędź
-        public void MakeEdges( VectorRectangeGroup aEdgePxList, bool ablInnerBorder = false, int aOuterGroup = 0)
+        public void MakeEdges( VectorRectangeGroup aEdgePxList, bool aBlInnerBorder = false, int aOuterGroup = 0)
         {
-            var NextDirection = new Func<int, int>
-            (
-                aDirection => 
-                {   long dummy;
-                    aDirection++;
-                    return (int)Math.DivRem((long)aDirection, (long)4, out dummy);
-                }
-            );
- 
-            var CheckBottomPX = new Func<Vector_Rectangle, bool>
-            (
-                aStartEdgePoint => 
+            Func<int, int> NextDirection = delegate(int aDirection)
+            {
+                long dummy;
+                aDirection++;
+                return (int)Math.DivRem((long)aDirection, (long)4, out dummy);
+            };//<<NextDirection
+
+            Func<Vector_Rectangle, bool> CheckBottomPX = delegate(Vector_Rectangle aStartEdgePoint)
+            {
+                bool result = false;
+                if (aStartEdgePoint.p1.Y < SrcHeight() - 1)
                 {
-                    bool result = false;
-                    if (aStartEdgePoint.p1.Y < SrcHeight()-1)
-                    {
-                        Vector_Rectangle bottomVectorRectangle = GetVectorArr[aStartEdgePoint.p1.X, aStartEdgePoint.p1.Y+1];
-                        result = (bottomVectorRectangle != null) & (bottomVectorRectangle.vectGroupId = aStartEdgePoint.vectGroupId)
-                    }
-                    return result;
+                    Vector_Gen bottomVectorRectangle = GetVectorArr()[aStartEdgePoint.p1.X, aStartEdgePoint.p1.Y + 1];
+                    result = (bottomVectorRectangle != null) & (bottomVectorRectangle.parentVectorGroupId == aStartEdgePoint.parentVectorGroupId);
                 }
-            );
+                return result;
+            };//<<CheckBottomPX
+
+            Func<Vector_Rectangle, int, Vector_Rectangle> GetNextEdge = delegate(Vector_Rectangle aPrevEdge, ref int aArrDir)
+            {
+                Func<Vector_Rectangle, int, Vector_Rectangle> CheckNextEdge = delegate(Vector_Rectangle aPrevEdge2, int aArrDir)
+                {
+                    Func<Vector_Rectangle, Vector_Rectangle> CheckTop = delegate(Vector_Rectangle aPrevEdge3)
+                    {
+                        if (aPrevEdge3.p1.Y > 0)
+                        {
+                            Vector_Rectangle Result3 = GetVectObjArr[aPrevEdge3.p1.X, aPrevEdge3.p1.Y-1];
+                            if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                                (aBlInnerBorder & ( Result3.parentVectorGroupId != aOuterGroup))) 
+                                return Result3;
+                        }
+                        return null;         
+                    };//<<CheckTop
+
+                    Func<Vector_Rectangle, Vector_Rectangle> CheckRight = delegate(Vector_Rectangle aPrevEdge3)
+                    {
+                        if (aPrevEdge3.p1.X < srcWidth-1) 
+                        {
+                            Vector_Rectangle Result3 = VectObjArr[aPrevEdge3.p1.X+1, aPrevEdge3.p1.Y];
+                            if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                                (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
+                                return Result3;
+                        }
+                        return null;
+                    };//<<CheckRight
+
+                    Func<Vector_Rectangle, Vector_Rectangle> CheckBottom = delegate(Vector_Rectangle aPrevEdge3)
+                    {
+                        if (aPrevEdge3.p1.Y < srcHeight-1)
+                        {
+                            Vector_Rectangle Result3 = VectObjArr[aPrevEdge3.p1.X, aPrevEdge3.p1.Y+1];
+                            if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                                (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
+                                return Result3;
+                        }
+                        return null;
+                    };//<<CheckBottom
+
+                    Func<Vector_Rectangle, Vector_Rectangle> CheckLeft = delegate(Vector_Rectangle aPrevEdge3)
+                    {
+                        if (aPrevEdge3.p1.X > 0)
+                        {
+                            Vector_Rectangle Result3 = VectObjArr[aPrevEdge3.p1.X-1, aPrevEdge3.p1.Y];
+                            if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                                (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
+                                return Result3;
+                        }
+                        return null;
+                    };//<<CheckLeft
+
+                    Vector_Rectangle Result2;
+                    if (aArrDir == Cst.goTop)
+                        Result2 = CheckTop(aPrevEdge2);
+                    else if (aArrDir == Cst.goRight)
+                        Result2 = CheckRight(aPrevEdge2);
+                    else if (aArrDir == Cst.goBottom)
+                        Result2 = CheckBottom(aPrevEdge2);
+                    else if (aArrDir == Cst.goLeft)
+                        Result2 = CheckLeft(aPrevEdge2);
+                    else
+                    {
+                        Result2 = null;
+                        //Assert(False, 'checkNextEdge');
+                    };
+                };//<<CheckNextEdge
+
+                Vector_Rectangle Result;
+                int j = 0;
+                for (int i=0; i<4; i++)
+                {
+                    if (aArrDir + j == 4) 
+                    {
+                        j = -aArrDir;
+                        Result = CheckNextEdge(aPrevEdge, aArrDir+j);
+                        if (Result != null)
+                        {
+                            if (aArrDir + j == Cst.fromLeft)
+                                aArrDir = Cst.fromBottom;
+                            else if (aArrDir + j == Cst.fromBottom)
+                                aArrDir = Cst.fromRight;
+                            else if (aArrDir + j == Cst.fromTop)
+                                aArrDir = Cst.fromLeft;
+                            else if (aArrDir + j == Cst.fromRight)
+                                aArrDir = Cst.fromTop;
+                            break;
+                        };
+                        j++;
+                    };
+                    if ((Result != null) &
+                        //przeszliśmy z prawa na lewo
+                        (aArrDir == Cst.fromRight)) 
+                        GetColorArr[Result.p1.x, Result.p1.y]).borderEW = true;
+                };
+            };//<<GetNextEdge
+
+            Action MakeUsed = delegate()
+            {
+            if (aBlInnerBorder) 
+                for (int i=0; i<aEdgePxList.Count; i++) 
+                {
+                    Vector_Rectangle point = aEdgePxList[i];
+                    GetColorArr[point.p1.X, point.p1.Y-1].used = true;
+                };
+            };//<<MakeUsed
+
+            //var
+            //startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
+            //arrivDir: integer;
+            //dummyArr: TDynamicGeoPointArray;
+
+            
+            aEdgePxList.Clear;
+            //startEdgePoint to pierwszy punkt na liście, bo idziemy ol lewej strony
+            //w najwyższym wierszu
+            Vector_Rectangle startEdgePoint = rectList.Objects[0];
+            Vector_Rectangle prevEdgePoint = startEdgePoint;
+            int arrivDir = Cst.goRight; //zaczynamy od max lewego ponktu na górnej linji
+            //Każemy zacząć szukanie od prawej
+            Vector_Rectangle nextEdgePoint = null;
+            //1-pixelowy obiekt traktujemy inaczej
+            if (rectList.count != 1)
+            //kończymy jeśli trafiamy na początek, lub na 1-pixelowy obiekt
+            //while (nextEdgePoint != startEdgePoint) & (prevEdgePoint != nil) do
+            while (true) do
+            {
+                if (nextEdgePoint == startEdgePoint)
+                {
+                    if (CheckBottomPX(startEdgePoint) & (arrivDir == Cst.fromRight))
+                    {
+                        arrivDir = Cst.goBottom;
+                    };
+                    else
+                    {
+                        //arrivDir = -1;
+                        break;
+                    };
+                };
+                //try
+                nextEdgePoint = GetNextEdge(prevEdgePoint, arrivDir);
+                //powstanie gdy nie możemy oddać następnej krawędzi, ale wyjątkikem jest gdy jest to pojedynczy pixel
+                if ((nextEdgePoint == nil) & (aEdgePxList.Count != 0))
+                    Assert(false, 'Oddany edge jest nil (' + IntToStr(prevEdgePoint.p1.X) +
+                           ',' + IntToStr(prevEdgePoint.p1.Y) + '), liczba znalezionych kreawędzi:' +
+                           aEdgePxList.Count.ToString);
+
+                aEdgePxList.AddObject(aEdgePxList.NextKey, nextEdgePoint);
+                //MakeUsed(nextEdgePoint);
+                prevEdgePoint = nextEdgePoint;
+
+                //except
+                //  on E: Exception do
+                //    raise;
+                //end;
+
+            };
+            //dla obiektu 1-pixelowego
+            else
+            {
+                //dodajemy punkty graniczne do listy
+                aEdgePxList.AddObject(aEdgePxList.NextKey, startEdgePoint);
+                // MakeUsed(startEdgePoint);
+            };
+            List<GeoPoint> dummyArr = MakeVectorEdge(aEdgePxList, GetColorArr, true);
+            MakeUsed();
+            SetLength(dummyArr, 0);
+            //PxListToGeoList;
+            
         }
+
+
+            
     }
 }
