@@ -16,10 +16,12 @@ namespace Ras2Vec
     public partial class MainWindow : Form
     {
         Bitmap sourceBmp;
+        Bitmap destinationBmp;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
-        ImageCrooper p;
+        ImageCrooper sourceImageCropper;
+        VectorImageCrooper desinationImageCrooper;
         int horChange;
         int verChange;
         int mouseDownSourcePBLeft;
@@ -150,11 +152,12 @@ namespace Ras2Vec
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
             ScaleRefresh();
-            if (p != null)
+            if (sourceImageCropper != null)
             {
-                p.centerX = aSettings.centerX;
-                p.centerY = aSettings.centerY;
+                sourceImageCropper.centerX = aSettings.centerX;
+                sourceImageCropper.centerY = aSettings.centerY;
                 DrawCroppedScaledImage(windowSettings.dpScale);
+                //Dodać kod, który odczytaną mapę odpoweirdnio ustawi i wyświetli przy pomocy destinationImageCropper 
             }
             SetScaleControlEnable(true);
 
@@ -208,7 +211,8 @@ namespace Ras2Vec
             int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            sourceImageCropper = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), destinationBmp);
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 

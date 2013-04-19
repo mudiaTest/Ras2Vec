@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Ras2Vec
 {
-    public class ImageCrooper
+    class Crooper
     {
         public Size panelSize;
         private int fCenterX;
@@ -35,7 +35,7 @@ namespace Ras2Vec
         public int left;
         public int top;
 
-        public ImageCrooper(Size aPanelSize,  Bitmap aSrcBmp )
+        public Crooper(Size aPanelSize,  Bitmap aSrcBmp )
         {
             panelSize = aPanelSize;
             srcBmp = aSrcBmp;
@@ -63,8 +63,8 @@ namespace Ras2Vec
             return GetTopAbsoluteOryg(aScale) + (int)Math.Ceiling(3 * panelSize.Height / aScale);
         }
 
-
-        public Bitmap GetCroppedImage(float aScale)
+        //ustala jaki wycinek oryginalnego obrazu ma zostać pokazany
+        private Rectangle GetSourceRectangle(float aScale)
         {
             //aby x,y nie były mniejsze niż punkt (0,0) - ograniczenie o lewej strony. 
             //Od prawej strony nie wyjdą poza ramy obrazu, bo x zawsze będzie < centerX, 
@@ -73,38 +73,50 @@ namespace Ras2Vec
             int y = Math.Max(0, GetTopAbsoluteOryg(aScale));
 
             //ustalanie rozmiaru, tak aby dla mocnego przesuniącia wycinka w lewo pobrał tylko część wycinka
-            int rectWidth =  Math.Min(srcBmp.Width, GetRightAbsoluteOryg(aScale)) - Math.Max(GetLeftAbsoluteOryg(aScale), x);
+            int rectWidth = Math.Min(srcBmp.Width, GetRightAbsoluteOryg(aScale)) - Math.Max(GetLeftAbsoluteOryg(aScale), x);
             int rectHeight = Math.Min(srcBmp.Height, GetBottomAbsoluteOryg(aScale)) - Math.Max(GetTopAbsoluteOryg(aScale), y);
 
-            Rectangle rect = new Rectangle(x, y, rectWidth, rectHeight);
-            Bitmap result;
+            return new Rectangle(x, y, rectWidth, rectHeight);
+        }
+
+        //ustala jak ma być położony oryginalny wycinek w nowopokazywanym fragmencie. Możliwe jest, że wycinek będzie 
+        //przesunięty pokazując wolną przestrzeń na jednym z brzegów fragmentu.
+        private Rectangle GetDestinationRectangle(float aScale, Rectangle srcRectangle)
+        {
             int resultRectX;
             int resultRectY;
             //jeśli wycinek jest mniejszy i ma być odsunięty od boku obrazu (sam wycinek był przyciśnięty do boku, więc 
             //prawdopodobnie postła wolna przestrzeń po lewej stronie do wypełnienia. Prawa soraona "wypełni" 
             //się automatycznie, bo mając przerwę z lewej strony i wklejony obrazek, przerwa po prawej stworzy się samoczynnie)
-            if ((rectWidth * aScale < 3 * panelSize.Width) & (x == 0))
+            if ((srcRectangle.Width * aScale < 3 * panelSize.Width) & (srcRectangle.X == 0))
                 resultRectX = (int)Math.Ceiling(-GetLeftAbsoluteOryg(aScale) * aScale);//GetAbsolute... oddaje wartości dla oryginalnej wielkości/skala, a my 
-                                                                                       //obliczamy teraz przesunięcie na rozciągniętym obrazie, więc trzeba 
-                                                                                       //pomnożyć to przez skalę
+            //obliczamy teraz przesunięcie na rozciągniętym obrazie, więc trzeba 
+            //pomnożyć to przez skalę
             else
                 resultRectX = 0;
-            if ((rectHeight * aScale < 3 * panelSize.Height) & (y == 0))
+            if ((srcRectangle.Height * aScale < 3 * panelSize.Height) & (srcRectangle.Y == 0))
                 resultRectY = (int)Math.Ceiling(-GetTopAbsoluteOryg(aScale) * aScale);
             else
                 resultRectY = 0;
 
-            Rectangle resultRect = new Rectangle(resultRectX,
-                                                    resultRectY,
-                                                    (int)Math.Ceiling(rectWidth * aScale),
-                                                    (int)Math.Ceiling( rectHeight * aScale)
-                                                    );
+            return new Rectangle(resultRectX,
+                                 resultRectY,
+                                 (int)Math.Ceiling(srcRectangle.Width * aScale),
+                                 (int)Math.Ceiling(srcRectangle.Height * aScale)
+                                 );
+        }
+
+        public Bitmap GetCroppedImage(float aScale)
+        {
+            Rectangle rect = GetSourceRectangle(aScale);
+            Bitmap result;
+            Rectangle resultRect = GetDestinationRectangle(aScale, rect);
 
             //finalna bitmapa o odpowiednim rozmiarze
             result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
             //ustawia, że result będzie płutnem graphics
             Graphics graphics = Graphics.FromImage(result);
-            //ustawia sposób zmiękczania przy powiększaniy - NN da brak zmiękczania
+            //ustawia sposób zmiękczania przy powiększaniu - NN da brak zmiękczania
             graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             //przepisze źródło na cel odpowiednio skalująć. W tym przypadku źódło i cel to result
             //nowy obszar jest większy od startego więc nastąpi rozciągnięcie pixeli zgodnie z InterpolationMode
@@ -114,6 +126,22 @@ namespace Ras2Vec
                                 System.Drawing.GraphicsUnit.Pixel);
 
             return result;
+        }
+    }
+
+    class ImageCrooper: Crooper
+    {
+        public ImageCrooper(Size aPanelSize,  Bitmap aSrcBmp)
+            : base(aPanelSize, aSrcBmp)
+        {
+        }
+    }
+
+    class VectorImageCrooper : Crooper
+    {
+        public VectorImageCrooper(Size aPanelSize, Bitmap aSrcBmp)
+            : base(aPanelSize, aSrcBmp)
+        {
         }
     }
 }

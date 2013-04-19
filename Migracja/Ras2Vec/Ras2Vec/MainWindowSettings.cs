@@ -135,7 +135,7 @@ namespace Ras2Vec
         }
     }
 
-    public class MainWindowRegister
+    class MainWindowRegister
     {
         public void SetLastSaveInfo(MainWindowSettings settings)
         {

@@ -14,11 +14,11 @@ namespace Ras2Vec
         //lista wierzchołków obeiktu
         protected Dictionary<int, Point> points;
         //kolor wypełniający obiekt
-        protected Color color{get; set;}
+        public Color color{get; set;}
         //odnośnik do grupy, która posiada dany obiekt vektorowy
-        protected VectorGroup parentVectorGroup{get; set;}
+        public VectoredRectangleGroup parentVectorGroup{get; set;}
         //numer grupy (w liście grup), która posiada dany obiekt vektorowy
-        protected int parentVectorGroupId { get; set; }
+        public int parentVectorGroupId { get; set; }
 
         public Vector_Gen()
         {
@@ -26,9 +26,9 @@ namespace Ras2Vec
         }
 
         //przepisanie (dołączenie) obiektów z innej grupy do tej, która posiada obiekt self
-        protected void DopiszGrupe(VectorGroup aGroup)
+        public void DopiszGrupe(VectoredRectangleGroup aGroup)
         {
-            foreach(KeyValuePair<int, Vector_Gen> vectObj in aGroup)
+            foreach(KeyValuePair<int, Vector_Rectangle> vectObj in aGroup)
             {
                 vectObj.Value.parentVectorGroup = parentVectorGroup;
                 vectObj.Value.parentVectorGroupId = parentVectorGroupId;
@@ -36,7 +36,7 @@ namespace Ras2Vec
             }
         }
 
-        protected Point GetP(int aIdx)
+        public Point GetP(int aIdx)
         {
             return points.ElementAt(aIdx).Value;
         }

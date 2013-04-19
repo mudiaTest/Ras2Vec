@@ -31,19 +31,23 @@ namespace Ras2Vec
                 //centrum oglądanego obszaru przesówamy o przesunięcię myszą z uwzględnieniem sklai
                 case MovedPicture.source:
                     {
-                        p.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
-                        p.centerY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
+                        sourceImageCropper.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
+                        sourceImageCropper.centerY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
+                        desinationImageCrooper.centerX = sourceImageCropper.centerX;
+                        desinationImageCrooper.centerY = sourceImageCropper.centerY;
                         break;
                     }
                 case MovedPicture.desination:
                     {
-                        p.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
-                        p.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
+                        desinationImageCrooper.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
+                        desinationImageCrooper.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
+                        sourceImageCropper.centerX = desinationImageCrooper.centerX;
+                        sourceImageCropper.centerY = desinationImageCrooper.centerY;
                         break;
                     }
             }
-            windowSettings.centerX = p.centerX;
-            windowSettings.centerY = p.centerY;
+            windowSettings.centerX = sourceImageCropper.centerX;
+            windowSettings.centerY = sourceImageCropper.centerY;
             DrawCroppedScaledImage(dpShift);
             blMouseInMoveMode = false;
         }
@@ -80,10 +84,14 @@ namespace Ras2Vec
             ScaleTrB.Enabled = aEnabled;
         }
 
+        //metoda po wczytaniu pliku save inicjalizuje obraz źródłowy i czyści docelowy. 
+        //Buduje na nowo też obiekty sourceImageCropper i destinationImageCropper
         private void PrepareSourceImage(String aPath)
         {
-            sourceBmp = new Bitmap(aPath); //"C:\\Users\\mudia\\Desktop\\kop1b.jpg
-            p = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            sourceBmp = new Bitmap(aPath);
+            destinationBmp = null;
+            sourceImageCropper = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), sourceBmp);
         }
 
         private bool LoadImage(String aPath)
@@ -118,17 +126,21 @@ namespace Ras2Vec
                 }
                 
             }*/
-            Bitmap croppedBmp = p.GetCroppedImage(aDpScale);
+            Bitmap croppedSrcBmp = sourceImageCropper.GetCroppedImage(aDpScale);
+
+            //tymczasowo przypisuję ten sam obraz
+            //Bitmap croppedDstBmp = croppedSrcBmp;
+            Bitmap croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale);
             
             /*int scaledShiftX = sourcePanel.Width;
             int scaledShiftY = sourcePanel.Height;*/
-            int scaledShiftX = (int)Math.Round(p.centerX * aDpScale);
-            int scaledShiftY = (int)Math.Round(p.centerY * aDpScale);
+            int scaledShiftX = (int)Math.Round(sourceImageCropper.centerX * aDpScale);
+            int scaledShiftY = (int)Math.Round(sourceImageCropper.centerY * aDpScale);
 
-            UpdateInfoBox("bmp: " + croppedBmp.Width.ToString() + " x " + croppedBmp.Height.ToString());
-            sourcePB.Height = croppedBmp.Height;
-            sourcePB.Width = croppedBmp.Width;
-            sourcePB.Image = croppedBmp;
+            UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
+            sourcePB.Height = croppedSrcBmp.Height;
+            sourcePB.Width = croppedSrcBmp.Width;
+            sourcePB.Image = croppedSrcBmp;
             UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
                           "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
             /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
@@ -137,9 +149,10 @@ namespace Ras2Vec
             sourcePB.Top = -sourcePanel.Height;
             UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
-            destinationPB.Height = croppedBmp.Height;
-            destinationPB.Width = croppedBmp.Width;
-            destinationPB.Image = croppedBmp;
+
+            destinationPB.Height = croppedDstBmp.Height;
+            destinationPB.Width = croppedDstBmp.Width;
+            destinationPB.Image = croppedDstBmp;
             /*destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
             destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
             destinationPB.Left = -destinationPanel.Width;

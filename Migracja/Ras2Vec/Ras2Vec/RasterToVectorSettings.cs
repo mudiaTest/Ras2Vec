@@ -3,26 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Ras2Vec
 {
-    public class RasterToVectorSettings
+    class RasterToVectorSettings
     {
         //źródłowa bitmapa rastrowa
         private Bitmap fsourceBmp;
-        public Bitmap sourceBmp{get{return fsourceBmp;} 
-                                set{fsourceBmp = value;
-                                    fsrcWidth = fsourceBmp.Width;
-                                    fsrcHeight = fsourceBmp.Height;
-                                }
+        public Bitmap sourceBmp
+        {
+            get { return fsourceBmp; }
+            set
+            {
+                fsourceBmp = value;
+                fsrcWidth = fsourceBmp.Width;
+                fsrcHeight = fsourceBmp.Height;
+            }
         }
         //szerokość i wysokość żródłowego obrazu (rastra) w px - upraszczają, bo nie trzeba odwoływać się przez sourceBmp
         private int fsrcWidth;
         private int fsrcHeight;
-        public int srcWidth { get{return fsrcWidth;} }
-        public int srcHeight { get{return fsrcHeight;} }
+        public int srcWidth { get { return fsrcWidth; } }
+        public int srcHeight { get { return fsrcHeight; } }
 
         //wartości współrzędnych w rogach mapy w stopniach z cześcią dziesiętną
         public float geoLeftUpX { get; set; }
@@ -53,36 +57,5 @@ namespace Ras2Vec
             xGeoPX = (geoRightDownX - geoLeftUpX) / (srcWidth + 1);
             yGeoPX = (geoLeftUpY - geoRightDownY) / (srcHeight + 1);
         }
-    }
-
-    public class RasterToVectorRunner
-    {
-        public static void RunRasterToVectorMainThread(RasterToVectorSettings aSettings)
-        {
-            RasterToVectorFactory singleThreadFactory = new RasterToVectorFactory();
-            singleThreadFactory.Init(aSettings);
-        }
-
-        public static void RunRasterToVectorSeparateThread()
-        {
-            RasterToVectorFactory separateThreadFactory = new RasterToVectorFactory();
-        }
-    }
-    class RasterToVectorFactory
-    {
-        /*private float fgeoLeftUpX;
-        private float fgeoLeftUpY;
-        private float fgeoRightDownX;
-        private float fgeoRightDownY;*/
-        private Vector_Gen[][] vectorArray; //tablica z obektami wektorowymi
-        RasterToVectorSettings settings;
-
-        public void Init(RasterToVectorSettings aSettings)
-        {
-            settings = aSettings;
-            settings.CalculateGeoPx();
-        }
-
-        
     }
 }
