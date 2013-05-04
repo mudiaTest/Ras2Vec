@@ -34,7 +34,6 @@
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadLastSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -81,6 +80,7 @@
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.loadLastSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -128,52 +128,44 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.newToolStripMenuItem.Text = "New";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(142, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(123, 6);
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.loadToolStripMenuItem.Text = "Load";
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
-            // 
-            // loadLastSaveToolStripMenuItem
-            // 
-            this.loadLastSaveToolStripMenuItem.Name = "loadLastSaveToolStripMenuItem";
-            this.loadLastSaveToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
-            this.loadLastSaveToolStripMenuItem.Text = "Load lastSave";
-            this.loadLastSaveToolStripMenuItem.Visible = false;
-            this.loadLastSaveToolStripMenuItem.Click += new System.EventHandler(this.loadLastSaveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.saveAsToolStripMenuItem.Text = "Save As ...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(142, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(123, 6);
             // 
             // exitToolStripMenuItem1
             // 
             this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
-            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
+            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(126, 22);
             this.exitToolStripMenuItem1.Text = "Exit";
             this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
             // 
@@ -318,7 +310,7 @@
             this.maskedTextBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.maskedTextBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maskedTextBox4.Location = new System.Drawing.Point(165, 83);
-            this.maskedTextBox4.Mask = "00.00.00.00";
+            this.maskedTextBox4.Mask = "00,00,00,00";
             this.maskedTextBox4.Name = "maskedTextBox4";
             this.maskedTextBox4.Size = new System.Drawing.Size(68, 20);
             this.maskedTextBox4.TabIndex = 24;
@@ -329,7 +321,7 @@
             this.maskedTextBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.maskedTextBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maskedTextBox3.Location = new System.Drawing.Point(165, 57);
-            this.maskedTextBox3.Mask = "00.00.00.00";
+            this.maskedTextBox3.Mask = "00,00,00,00";
             this.maskedTextBox3.Name = "maskedTextBox3";
             this.maskedTextBox3.Size = new System.Drawing.Size(68, 20);
             this.maskedTextBox3.TabIndex = 23;
@@ -339,7 +331,7 @@
             // 
             this.maskedTextBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maskedTextBox2.Location = new System.Drawing.Point(15, 29);
-            this.maskedTextBox2.Mask = "00.00.00.00";
+            this.maskedTextBox2.Mask = "00,00,00,00";
             this.maskedTextBox2.Name = "maskedTextBox2";
             this.maskedTextBox2.Size = new System.Drawing.Size(68, 20);
             this.maskedTextBox2.TabIndex = 22;
@@ -349,7 +341,7 @@
             // 
             this.maskedTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.maskedTextBox1.Location = new System.Drawing.Point(15, 3);
-            this.maskedTextBox1.Mask = "00.00.00.00";
+            this.maskedTextBox1.Mask = "00,00,00,00";
             this.maskedTextBox1.Name = "maskedTextBox1";
             this.maskedTextBox1.Size = new System.Drawing.Size(68, 20);
             this.maskedTextBox1.TabIndex = 21;
@@ -397,7 +389,6 @@
             this.btnMainThread.TabIndex = 11;
             this.btnMainThread.Text = "MainThread";
             this.btnMainThread.UseVisualStyleBackColor = true;
-            this.btnMainThread.Click += new System.EventHandler(this.btnMainThread_Click);
             // 
             // btnStopR2V
             // 
@@ -407,7 +398,6 @@
             this.btnStopR2V.TabIndex = 15;
             this.btnStopR2V.Text = "Stop R2V";
             this.btnStopR2V.UseVisualStyleBackColor = true;
-            this.btnStopR2V.Click += new System.EventHandler(this.btnStopR2V_Click);
             // 
             // gbThreadChoice
             // 
@@ -451,7 +441,6 @@
             this.btnStartR2V.TabIndex = 14;
             this.btnStartR2V.Text = "Start R2V";
             this.btnStartR2V.UseVisualStyleBackColor = true;
-            this.btnStartR2V.Click += new System.EventHandler(this.btnStartR2V_Click);
             // 
             // btnSeparateThread
             // 
@@ -461,7 +450,6 @@
             this.btnSeparateThread.TabIndex = 13;
             this.btnSeparateThread.Text = "SeparateThread";
             this.btnSeparateThread.UseVisualStyleBackColor = true;
-            this.btnSeparateThread.Click += new System.EventHandler(this.btnSeparateThread_Click);
             // 
             // panel3
             // 
@@ -613,6 +601,14 @@
             this.sourcePB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
+            // 
+            // loadLastSaveToolStripMenuItem
+            // 
+            this.loadLastSaveToolStripMenuItem.Name = "loadLastSaveToolStripMenuItem";
+            this.loadLastSaveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.loadLastSaveToolStripMenuItem.Text = "Load lastSave";
+            this.loadLastSaveToolStripMenuItem.Visible = false;
+            this.loadLastSaveToolStripMenuItem.Click += new System.EventHandler(this.loadLastSaveToolStripMenuItem_Click);
             // 
             // MainWindow
             // 

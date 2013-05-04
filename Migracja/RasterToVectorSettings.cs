@@ -45,18 +45,15 @@ namespace Ras2Vec
             geoRightDownX = DecodeGeoStr(stRightDownX);
             geoRightDownY = DecodeGeoStr(stRightDownY);
         }
-
         private float DecodeGeoStr(string aGeoPoint)
         {
             Debug.Assert(aGeoPoint != "", "aGeoPoint jest pusty");
             String[] tmp = aGeoPoint.Split(',');
             return float.Parse(tmp[0]) + float.Parse(tmp[1]) / 60 + float.Parse(tmp[2]) / 3600 + float.Parse(tmp[3]) / 360000;
         }
-
-        //Oblicze ile stopni zawiera jeden PX
         public void CalculateGeoPx()
         {
-            Debug.Assert(srcWidth > 0 || srcHeight > 0, "Szorokość lub wysokość obrazu żródłowgo jest zerowa: " + srcWidth.ToString() + "," + srcHeight.ToString());
+            Debug.Assert(srcWidth <= 0 | srcHeight <= 0, "Szorokość lub wysokość obrazu żródłowgo jest zerowa: " + srcWidth.ToString() + "," + srcHeight.ToString());
             xGeoPX = (geoRightDownX - geoLeftUpX) / (srcWidth + 1);
             yGeoPX = (geoLeftUpY - geoRightDownY) / (srcHeight + 1);
         }

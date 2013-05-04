@@ -300,12 +300,8 @@ namespace Ras2Vec
             //P1 i P2 będą takie same, bo aPxPoint reprezentuje pojedynczy pixel, więc wartośći x i y możemy wziąć z p1
             return new GeoPoint(aPxPoint.p1.X, aPxPoint.p1.Y);
         }
-
-        public VectoredRectangleGroup()
-        {
-            edgeList = new VectorRectangeGroup();
-            innerEdgesList = new Dictionary<int, VectorRectangeGroup>();
-        }
+      
+        //public VectoredRectangleGroup();
 
         //tworzy tablicę punktów z ponktów zawartych w edgePxList
         public List<GeoPoint> MakeVectorEdge(VectorRectangeGroup aEdgePxList,

@@ -25,7 +25,7 @@ namespace Ras2Vec
             if (aStartEdgePoint.p1.Y < SrcHeight() - 1)
             {
                 Vector_Gen bottomVectorRectangle = GetVectorArr()[aStartEdgePoint.p1.X][aStartEdgePoint.p1.Y + 1];
-                result = (bottomVectorRectangle != null) && (bottomVectorRectangle.parentVectorGroupId == aStartEdgePoint.parentVectorGroupId);
+                result = (bottomVectorRectangle != null) & (bottomVectorRectangle.parentVectorGroupId == aStartEdgePoint.parentVectorGroupId);
             }
             return result;
         }
@@ -35,8 +35,8 @@ namespace Ras2Vec
             if (aPrevEdge3.p1.Y > 0)
             {
                 Vector_Rectangle Result3 = GetVectorArr()[aPrevEdge3.p1.X][aPrevEdge3.p1.Y - 1];
-                if ((!aBlInnerBorder && (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) ||
-                    (aBlInnerBorder && (Result3.parentVectorGroupId != aOuterGroup)))
+                if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                    (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
                     return Result3;
             }
             return null;
@@ -47,8 +47,8 @@ namespace Ras2Vec
             if (aPrevEdge3.p1.X < SrcWidth() - 1)
             {
                 Vector_Rectangle Result3 = GetVectorArr()[aPrevEdge3.p1.X + 1][aPrevEdge3.p1.Y];
-                if ((!aBlInnerBorder && (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) ||
-                    (aBlInnerBorder && (Result3.parentVectorGroupId != aOuterGroup)))
+                if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                    (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
                     return Result3;
             }
             return null;
@@ -59,8 +59,8 @@ namespace Ras2Vec
             if (aPrevEdge3.p1.Y < SrcHeight() - 1)
             {
                 Vector_Rectangle Result3 = GetVectorArr()[aPrevEdge3.p1.X][aPrevEdge3.p1.Y + 1];
-                if ((!aBlInnerBorder && (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) ||
-                    (aBlInnerBorder && (Result3.parentVectorGroupId != aOuterGroup)))
+                if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                    (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
                     return Result3;
             }
             return null;
@@ -71,8 +71,8 @@ namespace Ras2Vec
             if (aPrevEdge3.p1.X > 0)
             {
                 Vector_Rectangle Result3 = GetVectorArr()[aPrevEdge3.p1.X - 1][aPrevEdge3.p1.Y];
-                if ((!aBlInnerBorder && (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) ||
-                    (aBlInnerBorder && (Result3.parentVectorGroupId != aOuterGroup)))
+                if ((!aBlInnerBorder & (aPrevEdge3.parentVectorGroupId == Result3.parentVectorGroupId)) |
+                    (aBlInnerBorder & (Result3.parentVectorGroupId != aOuterGroup)))
                     return Result3;
             }
             return null;
@@ -85,26 +85,28 @@ namespace Ras2Vec
             for (int i = 0; i < 4; i++)
             {
                 if (aArrDir + j == 4)
-                    j = -aArrDir;
-                Result = CheckNextEdge(aPrevEdge, aArrDir + j, aBlInnerBorder, aOuterGroup);
-                if (Result != null)
                 {
-                    if (aArrDir + j == Cst.fromLeft)
-                        aArrDir = Cst.fromBottom;
-                    else if (aArrDir + j == Cst.fromBottom)
-                        aArrDir = Cst.fromRight;
-                    else if (aArrDir + j == Cst.fromTop)
-                        aArrDir = Cst.fromLeft;
-                    else if (aArrDir + j == Cst.fromRight)
-                        aArrDir = Cst.fromTop;
-                    break;
+                    j = -aArrDir;
+                    Result = CheckNextEdge(aPrevEdge, aArrDir + j, aBlInnerBorder, aOuterGroup);
+                    if (Result != null)
+                    {
+                        if (aArrDir + j == Cst.fromLeft)
+                            aArrDir = Cst.fromBottom;
+                        else if (aArrDir + j == Cst.fromBottom)
+                            aArrDir = Cst.fromRight;
+                        else if (aArrDir + j == Cst.fromTop)
+                            aArrDir = Cst.fromLeft;
+                        else if (aArrDir + j == Cst.fromRight)
+                            aArrDir = Cst.fromTop;
+                        break;
+                    };
+                    j++;
                 };
-                j++;
+                if ((Result != null) &
+                    //przeszliśmy z prawa na lewo
+                    (aArrDir == Cst.fromRight))
+                    GetColorArr()[Result.p1.X][Result.p1.Y].borderEW = true;
             };
-            if ((Result != null) &&
-                //przeszliśmy z prawa na lewo
-                (aArrDir == Cst.fromRight))
-                GetColorArr()[Result.p1.X][Result.p1.Y].borderEW = true;
             return Result;
         }
 
@@ -114,8 +116,7 @@ namespace Ras2Vec
                 for (int i = 0; i < aEdgePxList.Count; i++)
                 {
                     Vector_Rectangle point = aEdgePxList[i];
-                    if (point.p1.Y >= 1)
-                        GetColorArr()[point.p1.X][point.p1.Y - 1].used = true;
+                    GetColorArr()[point.p1.X][point.p1.Y - 1].used = true;
                 };
         }
 
@@ -159,12 +160,12 @@ namespace Ras2Vec
             //1-pixelowy obiekt traktujemy inaczej
             if (Count != 1)
             //kończymy jeśli trafiamy na początek, lub na 1-pixelowy obiekt
-            while ((nextEdgePoint != startEdgePoint) && (prevEdgePoint != null))
+            while ((nextEdgePoint != startEdgePoint) & (prevEdgePoint != null))
            // while (true) do
             {
                 if (nextEdgePoint == startEdgePoint)
                 {
-                    if (CheckBottomPX(startEdgePoint) && (arrivDir == Cst.fromRight))
+                    if (CheckBottomPX(startEdgePoint) & (arrivDir == Cst.fromRight))
                     {
                         arrivDir = Cst.goBottom;
                     }
@@ -177,7 +178,7 @@ namespace Ras2Vec
                 //try
                 nextEdgePoint = GetNextEdge(prevEdgePoint, ref arrivDir, aBlInnerBorder, aOuterGroup);
                 //powstanie gdy nie możemy oddać następnej krawędzi, ale wyjątkikem jest gdy jest to pojedynczy pixel
-                if ((nextEdgePoint == null) && (aEdgePxList.Count != 0))
+                if ((nextEdgePoint == null) & (aEdgePxList.Count != 0))
                     Debug.Assert(false, "Oddany edge jest nil (" + prevEdgePoint.p1.X.ToString() +
                            "," + prevEdgePoint.p1.Y.ToString() + "), liczba znalezionych kreawędzi:" +
                            aEdgePxList.Count.ToString());

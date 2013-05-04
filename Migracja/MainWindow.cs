@@ -42,8 +42,6 @@ namespace Ras2Vec
             windowSettings = new MainWindowSettings();
             windowSettings.dpScale = 1;
             ScaleRefresh();
-            //tymczasowo
-            LoadLastSave();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -338,24 +336,13 @@ namespace Ras2Vec
         private void btnMainThread_Click(object sender, EventArgs e)
         {
             RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings();
-            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, 
-                                                  windowSettings.leftYCoord, 
-                                                  windowSettings.rightXCoord, 
-                                                  windowSettings.rightYCoord);
-            rasterToVectorSettings.sourceBmp = sourceBmp;
-            rasterToVectorSettings.CalculateGeoPx();
-            
+            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
             RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
         {
            RasterToVectorRunner. RunRasterToVectorSeparateThread();
-        }
-
-        private void btnStopR2V_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

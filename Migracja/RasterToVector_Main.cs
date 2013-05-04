@@ -12,8 +12,7 @@ namespace Ras2Vec
     {
         public static void RunRasterToVectorMainThread(RasterToVectorSettings aSettings)
         {
-            MapFactory singleThreadFactory = new MapFactory(aSettings);
-            singleThreadFactory.PrzygotujMapFactory();
+            MapFactory singleThreadFactory = new MapFactory();
             singleThreadFactory.GroupRect();
             singleThreadFactory.FillColorArr();
             singleThreadFactory.MakeEdgesForGroups();

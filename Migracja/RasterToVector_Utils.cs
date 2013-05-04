@@ -72,20 +72,20 @@ namespace Ras2Vec
     class ColorPx
     {
         public int color{get;set;}
-        public int? colorN {get;set;}
-        public int? colorS {get;set;}
-        public int? colorW {get;set;}
-        public int? colorE {get;set;}
+        public int colorN {get;set;}
+        public int colorS {get;set;}
+        public int colorW {get;set;}
+        public int colorE {get;set;}
         public int group  {get;set;}
-        public int? groupN {get;set;}
-        public int? groupS {get;set;}
-        public int? groupW {get;set;}
-        public int? groupE {get;set;}
+        public int groupN {get;set;}
+        public int groupS {get;set;}
+        public int groupW {get;set;}
+        public int groupE {get;set;}
         public bool borderNS {get;set;}
         public bool borderSN {get;set;}
         public bool borderEW {get;set;}
         public bool borderWE {get;set;}
-        public bool candidate {get;set;}
+        public bool canidate {get;set;}
         public bool used {get;set;}
     }
 }

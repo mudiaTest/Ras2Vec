@@ -88,13 +88,13 @@ namespace Ras2Vec
             //jeśli wycinek jest mniejszy i ma być odsunięty od boku obrazu (sam wycinek był przyciśnięty do boku, więc 
             //prawdopodobnie postła wolna przestrzeń po lewej stronie do wypełnienia. Prawa soraona "wypełni" 
             //się automatycznie, bo mając przerwę z lewej strony i wklejony obrazek, przerwa po prawej stworzy się samoczynnie)
-            if ((srcRectangle.Width * aScale < 3 * panelSize.Width) && (srcRectangle.X == 0))
+            if ((srcRectangle.Width * aScale < 3 * panelSize.Width) & (srcRectangle.X == 0))
                 resultRectX = (int)Math.Ceiling(-GetLeftAbsoluteOryg(aScale) * aScale);//GetAbsolute... oddaje wartości dla oryginalnej wielkości/skala, a my 
             //obliczamy teraz przesunięcie na rozciągniętym obrazie, więc trzeba 
             //pomnożyć to przez skalę
             else
                 resultRectX = 0;
-            if ((srcRectangle.Height * aScale < 3 * panelSize.Height) && (srcRectangle.Y == 0))
+            if ((srcRectangle.Height * aScale < 3 * panelSize.Height) & (srcRectangle.Y == 0))
                 resultRectY = (int)Math.Ceiling(-GetTopAbsoluteOryg(aScale) * aScale);
             else
                 resultRectY = 0;

@@ -35,7 +35,7 @@ namespace Ras2Vec
             int colorGroupListIdx;
             ColorGroupList colorGroupList;
 
-            if ((aObj2.parentVectorGroup == null) || (aObj1.parentVectorGroup.lpGroup < aObj2.parentVectorGroup.lpGroup)) 
+            if ((aObj2.parentVectorGroup == null) | (aObj1.parentVectorGroup.lpGroup < aObj2.parentVectorGroup.lpGroup)) 
             {
                 obj1 = aObj1;
                 obj2 = aObj2;
@@ -47,7 +47,7 @@ namespace Ras2Vec
             };
 
             //jeśli sąsiad jest niezintegrowany i ma taki sam kolor
-            if ((obj2.parentVectorGroup == null) && (obj2.color == obj1.color)) 
+            if ((obj2.parentVectorGroup == null) & (obj2.color == obj1.color)) 
             //dodajemy do grupy obj na którym jesteśmy
             {
                 obj2.parentVectorGroup = obj1.parentVectorGroup;
@@ -56,7 +56,7 @@ namespace Ras2Vec
                 obj1.parentVectorGroup.Add(obj1.parentVectorGroup.Count, obj2);
             //jeśli sąsiad jest ma grupę, ale ta grupa ma takisam kolor, to
             }
-            else if ((obj2.parentVectorGroup != obj1.parentVectorGroup) && (obj2.color == obj1.color)) 
+            else if ((obj2.parentVectorGroup != obj1.parentVectorGroup) & (obj2.color == obj1.color)) 
             {
                 //jeśli nasza grupa jest liczniejsza, to dodajemy grupę sąsiada do naszej
                 if (obj1.parentVectorGroup.Count > obj2.parentVectorGroup.Count) 
