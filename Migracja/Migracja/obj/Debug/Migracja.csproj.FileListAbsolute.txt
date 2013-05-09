@@ -1,0 +1,9 @@
+D:\Praca\Ras2Vec\Migracja\Migracja\bin\Debug\Migracja.exe.config
+D:\Praca\Ras2Vec\Migracja\Migracja\bin\Debug\Migracja.exe
+D:\Praca\Ras2Vec\Migracja\Migracja\bin\Debug\Migracja.pdb
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.csprojResolveAssemblyReference.cache
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.Properties.Resources.resources
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.csproj.GenerateResource.Cache
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.exe
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.pdb
+D:\Praca\Ras2Vec\Migracja\Migracja\obj\Debug\Migracja.MainWindow.resources
