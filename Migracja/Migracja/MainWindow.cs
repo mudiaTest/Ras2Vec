@@ -20,7 +20,7 @@ namespace Migracja
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
-        ImageCrooper sourceImageCropper;
+        RaserImageCrooper sourceImageCropper;
         VectorImageCrooper desinationImageCrooper;
         int horChange;
         int verChange;
@@ -214,8 +214,8 @@ namespace Migracja
             int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
-            sourceImageCropper = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), destinationBmp);
+            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory);
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 

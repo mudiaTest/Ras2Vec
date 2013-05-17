@@ -7,10 +7,10 @@ using System.Diagnostics;
 
 namespace Migracja
 {
-
+    //w ciele znajdują się grupy rectangli (VectoredRectangleGroup), czyli zbiory sąsiadujących rectangli o tym samym kolorze
     class MapFactory : Dictionary<int, VectoredRectangleGroup>
     {
-        public Vector_Rectangle[][] vectArr;// { get; set; }
+        public Vector_Rectangle[][] vectArr;// { get; set; } //2 wymiarowa tablica odzwiercieglająca rastra przy pomocy obiektów Vector_Rectangle
         public int srcWidth { get; set; } //szerokość wczytanego (ReadFromImgIntoRectArray) obrazka
         public int srcHeight { get; set; } //wysokość wczytanego (ReadFromImgIntoRectArray) obrazka
         //wsp. geo. lewego górnego rogu

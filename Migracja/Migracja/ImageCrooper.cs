@@ -5,22 +5,26 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Migracja
 {
-    class Crooper
+    abstract class Crooper
     {
         public Size panelSize;
         private int fCenterX;
         private int fCenterY;
         public Bitmap srcBmp;
+        protected int srcBmpWidth;
+        protected int srcBmpHeight;
+        protected MapFactory mapFactory;
             public int centerX 
             {
                 get { return fCenterX; }
                 set 
                 { 
                     fCenterX = (int)Math.Max(0, value);
-                    fCenterX = (int)Math.Min(fCenterX, srcBmp.Width); 
+                    fCenterX = (int)Math.Min(fCenterX, srcBmpWidth); 
                 }
             }
             public int centerY
@@ -29,18 +33,19 @@ namespace Migracja
                 set
                 {
                     fCenterY = (int)Math.Max(0, value);
-                    fCenterY = (int)Math.Min(fCenterY, srcBmp.Height);
+                    fCenterY = (int)Math.Min(fCenterY, srcBmpHeight);
                 }
             }
         public int left;
         public int top;
 
-        public Crooper(Size aPanelSize,  Bitmap aSrcBmp )
+        public Crooper(Size aPanelSize, int aSrcBmpHeight, int aSrcBmpWidth)
         {
             panelSize = aPanelSize;
-            srcBmp = aSrcBmp;
             centerX = (int)Math.Round(aPanelSize.Width / (float)2);
             centerY = (int)Math.Round(aPanelSize.Height / (float)2);
+            srcBmpHeight = aSrcBmpHeight;
+            srcBmpWidth = aSrcBmpWidth;
         }
 
         public int GetLeftAbsoluteOryg(float aScale)
@@ -64,7 +69,7 @@ namespace Migracja
         }
 
         //ustala jaki wycinek oryginalnego obrazu ma zostać pokazany
-        private Rectangle GetSourceRectangle(float aScale)
+        protected Rectangle GetSourceRectangle(float aScale)
         {
             //aby x,y nie były mniejsze niż punkt (0,0) - ograniczenie o lewej strony. 
             //Od prawej strony nie wyjdą poza ramy obrazu, bo x zawsze będzie < centerX, 
@@ -73,15 +78,15 @@ namespace Migracja
             int y = Math.Max(0, GetTopAbsoluteOryg(aScale));
 
             //ustalanie rozmiaru, tak aby dla mocnego przesuniącia wycinka w lewo pobrał tylko część wycinka
-            int rectWidth = Math.Min(srcBmp.Width, GetRightAbsoluteOryg(aScale)) - Math.Max(GetLeftAbsoluteOryg(aScale), x);
-            int rectHeight = Math.Min(srcBmp.Height, GetBottomAbsoluteOryg(aScale)) - Math.Max(GetTopAbsoluteOryg(aScale), y);
+            int rectWidth = Math.Min(srcBmpWidth, GetRightAbsoluteOryg(aScale)) - Math.Max(GetLeftAbsoluteOryg(aScale), x);
+            int rectHeight = Math.Min(srcBmpHeight, GetBottomAbsoluteOryg(aScale)) - Math.Max(GetTopAbsoluteOryg(aScale), y);
 
             return new Rectangle(x, y, rectWidth, rectHeight);
         }
 
         //ustala jak ma być położony oryginalny wycinek w nowopokazywanym fragmencie. Możliwe jest, że wycinek będzie 
         //przesunięty pokazując wolną przestrzeń na jednym z brzegów fragmentu.
-        private Rectangle GetDestinationRectangle(float aScale, Rectangle srcRectangle)
+        protected Rectangle GetDestinationRectangle(float aScale, Rectangle srcRectangle)
         {
             int resultRectX;
             int resultRectY;
@@ -106,7 +111,19 @@ namespace Migracja
                                  );
         }
 
-        public Bitmap GetCroppedImage(float aScale)
+        public abstract Bitmap GetCroppedImage(float aScale);
+   
+    }
+
+    class RaserImageCrooper: Crooper
+    {
+        public RaserImageCrooper(Size aPanelSize,  Bitmap aSrcBmp)
+            : base(aPanelSize, aSrcBmp.Height, aSrcBmp.Width)
+        { 
+            srcBmp = aSrcBmp; 
+        }
+
+        public override Bitmap GetCroppedImage(float aScale)
         {
             Rectangle rect = GetSourceRectangle(aScale);
             Bitmap result;
@@ -114,34 +131,69 @@ namespace Migracja
 
             //finalna bitmapa o odpowiednim rozmiarze
             result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
-            //ustawia, że result będzie płutnem graphics
+            //ustawia, że result będzie płótnem graphics
             Graphics graphics = Graphics.FromImage(result);
             //ustawia sposób zmiękczania przy powiększaniu - NN da brak zmiękczania
             graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             //przepisze źródło na cel odpowiednio skalująć. W tym przypadku źódło i cel to result
             //nowy obszar jest większy od startego więc nastąpi rozciągnięcie pixeli zgodnie z InterpolationMode
             graphics.DrawImage(srcBmp,
-                                resultRect, /*nowy obszar*/
-                                rect, /*originalny obszar*/
+                                resultRect, //nowy obszar
+                                rect, //originalny obszar
                                 System.Drawing.GraphicsUnit.Pixel);
 
             return result;
         }
     }
 
-    class ImageCrooper: Crooper
-    {
-        public ImageCrooper(Size aPanelSize,  Bitmap aSrcBmp)
-            : base(aPanelSize, aSrcBmp)
-        {
-        }
-    }
-
     class VectorImageCrooper : Crooper
     {
-        public VectorImageCrooper(Size aPanelSize, Bitmap aSrcBmp)
-            : base(aPanelSize, aSrcBmp)
+        public VectorImageCrooper(Size aPanelSize, MapFactory aMapFactory)
+            : base(aPanelSize, 0, 0)
         {
+            mapFactory = aMapFactory;
+            if (aMapFactory != null)
+            {
+                srcBmpWidth = aMapFactory.vectArr.Length;
+                Debug.Assert(aMapFactory.vectArr[0] != null, "aMapFactory.vectArr[0] jest null");
+                srcBmpHeight = aMapFactory.vectArr[0].Length;
+            }
+        }
+
+        public override Bitmap GetCroppedImage(float aScale)
+        {
+            Rectangle rect = GetSourceRectangle(aScale);
+            Bitmap result;
+            Rectangle resultRect = GetDestinationRectangle(aScale, rect);
+
+            //finalna bitmapa o odpowiednim rozmiarze
+            result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
+
+            Vector_Rectangle[][] vectArr = mapFactory.vectArr;
+            //będziemy poruszać się po ustalonym wycinku wzorcowego obrazu
+            for (int x = 0; x < rect.Width; x++)
+            {
+                for (int y = 0; y < rect.Height; y++)
+                {
+                    result.SetPixel(x + resultRect.X, y + resultRect.Y, vectArr[x][y].color);
+                }
+            }
+
+
+
+                /*//ustawia, że result będzie płótnem graphics
+                Graphics graphics = Graphics.FromImage(result);
+                //ustawia sposób zmiękczania przy powiększaniu - NN da brak zmiękczania
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                //przepisze źródło na cel odpowiednio skalująć. W tym przypadku źódło i cel to result
+                //nowy obszar jest większy od startego więc nastąpi rozciągnięcie pixeli zgodnie z InterpolationMode
+
+                graphics.DrawImage(srcBmp,
+                                    resultRect, //nowy obszar
+                                    rect, //originalny obszar
+                                    System.Drawing.GraphicsUnit.Pixel);*/
+
+                return result;
         }
     }
 }

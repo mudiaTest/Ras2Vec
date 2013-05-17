@@ -90,8 +90,8 @@ namespace Migracja
         {
             sourceBmp = new Bitmap(aPath);
             destinationBmp = null;
-            sourceImageCropper = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), sourceBmp);
+            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory);
         }
 
         private bool LoadImage(String aPath)
@@ -108,24 +108,6 @@ namespace Migracja
 
         private bool DrawCroppedScaledImage(float aDpScale, float? aDpScalePrev = null)
         {
-            /*if (aDpScalePrev != null)
-            {
-                if (aDpScale > aDpScalePrev)
-                {
-                    p.centerX = p.centerX + (int)Math.Round(sourcePanel.Width * (1 / Math.Pow(2, aDpScale)));
-                    p.centerY = p.centerY + (int)Math.Round(sourcePanel.Height * (1 / Math.Pow(2, aDpScale)));
-                }
-                else
-                {
-                    p.shiftX = p.shiftX - (int)Math.Round(sourcePanel.Width * (1 / Math.Pow(2, (float)aDpScalePrev)));
-                    p.shiftY = p.shiftY - (int)Math.Round(sourcePanel.Height * (1 / Math.Pow(2, (float)aDpScalePrev)));
-                    p.shiftX = Math.Max(0, p.shiftX);
-                    p.shiftY = Math.Max(0, p.shiftY);
-                    p.shiftX = (int)Math.Round(Math.Min(bmp.Width - (sourcePanel.Width / aDpScale), p.shiftX));
-                    p.shiftY =  (int)Math.Round(Math.Min(bmp.Height - (sourcePanel.Height / aDpScale), p.shiftY));
-                }
-                
-            }*/
             Bitmap croppedSrcBmp = sourceImageCropper.GetCroppedImage(aDpScale);
 
             //tymczasowo przypisuję ten sam obraz
