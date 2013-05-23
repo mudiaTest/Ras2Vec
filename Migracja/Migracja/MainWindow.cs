@@ -215,7 +215,8 @@ namespace Migracja
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
             sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 
@@ -345,7 +346,11 @@ namespace Migracja
             rasterToVectorSettings.sourceBmp = sourceBmp;
             rasterToVectorSettings.CalculateGeoPx();
             
-            RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+            mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
+            
+            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)

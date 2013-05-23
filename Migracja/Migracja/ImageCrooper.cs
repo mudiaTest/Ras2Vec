@@ -17,7 +17,7 @@ namespace Migracja
         public Bitmap srcBmp;
         protected int srcBmpWidth;
         protected int srcBmpHeight;
-        protected MapFactory mapFactory;
+        public MapFactory mapFactory;
             public int centerX 
             {
                 get { return fCenterX; }
@@ -117,7 +117,7 @@ namespace Migracja
 
     class RaserImageCrooper: Crooper
     {
-        public RaserImageCrooper(Size aPanelSize,  Bitmap aSrcBmp)
+        public RaserImageCrooper(Size aPanelSize, Bitmap aSrcBmp)
             : base(aPanelSize, aSrcBmp.Height, aSrcBmp.Width)
         { 
             srcBmp = aSrcBmp; 
@@ -148,16 +148,20 @@ namespace Migracja
 
     class VectorImageCrooper : Crooper
     {
-        public VectorImageCrooper(Size aPanelSize, MapFactory aMapFactory)
+        MainWindowSettings settings;
+        public VectorImageCrooper(Size aPanelSize, MapFactory aMapFactory, int aCenterX, int aCenterY, MainWindowSettings aSettings)
             : base(aPanelSize, 0, 0)
         {
             mapFactory = aMapFactory;
+            settings = aSettings;
             if (aMapFactory != null)
             {
                 srcBmpWidth = aMapFactory.vectArr.Length;
                 Debug.Assert(aMapFactory.vectArr[0] != null, "aMapFactory.vectArr[0] jest null");
                 srcBmpHeight = aMapFactory.vectArr[0].Length;
             }
+            centerX = aCenterX;
+            centerY = aCenterY;
         }
 
         public override Bitmap GetCroppedImage(float aScale)
@@ -168,14 +172,45 @@ namespace Migracja
 
             //finalna bitmapa o odpowiednim rozmiarze
             result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
+            Graphics graphics = Graphics.FromImage(result);
+            //Brush h = new Brush();
+            //Pen localPen = new Pen(new Brush() );
 
             Vector_Rectangle[][] vectArr = mapFactory.vectArr;
-            //będziemy poruszać się po ustalonym wycinku wzorcowego obrazu
-            for (int x = 0; x < rect.Width; x++)
+
+            //rysowanie rectangli odzwierciedlających pixele wzorcowego obrazka
+            if (!settings.Polygons() || aScale == 1)
             {
-                for (int y = 0; y < rect.Height; y++)
+                //będziemy poruszać się po ustalonym wycinku wzorcowego obrazu
+                for (int x = 0; x < rect.Width; x++)
                 {
-                    result.SetPixel(x + resultRect.X, y + resultRect.Y, vectArr[x][y].color);
+                    for (int y = 0; y < rect.Height; y++)
+                    {
+
+                        graphics.FillRectangle(new SolidBrush(vectArr[x][y].color), (x) * aScale + resultRect.X, (y) * aScale + resultRect.Y, aScale, aScale);
+                        if (settings.Edges() && aScale >= 4)
+                            graphics.DrawRectangle(new Pen(Color.Red), (x) * aScale + resultRect.X, (y) * aScale + resultRect.Y, aScale, aScale);
+                        //graphics.DrawRectangle(localPen, x/**aScale*/, y/**aScale*/, /*aScale, aScale*/ 100, 100);
+                        //result.SetPixel(x + resultRect.X, y + resultRect.Y, vectArr[x][y].color);
+                        /*for (int xScale = 0; xScale < aScale; xScale++)
+                        {
+                            for (int yScale = 0; yScale < aScale; yScale++)
+                            {
+                                result.SetPixel(x + resultRect.X, y + resultRect.Y, vectArr[x][y].color);
+                            }
+                        }   */
+                    }
+                }
+            }
+            //rysowanie polygonów
+            else
+            {
+                foreach (VectoredRectangleGroup group in mapFactory.Values)
+                {
+                    Point[] granica = group.GetEdgeListAsArray();
+
+                    graphics.FillPolygon(new SolidBrush(group.sourceColor), group.GetEdgeListAsArray());
+                    //group.edgeList
                 }
             }
 

@@ -214,7 +214,8 @@ namespace Migracja
             sourcePanel.Height = panelSize;
             destinationPanel.Height = panelSize;
             sourceImageCropper = new ImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), destinationBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), destinationBmp,
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY);
             DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
         }
 

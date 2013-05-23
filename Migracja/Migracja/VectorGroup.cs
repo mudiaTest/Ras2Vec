@@ -41,6 +41,22 @@ namespace Migracja
         //rodzic
         public MapFactory parentMapFactory{get;set;}
 
+        public Point[] GetEdgeListAsArray(float aScale)
+        {
+            Debug.Assert(aScale >= 1, "GetEdgeListAsArray nie może utworzyć polygonu dla skali <= 1.");
+
+            Point[] result = new Point[edgeList.Count];
+            int i = 0;
+            foreach(int key in edgeList.GetSortedKeyList())
+            {
+                result[i] = edgeList[key].p1;
+                i++;
+            }
+            jkl;
+            //
+            return result;
+        }
+
         //in: dwa KOLEJNE punkty poruszające się po liniach Hor i Ver
         //out: Cst.fromLeft, Cst.fromTop, Cst.fromRight, Cst.fromBottom
         private int Direction(Point p1, Point p2)

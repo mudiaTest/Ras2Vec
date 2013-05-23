@@ -133,6 +133,25 @@ namespace Migracja
         {
             return testOptions.Split(',');
         }
+
+        private bool StrExists(string aText)
+        {
+            int idx = Array.FindIndex(
+                GetCheckegTestOptionsList(),
+                delegate(string s) { return s.Equals(aText); }
+                );
+            return idx != -1;
+        }
+
+        public bool Polygons()
+        {
+            return StrExists("0");
+        }
+
+        public bool Edges()
+        {
+            return StrExists("1");
+        }
     }
 
     class MainWindowRegister

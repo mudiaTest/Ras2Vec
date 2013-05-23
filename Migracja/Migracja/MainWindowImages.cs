@@ -91,7 +91,8 @@ namespace Migracja
             sourceBmp = new Bitmap(aPath);
             destinationBmp = null;
             sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory);
+            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
         }
 
         private bool LoadImage(String aPath)
@@ -112,7 +113,15 @@ namespace Migracja
 
             //tymczasowo przypisuję ten sam obraz
             //Bitmap croppedDstBmp = croppedSrcBmp;
-            Bitmap croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale);
+            Bitmap croppedDstBmp;
+            if (desinationImageCrooper.mapFactory == null)
+            {
+                croppedDstBmp = null;
+            }
+            else
+            {
+                croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale);
+            }
             
             /*int scaledShiftX = sourcePanel.Width;
             int scaledShiftY = sourcePanel.Height;*/
@@ -131,14 +140,16 @@ namespace Migracja
             sourcePB.Top = -sourcePanel.Height;
             UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
-
-            destinationPB.Height = croppedDstBmp.Height;
-            destinationPB.Width = croppedDstBmp.Width;
-            destinationPB.Image = croppedDstBmp;
-            /*destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
-            destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
-            destinationPB.Left = -destinationPanel.Width;
-            destinationPB.Top = -destinationPanel.Height;
+            if (croppedDstBmp != null)
+            {
+                destinationPB.Height = croppedDstBmp.Height;
+                destinationPB.Width = croppedDstBmp.Width;
+                destinationPB.Image = croppedDstBmp;
+                /*destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
+                destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
+                destinationPB.Left = -destinationPanel.Width;
+                destinationPB.Top = -destinationPanel.Height;
+            }
             return true;
         }
 

@@ -8,6 +8,12 @@ namespace Migracja
 {
     class VectorRectangeGroup : Dictionary<int, Vector_Rectangle>
     {
+        public List<int> GetSortedKeyList()
+        {
+            List<int> result = Keys.ToList();
+            result.Sort();
+            return result;
+        }
     }
 
     partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
@@ -205,5 +211,6 @@ namespace Migracja
             //PxListToGeoList;
             
         }
+        
     }
 }
