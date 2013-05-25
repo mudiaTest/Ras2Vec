@@ -1,0 +1,9 @@
+D:\praca\Migracja\bin\Debug\WindowsApplication.exe.config
+D:\praca\Migracja\obj\x86\Debug\Migracja.csprojResolveAssemblyReference.cache
+D:\praca\Migracja\obj\x86\Debug\Migracja.MainWindow.resources
+D:\praca\Migracja\obj\x86\Debug\Migracja.Migracja.Properties.Resources.resources
+D:\praca\Migracja\obj\x86\Debug\Migracja.csproj.GenerateResource.Cache
+D:\praca\Migracja\bin\Debug\WindowsApplication.exe
+D:\praca\Migracja\bin\Debug\WindowsApplication.pdb
+D:\praca\Migracja\obj\x86\Debug\WindowsApplication.exe
+D:\praca\Migracja\obj\x86\Debug\WindowsApplication.pdb

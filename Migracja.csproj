@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{2920B4C9-E77D-4BC1-8251-032E29EBDBFB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>WindowsApplication</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Migracja</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".git\config" />
+    <None Include=".git\description" />
+    <None Include=".git\HEAD" />
+    <None Include=".git\hooks\applypatch-msg.sample" />
+    <None Include=".git\hooks\commit-msg.sample" />
+    <None Include=".git\hooks\post-commit.sample" />
+    <None Include=".git\hooks\post-receive.sample" />
+    <None Include=".git\hooks\post-update.sample" />
+    <None Include=".git\hooks\pre-applypatch.sample" />
+    <None Include=".git\hooks\pre-commit.sample" />
+    <None Include=".git\hooks\pre-rebase.sample" />
+    <None Include=".git\hooks\prepare-commit-msg.sample" />
+    <None Include=".git\hooks\update.sample" />
+    <None Include=".git\index" />
+    <None Include=".git\info\exclude" />
+    <None Include=".git\logs\HEAD" />
+    <None Include=".git\logs\refs\heads\master" />
+    <None Include=".git\objects\pack\pack-fa7f20410b1c3d3056d17b012d21ac1ca5f54056.idx" />
+    <None Include=".git\objects\pack\pack-fa7f20410b1c3d3056d17b012d21ac1ca5f54056.pack" />
+    <None Include=".git\packed-refs" />
+    <None Include=".git\refs\heads\master" />
+    <None Include=".git\refs\remotes\origin\HEAD" />
+    <None Include="Migracja\App.config" />
+    <None Include="Migracja\bin\Debug\Migracja.exe.config" />
+    <None Include="Migracja\bin\Debug\Migracja.vshost.exe.config" />
+    <None Include="Migracja\Properties\Settings.settings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Migracja\bin\Debug\Migracja.pdb" />
+    <Content Include="Migracja\obj\Debug\Migracja.csproj.FileListAbsolute.txt" />
+    <Content Include="Migracja\obj\Debug\Migracja.pdb" />
+    <Content Include="Migracja\_Migracja.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Migracja\ClassHelpers.cs" />
+    <Compile Include="Migracja\cst.cs" />
+    <Compile Include="Migracja\ImageCrooper.cs" />
+    <Compile Include="Migracja\MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Migracja\MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migracja\MainWindowImages.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Migracja\MainWindowSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Migracja\MakeEdges_Utils.cs" />
+    <Compile Include="Migracja\MapFactory.cs" />
+    <Compile Include="Migracja\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="Migracja\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="Migracja\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+    <Compile Include="Migracja\Program.cs" />
+    <Compile Include="Migracja\Properties\AssemblyInfo.cs" />
+    <Compile Include="Migracja\Properties\Resources.Designer.cs" />
+    <Compile Include="Migracja\Properties\Settings.Designer.cs" />
+    <Compile Include="Migracja\RasterToVectorSettings.cs" />
+    <Compile Include="Migracja\RasterToVector_Main.cs" />
+    <Compile Include="Migracja\RasterToVector_Utils.cs" />
+    <Compile Include="Migracja\VectorGroup.cs" />
+    <Compile Include="Migracja\VectorRectangeEdge.cs" />
+    <Compile Include="Migracja\Vector_Gen.cs" />
+    <Compile Include="Migracja\Vector_Rectangle.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migracja\MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migracja\obj\Debug\Migracja.MainWindow.resources" />
+    <EmbeddedResource Include="Migracja\obj\Debug\Migracja.Properties.Resources.resources" />
+    <EmbeddedResource Include="Migracja\Properties\Resources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\refs\tags\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
