@@ -205,17 +205,45 @@ namespace Migracja
             //rysowanie polygonów
             else
             {
+                Color tmpColor = new Color();
+                int tmpLineR;
+                int tmpLineG;
+                int tmpLineB;
+                int tmpPointR;
+                int tmpPointG;
+                int tmpPointB;
                 foreach (VectoredRectangleGroup group in mapFactory.Values)
                 {
                     Point[] granica = group.GetPointArrFromEdge(group.edgeList, aScale, resultRect.X, resultRect.Y);
                     graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);
                     if (settings.Edges())
                     {
-                        graphics.DrawPolygon(new Pen(Color.Black), granica);
+                        if (!settings.TestColor())
+                        {
+                            Math.DivRem(group.sourceColor.R + 100, 256, out tmpLineR);
+                            Math.DivRem(group.sourceColor.G + 200, 256, out tmpLineG);
+                            Math.DivRem(group.sourceColor.B + 10, 256, out tmpLineB);
+
+                            Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointR);
+                            Math.DivRem(group.sourceColor.G + 10, 256, out tmpPointG);
+                            Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
+                        }
+                        else
+                        {
+                            tmpLineR = 255;
+                            tmpLineG = 0;
+                            tmpLineB = 0;
+                            tmpPointR = 100;
+                            tmpPointG = 255;
+                            tmpPointB = 255;
+                        }
+
+                        graphics.DrawPolygon(new Pen(Color.FromArgb(tmpLineR, tmpLineG, tmpLineB)), granica);
                         foreach(Point p in granica)
                         {
                             //graphics.DrawLine(new Pen(Color.Blue), p, p);
-                            result.SetPixel(p.X, p.Y, Color.White);
+                            if (p.X < result.Width && p.Y < result.Height)
+                                result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointR, tmpPointG, tmpPointB));
                         }
                     }
                     //group.edgeList

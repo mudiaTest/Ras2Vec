@@ -261,12 +261,15 @@ namespace Migracja
         {
             VectoredRectangleGroup vectGroup;
             long dummy;
+            int i = 0;
 
-            for (int i = 0; i < Count; i++)
+            //for (int i = 0; i < Count; i++)
+            foreach(KeyValuePair<int, VectoredRectangleGroup> pair in this)
             {
-                vectGroup = this[i];                
+                vectGroup = pair.Value;                
                 if ((int)Math.DivRem((long)i, (long)inMod, out dummy) == 0)
                     UpdateInfoAction("Tworzenie granicy dla grupy " + i.ToString() + "/" + (Count - 1).ToString());
+                i++;
                 vectGroup.MakeEdges(vectGroup.edgeList);
             };            
         }

@@ -25,10 +25,13 @@ namespace Migracja
         }
         private void LoadLastSave()
         {
-            windowSettings.Load(lastSavePath);
-            if (File.Exists(windowSettings.stSourceImagePath))
-                PrepareSourceImage(windowSettings.stSourceImagePath);
-            SettingsToScr(windowSettings);
+            if (File.Exists(lastSavePath))
+            { 
+                windowSettings.Load(lastSavePath);
+                if (File.Exists(windowSettings.stSourceImagePath))
+                    PrepareSourceImage(windowSettings.stSourceImagePath);
+                SettingsToScr(windowSettings);
+            }
         }
         private void MenuSave(object sender, EventArgs e)
         {
@@ -103,7 +106,7 @@ namespace Migracja
                 thisSettingsPath = aPath;
             }
             else
-                file = new FileStream(thisSettingsPath, FileMode.OpenOrCreate);
+                file = new FileStream(thisSettingsPath, FileMode.Truncate);
             xmlEngine.Serialize(file, this);
             file.Close();
             //zapamiętanie ostatniego save'u w rejestrze
@@ -151,6 +154,11 @@ namespace Migracja
         public bool Edges()
         {
             return StrExists("1");
+        }
+
+        public bool TestColor()
+        {
+            return StrExists("2");
         }
     }
 

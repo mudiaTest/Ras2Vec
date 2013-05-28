@@ -363,6 +363,11 @@ namespace Migracja
 
         }
 
+        private void btnRefreshResultImg_Click(object sender, EventArgs e)
+        {
+            DrawCroppedScaledImage(windowSettings.dpScale, windowSettings.dpScale);
+        }
+
 
 
     }

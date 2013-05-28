@@ -388,6 +388,7 @@
             this.btnRefreshResultImg.TabIndex = 16;
             this.btnRefreshResultImg.Text = "Refresh result";
             this.btnRefreshResultImg.UseVisualStyleBackColor = true;
+            this.btnRefreshResultImg.Click += new System.EventHandler(this.btnRefreshResultImg_Click);
             // 
             // btnMainThread
             // 
