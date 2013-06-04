@@ -186,8 +186,9 @@ namespace Migracja
                 {
                     for (int y = 0; y < rect.Height; y++)
                     {
-
-                        graphics.FillRectangle(new SolidBrush(vectArr[x][y].color), (x) * aScale + resultRect.X, (y) * aScale + resultRect.Y, aScale, aScale);
+                        int sourceX = x + rect.X;
+                        int sourceY = y + rect.Y;
+                        graphics.FillRectangle(new SolidBrush(vectArr[sourceX][sourceY].color), (x) * aScale + resultRect.X, (y) * aScale + resultRect.Y, aScale, aScale);
                         if (settings.Edges() && aScale >= 4)
                             graphics.DrawRectangle(new Pen(Color.Red), (x) * aScale + resultRect.X, (y) * aScale + resultRect.Y, aScale, aScale);
                         //graphics.DrawRectangle(localPen, x/**aScale*/, y/**aScale*/, /*aScale, aScale*/ 100, 100);
@@ -265,6 +266,7 @@ namespace Migracja
                                     System.Drawing.GraphicsUnit.Pixel);*/
 
                 return result;
+
         }
     }
 }
