@@ -94,13 +94,25 @@ namespace Migracja
 
         }
 
-        private void UpdateInfoBox(string atext = "", bool aBlNewLine = true){
-            richTextBox1.Text = richTextBox1.Text + '\n';
+        DateTime UpdateInfoBoxTime(string aText = "", bool aBlNewLine = true, DateTime? aDatePrv = null)
+         {
+            infoBox.Text = infoBox.Text + '\n';
             if (aBlNewLine) 
-                richTextBox1.Text = richTextBox1.Text + '\n';
-            richTextBox1.Text = richTextBox1.Text + atext;
-            richTextBox1.SelectionStart = richTextBox1.Text.Length;
-            richTextBox1.ScrollToCaret();
+                infoBox.Text = infoBox.Text + '\n';
+            if (aDatePrv != null)
+            {
+                TimeSpan span = (DateTime.Now - aDatePrv.Value);
+                infoBox.Text = infoBox.Text + "[T]:" + span.ToString(@"hh\:mm\:ss\:fff") + " - ";
+            }
+            infoBox.Text = infoBox.Text + aText;
+            infoBox.SelectionStart = infoBox.Text.Length;
+            infoBox.ScrollToCaret();
+            return DateTime.Now;
+         }
+
+        void UpdateInfoBox(string aText = "", bool aBlNewLine = true)
+        {
+            UpdateInfoBoxTime(aText, aBlNewLine);
         }
 
         private void sourcePB_MouseDown(object sender, MouseEventArgs e)
@@ -322,8 +334,8 @@ namespace Migracja
             RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings{ sourceBmp = sourceBmp };
             rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
             if (rbMainThread.Checked)
-            {   
-                mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+            {
+                mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
                // Bitmap res = mapFactory.getBitmap(new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height));
             }
             else if (rbSeparateThread.Checked)
@@ -345,8 +357,8 @@ namespace Migracja
                                                   windowSettings.rightYCoord);
             rasterToVectorSettings.sourceBmp = sourceBmp;
             rasterToVectorSettings.CalculateGeoPx();
-            
-            mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings);
+
+            mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
                                                             sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
             

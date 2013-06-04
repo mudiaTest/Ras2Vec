@@ -213,41 +213,58 @@ namespace Migracja
                 int tmpPointR;
                 int tmpPointG;
                 int tmpPointB;
-                foreach (VectoredRectangleGroup group in mapFactory.Values)
+
+                List<int> usedGroups = new List<int>();
+                
+                //będziemy poruszać się po ustalonym wycinku wzorcowego obrazu
+                for (int x = 0; x < rect.Width; x++)
                 {
-                    Point[] granica = group.GetPointArrFromEdge(group.edgeList, aScale, resultRect.X, resultRect.Y);
-                    graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);
-                    if (settings.Edges())
+                    for (int y = 0; y < rect.Height; y++)
                     {
-                        if (!settings.TestColor())
-                        {
-                            Math.DivRem(group.sourceColor.R + 100, 256, out tmpLineR);
-                            Math.DivRem(group.sourceColor.G + 200, 256, out tmpLineG);
-                            Math.DivRem(group.sourceColor.B + 10, 256, out tmpLineB);
+                        int sourceX = x + rect.X;
+                        int sourceY = y + rect.Y;
 
-                            Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointR);
-                            Math.DivRem(group.sourceColor.G + 10, 256, out tmpPointG);
-                            Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
-                        }
-                        else
-                        {
-                            tmpLineR = 255;
-                            tmpLineG = 0;
-                            tmpLineB = 0;
-                            tmpPointR = 100;
-                            tmpPointG = 255;
-                            tmpPointB = 255;
-                        }
+                        VectoredRectangleGroup group = mapFactory.GetGroupByXY(sourceX, sourceY, usedGroups);
 
-                        graphics.DrawPolygon(new Pen(Color.FromArgb(tmpLineR, tmpLineG, tmpLineB)), granica);
-                        foreach(Point p in granica)
+                        //foreach (VectoredRectangleGroup group in mapFactory.Values)
+                        if(group != null)
                         {
-                            //graphics.DrawLine(new Pen(Color.Blue), p, p);
-                            if (p.X < result.Width && p.Y < result.Height)
-                                result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointR, tmpPointG, tmpPointB));
+                            Point[] granica = group.GetPointArrFromEdge(group.edgeList, aScale, resultRect.X - rect.X*aScale,
+                                                                        resultRect.Y - rect.Y * aScale, rect);
+                            graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);
+                            if (settings.Edges())
+                            {
+                                if (!settings.TestColor())
+                                {
+                                    Math.DivRem(group.sourceColor.R + 100, 256, out tmpLineR);
+                                    Math.DivRem(group.sourceColor.G + 200, 256, out tmpLineG);
+                                    Math.DivRem(group.sourceColor.B + 10, 256, out tmpLineB);
+
+                                    Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointR);
+                                    Math.DivRem(group.sourceColor.G + 10, 256, out tmpPointG);
+                                    Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
+                                }
+                                else
+                                {
+                                    tmpLineR = 255;
+                                    tmpLineG = 0;
+                                    tmpLineB = 0;
+                                    tmpPointR = 100;
+                                    tmpPointG = 255;
+                                    tmpPointB = 255;
+                                }
+
+                                graphics.DrawPolygon(new Pen(Color.FromArgb(tmpLineR, tmpLineG, tmpLineB)), granica);
+                                foreach (Point p in granica)
+                                {
+                                    //graphics.DrawLine(new Pen(Color.Blue), p, p);
+                                    if (p.X < result.Width && p.Y < result.Height && p.X > 0 && p.Y > 0)
+                                        result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointR, tmpPointG, tmpPointB));
+                                }
+                            }
+                            //group.edgeList
                         }
                     }
-                    //group.edgeList
                 }
             }
 

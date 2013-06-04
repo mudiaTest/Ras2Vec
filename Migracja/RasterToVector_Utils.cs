@@ -88,4 +88,6 @@ namespace Migracja
         public bool candidate {get;set;}
         public bool used {get;set;}
     }
+
+    internal delegate DateTime UpdateInfoBoxTimeDelegate(string aText = "", bool aBlNewLine = true, DateTime? aDatePrv = null);
 }

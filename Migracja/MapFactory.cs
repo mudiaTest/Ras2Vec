@@ -27,6 +27,7 @@ namespace Migracja
         public string stMessage;
         public string stTime;
         private RasterToVectorSettings settings;
+        internal UpdateInfoBoxTimeDelegate infoBoxUpdateFunct;
         //dostęp do obiektów używając GetObjById i SetObjById
         //property vObj[index: integer]: TVectObj read GetObjByIdx write SetObjByIdx;
 
@@ -321,6 +322,20 @@ namespace Migracja
             geoLeftUpY = settings.geoLeftUpY;
             geoRightDownX = settings.geoRightDownX;
             geoRightDownY = settings.geoRightDownY;
+        }
+
+        public VectoredRectangleGroup GetGroupByXY(int x, int y, List<int> aList)
+        {
+            VectoredRectangleGroup result = vectArr[x][y].parentVectorGroup;
+            if (!aList.Contains(result.lpGroup))
+            {
+                aList.Add(result.lpGroup);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         //public Bitmap getBitmap(Rectangle rect)

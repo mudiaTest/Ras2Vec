@@ -10,15 +10,22 @@ namespace Migracja
 {
     class RasterToVectorRunner
     {
-        public static MapFactory RunRasterToVectorMainThread(RasterToVectorSettings aSettings)
+        public static MapFactory RunRasterToVectorMainThread(RasterToVectorSettings aSettings, UpdateInfoBoxTimeDelegate aFunct)
         {
-            MapFactory singleThreadFactory = new MapFactory(aSettings);
+            MapFactory singleThreadFactory = new MapFactory(aSettings) { infoBoxUpdateFunct  = aFunct };
+            DateTime datePrv = DateTime.Now;
             singleThreadFactory.PrzygotujMapFactory();
+            datePrv = aFunct("'PrzygotujMapFactory'", false, datePrv);
             singleThreadFactory.GroupRect();
+            datePrv = aFunct("'GroupRect'", false, datePrv);
             singleThreadFactory.FillColorArr();
+            datePrv = aFunct("'FillColorArr'", false, datePrv);
             singleThreadFactory.MakeEdgesForGroups();
+            datePrv = aFunct("'MakeEdgesForGroups'", false, datePrv);
             singleThreadFactory.UpdateColorArr();
+            datePrv = aFunct("'UpdateColorArr'", false, datePrv);
             singleThreadFactory.MakeInnerEdgesForGroups();
+            aFunct("'MakeInnerEdgesForGroups'", false, datePrv);
             //singleThreadFactory.Init(aSettings);
             return singleThreadFactory;
         }

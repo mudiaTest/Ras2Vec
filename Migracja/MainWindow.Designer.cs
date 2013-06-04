@@ -47,7 +47,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.reloadSrcMapBtn = new System.Windows.Forms.Button();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.infoBox = new System.Windows.Forms.RichTextBox();
             this.panel5 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -107,7 +107,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuMain.Size = new System.Drawing.Size(817, 24);
+            this.menuMain.Size = new System.Drawing.Size(880, 24);
             this.menuMain.TabIndex = 0;
             // 
             // mainToolStripMenuItem
@@ -212,14 +212,14 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(333, 482);
+            this.panel2.Size = new System.Drawing.Size(349, 491);
             this.panel2.TabIndex = 12;
             // 
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel4.Controls.Add(this.reloadSrcMapBtn);
-            this.panel4.Controls.Add(this.richTextBox1);
+            this.panel4.Controls.Add(this.infoBox);
             this.panel4.Controls.Add(this.panel5);
             this.panel4.Controls.Add(this.loadSrcMapBtn);
             this.panel4.Controls.Add(this.chkBoxTestOptions);
@@ -233,13 +233,13 @@
             this.panel4.Location = new System.Drawing.Point(34, 0);
             this.panel4.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(299, 482);
+            this.panel4.Size = new System.Drawing.Size(315, 491);
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
             // 
             // reloadSrcMapBtn
             // 
-            this.reloadSrcMapBtn.Location = new System.Drawing.Point(3, 443);
+            this.reloadSrcMapBtn.Location = new System.Drawing.Point(188, 271);
             this.reloadSrcMapBtn.Name = "reloadSrcMapBtn";
             this.reloadSrcMapBtn.Size = new System.Drawing.Size(112, 23);
             this.reloadSrcMapBtn.TabIndex = 26;
@@ -247,13 +247,13 @@
             this.reloadSrcMapBtn.UseVisualStyleBackColor = true;
             this.reloadSrcMapBtn.Click += new System.EventHandler(this.button2_Click);
             // 
-            // richTextBox1
+            // infoBox
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(121, 299);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(170, 167);
-            this.richTextBox1.TabIndex = 25;
-            this.richTextBox1.Text = "";
+            this.infoBox.Location = new System.Drawing.Point(5, 300);
+            this.infoBox.Name = "infoBox";
+            this.infoBox.Size = new System.Drawing.Size(295, 178);
+            this.infoBox.TabIndex = 25;
+            this.infoBox.Text = "";
             // 
             // panel5
             // 
@@ -357,7 +357,7 @@
             // 
             // loadSrcMapBtn
             // 
-            this.loadSrcMapBtn.Location = new System.Drawing.Point(3, 414);
+            this.loadSrcMapBtn.Location = new System.Drawing.Point(84, 271);
             this.loadSrcMapBtn.Name = "loadSrcMapBtn";
             this.loadSrcMapBtn.Size = new System.Drawing.Size(98, 23);
             this.loadSrcMapBtn.TabIndex = 14;
@@ -374,15 +374,15 @@
             "Polygons - po R2V (yes) / Rectangles - z Rastra (no)",
             "Edge (polygons) / Grid (rectangles)",
             "Kolor testowy"});
-            this.chkBoxTestOptions.Location = new System.Drawing.Point(4, 242);
+            this.chkBoxTestOptions.Location = new System.Drawing.Point(3, 216);
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
-            this.chkBoxTestOptions.Size = new System.Drawing.Size(290, 49);
+            this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 49);
             this.chkBoxTestOptions.TabIndex = 10;
             this.chkBoxTestOptions.SelectedIndexChanged += new System.EventHandler(this.chkBoxTestOptions_SelectedIndexChanged);
             // 
             // btnRefreshResultImg
             // 
-            this.btnRefreshResultImg.Location = new System.Drawing.Point(4, 297);
+            this.btnRefreshResultImg.Location = new System.Drawing.Point(3, 271);
             this.btnRefreshResultImg.Name = "btnRefreshResultImg";
             this.btnRefreshResultImg.Size = new System.Drawing.Size(75, 23);
             this.btnRefreshResultImg.TabIndex = 16;
@@ -471,7 +471,7 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(34, 482);
+            this.panel3.Size = new System.Drawing.Size(34, 491);
             this.panel3.TabIndex = 25;
             // 
             // btnMenuHide
@@ -481,7 +481,7 @@
             this.btnMenuHide.Location = new System.Drawing.Point(0, 0);
             this.btnMenuHide.Margin = new System.Windows.Forms.Padding(0);
             this.btnMenuHide.Name = "btnMenuHide";
-            this.btnMenuHide.Size = new System.Drawing.Size(30, 482);
+            this.btnMenuHide.Size = new System.Drawing.Size(30, 491);
             this.btnMenuHide.TabIndex = 0;
             this.btnMenuHide.Text = "<<";
             this.btnMenuHide.UseVisualStyleBackColor = true;
@@ -495,9 +495,9 @@
             this.panel6.Controls.Add(this.ScaleTB);
             this.panel6.Controls.Add(this.ZoomInBtn);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel6.Location = new System.Drawing.Point(333, 0);
+            this.panel6.Location = new System.Drawing.Point(349, 0);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(484, 38);
+            this.panel6.Size = new System.Drawing.Size(531, 38);
             this.panel6.TabIndex = 13;
             // 
             // ScaleTrB
@@ -555,7 +555,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(817, 482);
+            this.panel1.Size = new System.Drawing.Size(880, 491);
             this.panel1.TabIndex = 11;
             // 
             // panel7
@@ -564,9 +564,9 @@
             this.panel7.Controls.Add(this.destinationPanel);
             this.panel7.Controls.Add(this.sourcePanel);
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel7.Location = new System.Drawing.Point(333, 38);
+            this.panel7.Location = new System.Drawing.Point(349, 38);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(484, 444);
+            this.panel7.Size = new System.Drawing.Size(531, 453);
             this.panel7.TabIndex = 14;
             this.panel7.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
             // 
@@ -575,10 +575,10 @@
             this.destinationPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Location = new System.Drawing.Point(6, 224);
+            this.destinationPanel.Location = new System.Drawing.Point(6, 228);
             this.destinationPanel.Name = "destinationPanel";
             this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.destinationPanel.Size = new System.Drawing.Size(470, 210);
+            this.destinationPanel.Size = new System.Drawing.Size(517, 210);
             this.destinationPanel.TabIndex = 22;
             // 
             // destinationPB
@@ -600,7 +600,7 @@
             this.sourcePanel.Controls.Add(this.sourcePB);
             this.sourcePanel.Location = new System.Drawing.Point(6, 8);
             this.sourcePanel.Name = "sourcePanel";
-            this.sourcePanel.Size = new System.Drawing.Size(470, 210);
+            this.sourcePanel.Size = new System.Drawing.Size(517, 210);
             this.sourcePanel.TabIndex = 19;
             // 
             // sourcePB
@@ -619,7 +619,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(817, 506);
+            this.ClientSize = new System.Drawing.Size(880, 515);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;
@@ -666,7 +666,7 @@
         private System.Windows.Forms.OpenFileDialog loadDialog;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox infoBox;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

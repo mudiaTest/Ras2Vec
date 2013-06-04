@@ -370,7 +370,7 @@ namespace Migracja
             return result;
         }
 
-        public Point[] GetPointArrFromEdge(VectorRectangeGroup aEdgePxList, float aDpScale, float aDisplaceX, float aDisplaceY)
+        public Point[] GetPointArrFromEdge(VectorRectangeGroup aEdgePxList, float aDpScale, float aDisplaceX, float aDisplaceY, Rectangle aRect)
         {
             //Point[] result = new Point[aEdgePxList.Count * 3];
             List<GeoPoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
