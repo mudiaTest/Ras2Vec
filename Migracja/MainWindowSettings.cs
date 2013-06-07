@@ -78,6 +78,8 @@ namespace Migracja
         public float dpScale;
         public int centerX;
         public int centerY;
+        public int sliceWidth;
+        public int sliceHeight;
 
         //[NonSerialized]
         public string thisSettingsPath;
@@ -130,6 +132,8 @@ namespace Migracja
             this.centerY = tmp.centerY;
             this.thisSettingsPath = aPath;
             this.testOptions = tmp.testOptions;
+            this.sliceWidth = tmp.sliceWidth;
+            this.sliceHeight = tmp.sliceHeight;
         }
 
         public string[] GetCheckegTestOptionsList()

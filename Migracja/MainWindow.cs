@@ -166,6 +166,8 @@ namespace Migracja
             maskedTextBox2.Text = aSettings.leftYCoord;
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
+            edtSliceHeight.Text = aSettings.sliceHeight.ToString();
+            edtSliceWidth.Text = aSettings.sliceWidth.ToString();
             ScaleRefresh();
             if (sourceImageCropper != null)
             {
@@ -378,6 +380,33 @@ namespace Migracja
         private void btnRefreshResultImg_Click(object sender, EventArgs e)
         {
             DrawCroppedScaledImage(windowSettings.dpScale, windowSettings.dpScale);
+        }
+
+        private void edtSliceWidth_Leave(object sender, EventArgs e)
+        {
+            if (((MaskedTextBox)sender).Text == "")
+                windowSettings.sliceWidth = 0;
+            else
+                windowSettings.sliceWidth = Int32.Parse(((MaskedTextBox)sender).Text);
+        }
+
+
+        private void edtSliceHeight_Leave(object sender, EventArgs e)
+        {
+            if (((MaskedTextBox)sender).Text == "")
+                windowSettings.sliceHeight = 0;
+            else
+                windowSettings.sliceHeight = Int32.Parse(((MaskedTextBox)sender).Text);
+        }
+
+        private void edtSliceHeight_Validated(object sender, EventArgs e)
+        {
+            int r = 0;
+        }
+
+        private void menuMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            Focus();
         }
 
 
