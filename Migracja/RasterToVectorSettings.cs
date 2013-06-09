@@ -38,6 +38,9 @@ namespace Migracja
         public float xGeoPX { get; set; }
         public float yGeoPX { get; set; }
 
+        internal int sliceHeight;
+        internal int sliceWidth;
+
         public void ReadGeoCorners(String stLeftUpX, String stLeftUpY, String stRightDownX, String stRightDownY)
         {
             geoLeftUpX = DecodeGeoStr(stLeftUpX);

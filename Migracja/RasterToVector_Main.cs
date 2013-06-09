@@ -12,6 +12,19 @@ namespace Migracja
     {
         public static MapFactory RunRasterToVectorMainThread(RasterToVectorSettings aSettings, UpdateInfoBoxTimeDelegate aFunct)
         {
+
+            for (int y = 0; y < aSettings.sourceBmp.Height; y += aSettings.sliceHeight)
+            {
+                for (int x = 0; x < aSettings.sourceBmp.Width; y+=aSettings.sliceWidth)
+                {
+                    Bitmap sliceSrcBmp = new Bitmap(aSettings.sliceWidth, aSettings.sliceHeight);
+                    Graphics sliceSrcGraphics = Graphics.FromImage(sliceSrcBmp);
+                    sliceSrcGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    sliceSrcGraphics.DrawImage(aSettings.sourceBmp,
+                                                );
+            }
+
+
             MapFactory singleThreadFactory = new MapFactory(aSettings) { infoBoxUpdateFunct  = aFunct };
             DateTime datePrv = DateTime.Now;
             singleThreadFactory.PrzygotujMapFactory();

@@ -359,6 +359,8 @@ namespace Migracja
                                                   windowSettings.rightYCoord);
             rasterToVectorSettings.sourceBmp = sourceBmp;
             rasterToVectorSettings.CalculateGeoPx();
+            rasterToVectorSettings.sliceWidth = windowSettings.sliceWidth;
+            rasterToVectorSettings.sliceHeight = windowSettings.sliceHeight;
 
             mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
