@@ -28,6 +28,11 @@ namespace Migracja
         public string stTime;
         private RasterToVectorSettings settings;
         internal UpdateInfoBoxTimeDelegate infoBoxUpdateFunct;
+
+        internal int maxKey;
+
+        internal TimeSpan ts;
+
         //dostęp do obiektów używając GetObjById i SetObjById
         //property vObj[index: integer]: TVectObj read GetObjByIdx write SetObjByIdx;
 
@@ -96,7 +101,7 @@ namespace Migracja
                 for (int x=0; x<srcWidth; x++)
                 {
                     vectObj = vectArr[x][y];
-                    //perf2.Start(false);
+                    //perf2.Start(false);  
                     if (vectObj.parentVectorGroup == null)
                     {
                         vectObj.parentVectorGroup = new VectoredRectangleGroup();
@@ -107,11 +112,11 @@ namespace Migracja
                         vectObj.parentVectorGroup.sourceColor = vectObj.color;
                         vectObj.parentVectorGroup.Add(0, vectObj);
                         vectObj.parentVectorGroup.edgeList.Add(0, vectObj);
-
+                        DateTime d1 = DateTime.Now;
                         int key = this.NextKey();
+                        ts += (DateTime.Now - d1);
                         Add(key, vectObj.parentVectorGroup);
                         vectObj.parentVectorGroupId = key;
-
                         //dodanie grupy do listy kolorów
                         if (vectRectGroupsByColor.ContainsKey(vectObj.parentVectorGroup.sourceColor.ToArgb()))
                             colorGroupList = vectRectGroupsByColor[vectObj.parentVectorGroup.sourceColor.ToArgb()];
@@ -127,11 +132,13 @@ namespace Migracja
                     }
                     //perf2.Stop;
                     //perf3.Start(false);
+                    
                     if (x < srcWidth-1) 
                         Vector_Rectangle.Zintegruj(vectObj, vectArr[x+1][y], this);
                     if (y < srcHeight-1)
                         Vector_Rectangle.Zintegruj(vectObj, vectArr[x][y+1], this);
                     //perf3.Stop;
+                    
                 }
                 //perf.Stop;
                 //UpdateInfoAction('Grupowanie pixeli - linia:' + IntToStr(y) + '/' + IntToStr(srcHeight-1));
@@ -141,6 +148,8 @@ namespace Migracja
             }
 
         }
+
+        //DateTime d1 = DateTime.Now;
 
         //metoda pomocnicza dla FillColorArr
         ColorPx dajColorPx(int x, int y)
@@ -312,6 +321,13 @@ namespace Migracja
             settings = aSettings;
             vectRectGroupsByColor = new Dictionary<int, ColorGroupList>(256*4);
             inMod = 1;
+            maxKey = 0;
+            ts = new TimeSpan();
+        }
+
+        internal int NextKey()
+        {
+            return maxKey++;
         }
 
         public void PrzygotujMapFactory()

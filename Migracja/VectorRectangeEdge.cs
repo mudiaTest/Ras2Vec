@@ -8,11 +8,23 @@ namespace Migracja
 {
     class VectorRectangeGroup : Dictionary<int, Vector_Rectangle>
     {
+        private int maxKey;
+
+        internal int NextKey()
+        {
+            return maxKey++;
+        }
+
         public List<int> GetSortedKeyList()
         {
             List<int> result = Keys.ToList();
             result.Sort();
             return result;
+        }
+
+        public VectorRectangeGroup()
+        {
+            maxKey = 0;
         }
     }
 

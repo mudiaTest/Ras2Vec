@@ -41,6 +41,9 @@ namespace Migracja
         internal int sliceHeight;
         internal int sliceWidth;
 
+        internal int sliceDisplacementX ;
+        internal int sliceDisplacementY;
+
         public void ReadGeoCorners(String stLeftUpX, String stLeftUpY, String stRightDownX, String stRightDownY)
         {
             geoLeftUpX = DecodeGeoStr(stLeftUpX);

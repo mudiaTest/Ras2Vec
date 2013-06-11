@@ -79,8 +79,6 @@ namespace Migracja
                 colorGroupList = aMapFactory.vectRectGroupsByColor[colorGroupListIdx];
                 colorGroupList.Remove(delId);
             };
-
-
         }
     }
 }

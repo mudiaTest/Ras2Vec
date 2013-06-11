@@ -12,6 +12,19 @@ namespace Migracja
     //TDynamicPointArray = Vector_Gen[];
     //TDynamicPxColorPointArray = ColorPx[,];
 
+    class  EdgeList: Dictionary<int, VectorRectangeGroup>
+    {
+        private int maxKey;
+        internal int NextKey()
+        {
+            return maxKey++;
+        }
+        public EdgeList()
+        {
+            maxKey = 0;
+        }
+    }
+
     //Grupa rectangli tworzacych jedną płąszczyznę. Pozwala obliczyć swoją granicę
     partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
     {
@@ -21,7 +34,7 @@ namespace Migracja
         //Kolejnośc wyznaczają klucze
         public VectorRectangeGroup edgeList{get;set;}
         //lista wewnętrznych krawędzi. Każda z nich ma konstrukcję jak edgePxList
-        public Dictionary<int, VectorRectangeGroup> innerEdgesList{ get; set; }
+        public EdgeList innerEdgesList { get; set; }
         //lista krawędzi punktów Double
         public Dictionary<int, GeoPoint> edgeGeoList { get; set; }
         //lista krawędzi punktów-pixeli (kolejnych), które zostały poddane uproszczaniu - jest to okrojona edgePxList
@@ -320,7 +333,7 @@ namespace Migracja
         public VectoredRectangleGroup()
         {
             edgeList = new VectorRectangeGroup();
-            innerEdgesList = new Dictionary<int, VectorRectangeGroup>();
+            innerEdgesList = new EdgeList();
         }
 
         //tworzy tablicę punktów z ponktów zawartych w edgePxList
