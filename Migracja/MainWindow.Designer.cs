@@ -46,6 +46,11 @@
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.panel8 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.edtSliceHeight = new System.Windows.Forms.MaskedTextBox();
+            this.edtSliceWidth = new System.Windows.Forms.MaskedTextBox();
             this.reloadSrcMapBtn = new System.Windows.Forms.Button();
             this.infoBox = new System.Windows.Forms.RichTextBox();
             this.panel5 = new System.Windows.Forms.Panel();
@@ -81,14 +86,11 @@
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.panel8 = new System.Windows.Forms.Panel();
-            this.edtSliceHeight = new System.Windows.Forms.MaskedTextBox();
-            this.edtSliceWidth = new System.Windows.Forms.MaskedTextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.panel9 = new System.Windows.Forms.Panel();
             this.menuMain.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
+            this.panel8.SuspendLayout();
             this.panel5.SuspendLayout();
             this.gbThreadChoice.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -100,7 +102,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
             this.sourcePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
-            this.panel8.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -225,6 +226,7 @@
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.panel9);
             this.panel4.Controls.Add(this.panel8);
             this.panel4.Controls.Add(this.reloadSrcMapBtn);
             this.panel4.Controls.Add(this.infoBox);
@@ -233,9 +235,7 @@
             this.panel4.Controls.Add(this.chkBoxTestOptions);
             this.panel4.Controls.Add(this.btnRefreshResultImg);
             this.panel4.Controls.Add(this.btnMainThread);
-            this.panel4.Controls.Add(this.btnStopR2V);
             this.panel4.Controls.Add(this.gbThreadChoice);
-            this.panel4.Controls.Add(this.btnStartR2V);
             this.panel4.Controls.Add(this.btnSeparateThread);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(34, 0);
@@ -245,9 +245,64 @@
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
             // 
+            // panel8
+            // 
+            this.panel8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel8.Controls.Add(this.label3);
+            this.panel8.Controls.Add(this.label4);
+            this.panel8.Controls.Add(this.edtSliceHeight);
+            this.panel8.Controls.Add(this.edtSliceWidth);
+            this.panel8.Enabled = false;
+            this.panel8.Location = new System.Drawing.Point(156, 4);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(152, 33);
+            this.panel8.TabIndex = 29;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(84, 5);
+            this.label3.Margin = new System.Windows.Forms.Padding(0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(14, 13);
+            this.label3.TabIndex = 32;
+            this.label3.Text = "Y";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 5);
+            this.label4.Margin = new System.Windows.Forms.Padding(0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(14, 13);
+            this.label4.TabIndex = 31;
+            this.label4.Text = "X";
+            // 
+            // edtSliceHeight
+            // 
+            this.edtSliceHeight.BackColor = System.Drawing.SystemColors.Info;
+            this.edtSliceHeight.Location = new System.Drawing.Point(101, 3);
+            this.edtSliceHeight.Mask = "000000";
+            this.edtSliceHeight.Name = "edtSliceHeight";
+            this.edtSliceHeight.ReadOnly = true;
+            this.edtSliceHeight.Size = new System.Drawing.Size(44, 20);
+            this.edtSliceHeight.TabIndex = 30;
+            this.edtSliceHeight.Leave += new System.EventHandler(this.edtSliceHeight_Leave);
+            // 
+            // edtSliceWidth
+            // 
+            this.edtSliceWidth.BackColor = System.Drawing.SystemColors.Info;
+            this.edtSliceWidth.Location = new System.Drawing.Point(21, 3);
+            this.edtSliceWidth.Mask = "000000";
+            this.edtSliceWidth.Name = "edtSliceWidth";
+            this.edtSliceWidth.ReadOnly = true;
+            this.edtSliceWidth.Size = new System.Drawing.Size(44, 20);
+            this.edtSliceWidth.TabIndex = 29;
+            this.edtSliceWidth.Leave += new System.EventHandler(this.edtSliceWidth_Leave);
+            // 
             // reloadSrcMapBtn
             // 
-            this.reloadSrcMapBtn.Location = new System.Drawing.Point(188, 288);
+            this.reloadSrcMapBtn.Location = new System.Drawing.Point(193, 293);
             this.reloadSrcMapBtn.Name = "reloadSrcMapBtn";
             this.reloadSrcMapBtn.Size = new System.Drawing.Size(112, 23);
             this.reloadSrcMapBtn.TabIndex = 26;
@@ -276,7 +331,7 @@
             this.panel5.Controls.Add(this.maskedTextBox1);
             this.panel5.Location = new System.Drawing.Point(8, 4);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(142, 109);
+            this.panel5.Size = new System.Drawing.Size(142, 120);
             this.panel5.TabIndex = 21;
             // 
             // label1
@@ -303,7 +358,7 @@
             // 
             this.lblY2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblY2.AutoSize = true;
-            this.lblY2.Location = new System.Drawing.Point(55, 85);
+            this.lblY2.Location = new System.Drawing.Point(55, 96);
             this.lblY2.Margin = new System.Windows.Forms.Padding(0);
             this.lblY2.Name = "lblY2";
             this.lblY2.Size = new System.Drawing.Size(14, 13);
@@ -314,7 +369,7 @@
             // 
             this.lblX2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblX2.AutoSize = true;
-            this.lblX2.Location = new System.Drawing.Point(55, 59);
+            this.lblX2.Location = new System.Drawing.Point(55, 70);
             this.lblX2.Margin = new System.Windows.Forms.Padding(0);
             this.lblX2.Name = "lblX2";
             this.lblX2.Size = new System.Drawing.Size(14, 13);
@@ -325,7 +380,7 @@
             // 
             this.maskedTextBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.maskedTextBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.maskedTextBox4.Location = new System.Drawing.Point(69, 83);
+            this.maskedTextBox4.Location = new System.Drawing.Point(69, 94);
             this.maskedTextBox4.Mask = "00.00.00.00";
             this.maskedTextBox4.Name = "maskedTextBox4";
             this.maskedTextBox4.Size = new System.Drawing.Size(68, 20);
@@ -336,7 +391,7 @@
             // 
             this.maskedTextBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.maskedTextBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.maskedTextBox3.Location = new System.Drawing.Point(69, 57);
+            this.maskedTextBox3.Location = new System.Drawing.Point(69, 68);
             this.maskedTextBox3.Mask = "00.00.00.00";
             this.maskedTextBox3.Name = "maskedTextBox3";
             this.maskedTextBox3.Size = new System.Drawing.Size(68, 20);
@@ -365,7 +420,7 @@
             // 
             // loadSrcMapBtn
             // 
-            this.loadSrcMapBtn.Location = new System.Drawing.Point(84, 288);
+            this.loadSrcMapBtn.Location = new System.Drawing.Point(89, 293);
             this.loadSrcMapBtn.Name = "loadSrcMapBtn";
             this.loadSrcMapBtn.Size = new System.Drawing.Size(98, 23);
             this.loadSrcMapBtn.TabIndex = 14;
@@ -382,7 +437,7 @@
             "Polygons - po R2V (yes) / Rectangles - z Rastra (no)",
             "Edge (polygons) / Grid (rectangles)",
             "Kolor testowy"});
-            this.chkBoxTestOptions.Location = new System.Drawing.Point(3, 233);
+            this.chkBoxTestOptions.Location = new System.Drawing.Point(8, 240);
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
             this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 49);
             this.chkBoxTestOptions.TabIndex = 10;
@@ -390,7 +445,7 @@
             // 
             // btnRefreshResultImg
             // 
-            this.btnRefreshResultImg.Location = new System.Drawing.Point(3, 288);
+            this.btnRefreshResultImg.Location = new System.Drawing.Point(8, 293);
             this.btnRefreshResultImg.Name = "btnRefreshResultImg";
             this.btnRefreshResultImg.Size = new System.Drawing.Size(75, 23);
             this.btnRefreshResultImg.TabIndex = 16;
@@ -400,9 +455,9 @@
             // 
             // btnMainThread
             // 
-            this.btnMainThread.Location = new System.Drawing.Point(8, 166);
+            this.btnMainThread.Location = new System.Drawing.Point(207, 173);
             this.btnMainThread.Name = "btnMainThread";
-            this.btnMainThread.Size = new System.Drawing.Size(75, 23);
+            this.btnMainThread.Size = new System.Drawing.Size(99, 23);
             this.btnMainThread.TabIndex = 11;
             this.btnMainThread.Text = "MainThread";
             this.btnMainThread.UseVisualStyleBackColor = true;
@@ -410,9 +465,9 @@
             // 
             // btnStopR2V
             // 
-            this.btnStopR2V.Location = new System.Drawing.Point(112, 195);
+            this.btnStopR2V.Location = new System.Drawing.Point(111, 39);
             this.btnStopR2V.Name = "btnStopR2V";
-            this.btnStopR2V.Size = new System.Drawing.Size(99, 23);
+            this.btnStopR2V.Size = new System.Drawing.Size(75, 23);
             this.btnStopR2V.TabIndex = 15;
             this.btnStopR2V.Text = "Stop R2V";
             this.btnStopR2V.UseVisualStyleBackColor = true;
@@ -422,18 +477,20 @@
             // 
             this.gbThreadChoice.Controls.Add(this.rbSeparateThread);
             this.gbThreadChoice.Controls.Add(this.rbMainThread);
-            this.gbThreadChoice.Location = new System.Drawing.Point(8, 127);
+            this.gbThreadChoice.Controls.Add(this.btnStopR2V);
+            this.gbThreadChoice.Controls.Add(this.btnStartR2V);
+            this.gbThreadChoice.Location = new System.Drawing.Point(8, 163);
             this.gbThreadChoice.Margin = new System.Windows.Forms.Padding(0);
             this.gbThreadChoice.Name = "gbThreadChoice";
             this.gbThreadChoice.Padding = new System.Windows.Forms.Padding(0);
-            this.gbThreadChoice.Size = new System.Drawing.Size(203, 36);
+            this.gbThreadChoice.Size = new System.Drawing.Size(193, 65);
             this.gbThreadChoice.TabIndex = 12;
             this.gbThreadChoice.TabStop = false;
             // 
             // rbSeparateThread
             // 
             this.rbSeparateThread.AutoSize = true;
-            this.rbSeparateThread.Location = new System.Drawing.Point(91, 7);
+            this.rbSeparateThread.Location = new System.Drawing.Point(6, 39);
             this.rbSeparateThread.Name = "rbSeparateThread";
             this.rbSeparateThread.Size = new System.Drawing.Size(102, 17);
             this.rbSeparateThread.TabIndex = 6;
@@ -444,7 +501,7 @@
             // 
             this.rbMainThread.AutoSize = true;
             this.rbMainThread.Checked = true;
-            this.rbMainThread.Location = new System.Drawing.Point(3, 7);
+            this.rbMainThread.Location = new System.Drawing.Point(6, 13);
             this.rbMainThread.Name = "rbMainThread";
             this.rbMainThread.Size = new System.Drawing.Size(82, 17);
             this.rbMainThread.TabIndex = 5;
@@ -454,7 +511,7 @@
             // 
             // btnStartR2V
             // 
-            this.btnStartR2V.Location = new System.Drawing.Point(8, 195);
+            this.btnStartR2V.Location = new System.Drawing.Point(111, 10);
             this.btnStartR2V.Name = "btnStartR2V";
             this.btnStartR2V.Size = new System.Drawing.Size(75, 23);
             this.btnStartR2V.TabIndex = 14;
@@ -464,7 +521,7 @@
             // 
             // btnSeparateThread
             // 
-            this.btnSeparateThread.Location = new System.Drawing.Point(112, 166);
+            this.btnSeparateThread.Location = new System.Drawing.Point(207, 201);
             this.btnSeparateThread.Name = "btnSeparateThread";
             this.btnSeparateThread.Size = new System.Drawing.Size(99, 23);
             this.btnSeparateThread.TabIndex = 13;
@@ -623,57 +680,13 @@
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
-            // panel8
+            // panel9
             // 
-            this.panel8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel8.Controls.Add(this.label3);
-            this.panel8.Controls.Add(this.label4);
-            this.panel8.Controls.Add(this.edtSliceHeight);
-            this.panel8.Controls.Add(this.edtSliceWidth);
-            this.panel8.Location = new System.Drawing.Point(166, 4);
-            this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(87, 109);
-            this.panel8.TabIndex = 29;
-            // 
-            // edtSliceHeight
-            // 
-            this.edtSliceHeight.Location = new System.Drawing.Point(29, 31);
-            this.edtSliceHeight.Mask = "000000";
-            this.edtSliceHeight.Name = "edtSliceHeight";
-            this.edtSliceHeight.Size = new System.Drawing.Size(44, 20);
-            this.edtSliceHeight.TabIndex = 30;
-            this.edtSliceHeight.Leave += new System.EventHandler(this.edtSliceHeight_Leave);
-            // 
-            // edtSliceWidth
-            // 
-            this.edtSliceWidth.Location = new System.Drawing.Point(29, 7);
-            this.edtSliceWidth.Mask = "000000";
-            this.edtSliceWidth.Name = "edtSliceWidth";
-            this.edtSliceWidth.Size = new System.Drawing.Size(44, 20);
-            this.edtSliceWidth.TabIndex = 29;
-            this.edtSliceWidth.Leave += new System.EventHandler(this.edtSliceWidth_Leave);
-            // 
-            // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 32);
-            this.label3.Margin = new System.Windows.Forms.Padding(0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(14, 13);
-            this.label3.TabIndex = 32;
-            this.label3.Text = "Y";
-            // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 6);
-            this.label4.Margin = new System.Windows.Forms.Padding(0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(14, 13);
-            this.label4.TabIndex = 31;
-            this.label4.Text = "X";
+            this.panel9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel9.Location = new System.Drawing.Point(156, 43);
+            this.panel9.Name = "panel9";
+            this.panel9.Size = new System.Drawing.Size(152, 81);
+            this.panel9.TabIndex = 30;
             // 
             // MainWindow
             // 
@@ -689,6 +702,8 @@
             this.menuMain.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
+            this.panel8.ResumeLayout(false);
+            this.panel8.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             this.gbThreadChoice.ResumeLayout(false);
@@ -703,8 +718,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
             this.sourcePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
-            this.panel8.ResumeLayout(false);
-            this.panel8.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -769,6 +782,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.MaskedTextBox edtSliceHeight;
         private System.Windows.Forms.MaskedTextBox edtSliceWidth;
+        private System.Windows.Forms.Panel panel9;
     }
 }
 

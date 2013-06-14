@@ -48,7 +48,7 @@ namespace Migracja
             }
             windowSettings.centerX = sourceImageCropper.centerX;
             windowSettings.centerY = sourceImageCropper.centerY;
-            DrawCroppedScaledImage(dpShift);
+            DrawCroppedScaledImage(dpShift, UpdateInfoBoxTime);
             blMouseInMoveMode = false;
         }
 
@@ -92,7 +92,8 @@ namespace Migracja
             destinationBmp = null;
             sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
             desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings,
+                                                            sourceBmp);
         }
 
         private bool LoadImage(String aPath)
@@ -100,27 +101,30 @@ namespace Migracja
             if (File.Exists(aPath))
             {
                 PrepareSourceImage(aPath);
-                DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
+                DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
                 SetScaleControlEnable(true);
                 return true;
             }
             return false;
         }
 
-        private bool DrawCroppedScaledImage(float aDpScale, float? aDpScalePrev = null)
+        private bool DrawCroppedScaledImage(float aDpScale,  UpdateInfoBoxTimeDelegate aFunct = null, float? aDpScalePrev = null)
         {
+            DateTime dtTimePrv = DateTime.Now;
             Bitmap croppedSrcBmp = sourceImageCropper.GetCroppedImage(aDpScale);
-
+            dtTimePrv = aFunct("GetCroppedImage 1:", true, dtTimePrv);
             //tymczasowo przypisuję ten sam obraz
             //Bitmap croppedDstBmp = croppedSrcBmp;
             Bitmap croppedDstBmp;
             if (desinationImageCrooper.mapFactory == null)
             {
                 croppedDstBmp = null;
+                dtTimePrv = aFunct("GetCroppedImage 2 NULL:", false, dtTimePrv);
             }
             else
             {
-                croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale);
+                croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale, aFunct);
+                dtTimePrv = aFunct("GetCroppedImage 2:", false, dtTimePrv);
             }
             
             /*int scaledShiftX = sourcePanel.Width;
@@ -128,17 +132,17 @@ namespace Migracja
             int scaledShiftX = (int)Math.Round(sourceImageCropper.centerX * aDpScale);
             int scaledShiftY = (int)Math.Round(sourceImageCropper.centerY * aDpScale);
 
-            UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
+            //UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
             sourcePB.Height = croppedSrcBmp.Height;
             sourcePB.Width = croppedSrcBmp.Width;
             sourcePB.Image = croppedSrcBmp;
-            UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
-                          "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
+            //UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
+            //              "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
             /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
             sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);*/
             sourcePB.Left = -sourcePanel.Width;
             sourcePB.Top = -sourcePanel.Height;
-            UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
+            //UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
             if (croppedDstBmp != null)
             {
@@ -150,6 +154,7 @@ namespace Migracja
                 destinationPB.Left = -destinationPanel.Width;
                 destinationPB.Top = -destinationPanel.Height;
             }
+            aFunct("Pozostałe:", false, dtTimePrv);
             return true;
         }
 

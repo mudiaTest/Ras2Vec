@@ -111,7 +111,7 @@ namespace Migracja
                                  );
         }
 
-        public abstract Bitmap GetCroppedImage(float aScale);
+        public abstract Bitmap GetCroppedImage(float aScale, UpdateInfoBoxTimeDelegate aFunct = null);
    
     }
 
@@ -123,7 +123,7 @@ namespace Migracja
             srcBmp = aSrcBmp; 
         }
 
-        public override Bitmap GetCroppedImage(float aScale)
+        public override Bitmap GetCroppedImage(float aScale, UpdateInfoBoxTimeDelegate aFunct = null)
         {
             Rectangle rect = GetSourceRectangle(aScale);
             Bitmap result;
@@ -149,8 +149,8 @@ namespace Migracja
     class VectorImageCrooper : Crooper
     {
         MainWindowSettings settings;
-        public VectorImageCrooper(Size aPanelSize, MapFactory aMapFactory, int aCenterX, int aCenterY, MainWindowSettings aSettings)
-            : base(aPanelSize, 0, 0)
+        public VectorImageCrooper(Size aPanelSize, MapFactory aMapFactory, int aCenterX, int aCenterY, MainWindowSettings aSettings, Bitmap aSrcBmp)
+            : base(aPanelSize, aSrcBmp.Height, aSrcBmp.Width)
         {
             mapFactory = aMapFactory;
             settings = aSettings;
@@ -164,11 +164,13 @@ namespace Migracja
             centerY = aCenterY;
         }
 
-        public override Bitmap GetCroppedImage(float aScale)
+        public override Bitmap GetCroppedImage(float aScale, UpdateInfoBoxTimeDelegate aFunct = null)
         {
+            DateTime dtStart = DateTime.Now;
             Rectangle rect = GetSourceRectangle(aScale);
             Bitmap result;
             Rectangle resultRect = GetDestinationRectangle(aScale, rect);
+            //Rectangle resultRect = new Rectangle(0, 0, (int)Math.Round(srcBmpWidth * aScale), (int)Math.Round(srcBmpHeight * aScale));
 
             //finalna bitmapa o odpowiednim rozmiarze
             result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
@@ -177,7 +179,7 @@ namespace Migracja
             //Pen localPen = new Pen(new Brush() );
 
             Vector_Rectangle[][] vectArr = mapFactory.vectArr;
-
+            aFunct("  Faza1", false, dtStart);
             //rysowanie rectangli odzwierciedlających pixele wzorcowego obrazka
             if (!settings.Polygons() || aScale == 1)
             {
@@ -214,7 +216,16 @@ namespace Migracja
                 int tmpPointG;
                 int tmpPointB;
 
-                List<int> usedGroups = new List<int>();
+                Boolean[][] usedArray = new Boolean[rect.Width + rect.X][];
+                for (int i = 0; i < rect.Width + rect.X; i++)
+                {
+                    usedArray[i] = new Boolean[rect.Height + rect.Y];
+                    for (int j = 0; j < rect.Height; j++)
+                    {
+                        usedArray[i][j] = false;
+                    }
+
+                }
                 
                 //będziemy poruszać się po ustalonym wycinku wzorcowego obrazu
                 for (int x = 0; x < rect.Width; x++)
@@ -224,13 +235,24 @@ namespace Migracja
                         int sourceX = x + rect.X;
                         int sourceY = y + rect.Y;
 
-                        VectoredRectangleGroup group = mapFactory.GetGroupByXY(sourceX, sourceY, usedGroups);
+                        VectoredRectangleGroup group = mapFactory.GetGroupByXY(sourceX, sourceY, usedArray);
 
                         //foreach (VectoredRectangleGroup group in mapFactory.Values)
                         if(group != null)
                         {
-                            Point[] granica = group.GetPointArrFromEdge(group.edgeList, aScale, resultRect.X - rect.X*aScale,
-                                                                        resultRect.Y - rect.Y * aScale, rect);
+                            /*if (group.pointArrFromEdge == null)
+                                group.MakePointArrFromEdge(Cst.maxZoom,
+                                                           resultRect.X - rect.X*aScale,
+                                                           resultRect.Y - rect.Y*aScale);*/
+                            Debug.Assert(group.pointArrFromFullEdge != null,
+                                         "Tablica pointArrFromFullEdge nie została zainicjalizowana.");
+                            Debug.Assert(group.pointArrFromFullEdge.Length != 0,
+                                         "Tablica pointArrFromFullEdge jest pusta.");
+                            Point[] granica = group.GetScaledPointArrFromFullEdge(aScale, 
+                                                                                  resultRect.X - rect.X * aScale,
+                                                                                  resultRect.Y - rect.Y * aScale);
+
+
                             graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);
                             if (settings.Edges())
                             {

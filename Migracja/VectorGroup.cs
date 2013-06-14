@@ -54,7 +54,10 @@ namespace Migracja
         //rodzic
         public MapFactory parentMapFactory{get;set;}
 
-        public Point[] GetEdgeListAsArray(float aScale)
+        internal Point[] pointArrFromFullEdge = null;
+        internal Point[] pointArrFromSimplifiedEdge = null;
+
+        Point[] GetEdgeListAsArray(float aScale)
         {
             Debug.Assert(aScale >= 1, "GetEdgeListAsArray nie może utworzyć polygonu dla skali <= 1.");
 
@@ -340,7 +343,7 @@ namespace Migracja
         public List<GeoPoint> MakeVectorEdge(VectorRectangeGroup aEdgePxList,
                                              ColorPx[][] aColorArr,
                                              bool aBlOnlyFillColorArr,
-                                             float aMultiX = 0, float aMultiY = 0,
+                                             float aMultiX = 1, float aMultiY = 1,
                                              float aDisplaceX = 0, float aDisplaceY = 0)
         {
             List<GeoPoint> result = new List<GeoPoint>(aEdgePxList.Count * 3);
@@ -383,12 +386,44 @@ namespace Migracja
             return result;
         }
 
-        public Point[] GetPointArrFromEdge(VectorRectangeGroup aEdgePxList, float aDpScale, float aDisplaceX, float aDisplaceY, Rectangle aRect)
+        internal void MakePointArrFromFullEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
         {
-            //Point[] result = new Point[aEdgePxList.Count * 3];
-            List<GeoPoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
-            return GeoPointList2PxArray(geoPointList);
+            pointArrFromFullEdge = MakePointArrFromEdge(edgeList, aDpScale, aDisplaceX, aDisplaceY);
         }
+
+        internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
+        {
+            pointArrFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
+        }
+
+            private Point[] MakePointArrFromEdge(VectorRectangeGroup aEdgeList, float aDpScale, float aDisplaceX, float aDisplaceY)
+            {
+                //Point[] result = new Point[aEdgePxList.Count * 3];
+                List<GeoPoint> geoPointList = MakeVectorEdge(aEdgeList, GetColorArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+                return GeoPointList2PxArray(geoPointList);
+            }
+
+
+        internal Point[] GetScaledPointArrFromFullEdge(float adpScale, float aDisplaceX, float aDisplaceY)
+        {
+            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointArrFromFullEdge);
+        }
+
+        internal Point[] GetScaledPointArrFromSimplifiedEdge(float adpScale, float aDisplaceX, float aDisplaceY)
+        {
+            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointArrFromSimplifiedEdge);
+        }
+
+            private Point[] GetScaledPointArrFromEdge(float adpScale, float aDisplaceX, float aDisplaceY, Point[] aPointArr)
+            {
+                Point[] result = new Point[aPointArr.Length];
+                for(int i=0; i< aPointArr.Length; i++)
+                {
+                    result[i] = new Point((int)Math.Round(aPointArr[i].X * adpScale / Cst.maxZoom + aDisplaceX), 
+                                          (int)Math.Round(aPointArr[i].Y * adpScale / Cst.maxZoom + aDisplaceY));
+                }
+                return result;
+            }
 
         public List<GeoPoint> SimplifyVectorEdge(List<GeoPoint> aArr)
         {

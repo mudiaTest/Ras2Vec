@@ -7,16 +7,18 @@ namespace Migracja
 {
     class Cst
     {
-        public const int fromLeft = 0;
-        public const int fromTop = 1;
-        public const int fromRight = 2;
-        public const int fromBottom = 3;
+        internal const int fromLeft = 0;
+        internal const int fromTop = 1;
+        internal const int fromRight = 2;
+        internal const int fromBottom = 3;
 
-        public const int goTop = 0;
-        public const int goRight = 1;
-        public const int goBottom = 2;
-        public const int goLeft = 3;
+        internal const int goTop = 0;
+        internal const int goRight = 1;
+        internal const int goBottom = 2;
+        internal const int goLeft = 3;
 
-        public const string progName = "Ras2Vec";
+        internal const string progName = "Ras2Vec";
+
+        internal const int maxZoom = 10;
     }
 }

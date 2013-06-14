@@ -173,7 +173,7 @@ namespace Migracja
             {
                 sourceImageCropper.centerX = aSettings.centerX;
                 sourceImageCropper.centerY = aSettings.centerY;
-                DrawCroppedScaledImage(windowSettings.dpScale);
+                DrawCroppedScaledImage(windowSettings.dpScale, UpdateInfoBoxTime);
                 //Dodać kod, który odczytaną mapę odpoweirdnio ustawi i wyświetli przy pomocy destinationImageCropper 
             }
             SetScaleControlEnable(true);
@@ -204,10 +204,10 @@ namespace Migracja
 
         private void ZoomInBtn_Click(object sender, EventArgs e)
         {
-            if (windowSettings.dpScale < 10)
+            if (windowSettings.dpScale < Cst.maxZoom)
             {
 
-                if (DrawCroppedScaledImage(windowSettings.dpScale + 1, windowSettings.dpScale))
+                if (DrawCroppedScaledImage(windowSettings.dpScale + 1, UpdateInfoBoxTime, windowSettings.dpScale))
                     windowSettings.dpScale += 1;
                     ScaleRefresh();
             }
@@ -217,7 +217,7 @@ namespace Migracja
         {
             if (windowSettings.dpScale > 1)
             {
-                if (DrawCroppedScaledImage(windowSettings.dpScale - 1, windowSettings.dpScale))
+                if (DrawCroppedScaledImage(windowSettings.dpScale - 1, UpdateInfoBoxTime, windowSettings.dpScale))
                 windowSettings.dpScale -= 1;
                 ScaleRefresh();
             }
@@ -230,8 +230,9 @@ namespace Migracja
             destinationPanel.Height = panelSize;
             sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
-            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY,
+                                                            windowSettings, sourceBmp);
+            DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
         }
 
         private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
@@ -277,7 +278,7 @@ namespace Migracja
         {
             if (ScaleTrB.Value != windowSettings.dpScale)
             {
-                if (DrawCroppedScaledImage(ScaleTrB.Value, windowSettings.dpScale))
+                if (DrawCroppedScaledImage(ScaleTrB.Value, UpdateInfoBoxTime, windowSettings.dpScale))
                 windowSettings.dpScale = ScaleTrB.Value;
                 ScaleRefresh();
             }
@@ -364,9 +365,10 @@ namespace Migracja
 
             mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings);
-            
-            DrawCroppedScaledImage(float.Parse(ScaleTB.Text));
+                                                            sourceImageCropper.centerX, sourceImageCropper.centerY,
+                                                            windowSettings, sourceBmp);
+
+            DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
@@ -381,7 +383,7 @@ namespace Migracja
 
         private void btnRefreshResultImg_Click(object sender, EventArgs e)
         {
-            DrawCroppedScaledImage(windowSettings.dpScale, windowSettings.dpScale);
+            DrawCroppedScaledImage(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
         }
 
         private void edtSliceWidth_Leave(object sender, EventArgs e)

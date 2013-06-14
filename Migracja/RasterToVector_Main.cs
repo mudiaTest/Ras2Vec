@@ -17,52 +17,10 @@ namespace Migracja
             MapFactory singleThreadFactory = new MapFactory(aSettings) { infoBoxUpdateFunct = aFunct };
             DateTime datePrv = DateTime.Now;
             singleThreadFactory.PrzygotujMapFactory();
-            datePrv = aFunct("'Przygotuj singleThreadFactory'", false, datePrv);
+            datePrv = aFunct("'Przygotuj singleThreadFactory'", true, datePrv);
 
             singleThreadFactory.GroupRect();
             datePrv = aFunct("'  GroupRect'", false, datePrv);
-           /* Bitmap srcBmp = aSettings.sourceBmp;
-            for (int y = 0; y < srcBmp.Height; y += aSettings.sliceHeight)
-            {
-                for (int x = 0; x < srcBmp.Width; y += aSettings.sliceWidth)
-                {
-                    Bitmap sliceSrcBmp = new Bitmap(aSettings.sliceWidth, aSettings.sliceHeight);
-                    Graphics sliceSrcGraphics = Graphics.FromImage(sliceSrcBmp);
-                    sliceSrcGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                    sliceSrcGraphics.DrawImage(srcBmp,
-                                               new Rectangle(0, 
-                                                             0,
-                                                             Math.Min(aSettings.sliceWidth,
-                                                                      srcBmp.Width - x * aSettings.sliceWidth),
-                                                             Math.Min(aSettings.sliceHeight,
-                                                                      srcBmp.Height -
-                                                                      y*aSettings.sliceHeight)),
-                                               new Rectangle(aSettings.sliceWidth*x, 
-                                                             aSettings.sliceHeight*y,
-                                                             Math.Min(aSettings.sliceWidth,
-                                                                      srcBmp.Width - x * aSettings.sliceWidth),
-                                                             Math.Min(aSettings.sliceHeight,
-                                                                      srcBmp.Height -
-                                                                      y*aSettings.sliceHeight)),
-                                               System.Drawing.GraphicsUnit.Pixel);
-                    aSettings.sourceBmp = sliceSrcBmp;
-
-                    //przygotowanie do vektorowanie - np. zczytanie obrazka to tablicy rectangli
-                    MapFactory sliceThreadFactory = new MapFactory(aSettings) { infoBoxUpdateFunct  = aFunct };
-                    sliceThreadFactory.PrzygotujMapFactory();
-                    datePrv = aFunct( "x:'" + x.ToString() + " y:" + y.ToString() + '\n' +"'  Przygotuj sliceMapFactory" , false, datePrv);
-
-                    //grupowanie rectangli
-                    sliceThreadFactory.GroupRect();
-                    datePrv = aFunct("'  GroupRect'", false, datePrv);
-
-                    //przepisywanie grup rectangli do singleThreadFactory
-                    singleThreadFactory.GetGroupRectDisplacement(sliceThreadFactory, x * aSettings.sliceWidth, y * aSettings.sliceHeight);
-                    datePrv = aFunct("'  GetGroupRectDisplacement'", false, datePrv);
-
-                }
-            }
-            aSettings.sourceBmp = srcBmp;*/
 
             //wypełnianie informacją o kolorze
             singleThreadFactory.FillColorArr();
@@ -81,6 +39,10 @@ namespace Migracja
             //budowanie granic wewnętrznych
             singleThreadFactory.MakeInnerEdgesForGroups();
             aFunct("'MakeInnerEdgesForGroups'", false, datePrv);
+
+            //budowanie list punktów dla rysowania polygonów
+            singleThreadFactory.MakePointArrFromEdgeForGroups();
+            aFunct("'MakePointArrFromEdgeForGroups'", false, datePrv);
 
             //singleThreadFactory.Init(aSettings);
             return singleThreadFactory;

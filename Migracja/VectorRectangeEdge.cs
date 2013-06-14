@@ -26,6 +26,12 @@ namespace Migracja
         {
             maxKey = 0;
         }
+
+        public void ClearReset()
+        {
+            Clear();
+            maxKey = 0;
+        }
     }
 
     partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
@@ -167,7 +173,7 @@ namespace Migracja
             //dummyArr: TDynamicGeoPointArray;
 
             
-            aEdgePxList.Clear();
+            aEdgePxList.ClearReset();
             //startEdgePoint to pierwszy punkt na liście, bo idziemy ol lewej strony
             //w najwyższym wierszu
             Vector_Rectangle startEdgePoint = this[0];
@@ -179,7 +185,8 @@ namespace Migracja
             if (Count != 1)
             {
             //kończymy jeśli trafiamy na początek, lub na 1-pixelowy obiekt
-                aEdgePxList.Add(0, null);
+                Debug.Assert(aEdgePxList.Count == 0, "Dictionary aEdgePxList nie jest pusty.");
+                aEdgePxList.Add(aEdgePxList.NextKey(), null);
                 while (
                         ((nextEdgePoint != startEdgePoint) && (prevEdgePoint != null)) ||
                         (CheckBottomPX(startEdgePoint) && (arrivDir == Cst.fromRight)) //przypadek gdy wracamy się do punktu startu, ale mamy do prawdzenia to co jest pod nim

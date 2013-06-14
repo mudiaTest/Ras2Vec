@@ -30,6 +30,11 @@ namespace Migracja
         internal UpdateInfoBoxTimeDelegate infoBoxUpdateFunct;
 
         internal int maxKey;
+        internal void ClearReset()
+        {
+            Clear();
+            maxKey = 0;
+        }
 
         internal TimeSpan ts;
 
@@ -89,7 +94,7 @@ namespace Migracja
             /**perf = TTimeInterval.Create;
             perf2 = TTimeInterval.Create;
             perf3 = TTimeInterval.Create;*/
-            Clear();
+            ClearReset();
             int lpGroup = 0;
             ColorGroupList colorGroupList;
             Vector_Rectangle vectObj;
@@ -316,6 +321,16 @@ namespace Migracja
                 }
         }
 
+        internal void MakePointArrFromEdgeForGroups()
+        {
+            foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+            {
+                pair.Value.MakePointArrFromFullEdge(Cst.maxZoom, 
+                                                    0,
+                                                    0);
+            }
+        }
+
         public MapFactory(RasterToVectorSettings aSettings)
         {
             settings = aSettings;
@@ -332,7 +347,7 @@ namespace Migracja
 
         public void PrzygotujMapFactory()
         {
-            Clear();
+            ClearReset();
             ReadFromImgIntoRectArray(settings.sourceBmp);
             geoLeftUpX = settings.geoLeftUpX;
             geoLeftUpY = settings.geoLeftUpY;
@@ -340,10 +355,27 @@ namespace Migracja
             geoRightDownY = settings.geoRightDownY;
         }
 
-        public VectoredRectangleGroup GetGroupByXY(int x, int y, List<int> aList)
+        public VectoredRectangleGroup GetGroupByXY(int x, int y, Boolean[][] aUsedArray)
         {
-            VectoredRectangleGroup result = vectArr[x][y].parentVectorGroup;
-            if (!aList.Contains(result.lpGroup))
+            
+
+            if (!aUsedArray[x][y])
+            {
+                VectoredRectangleGroup result = vectArr[x][y].parentVectorGroup;
+                foreach (KeyValuePair<int, Vector_Rectangle> pair in result)
+                {
+                    if (aUsedArray.Length > pair.Value.p1.X)
+                        if(aUsedArray[pair.Value.p1.X].Length > pair.Value.p1.Y)
+                            aUsedArray[pair.Value.p1.X][pair.Value.p1.Y] = true;
+                }
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+            
+           /* if (!aList.Contains(result.lpGroup))
             {
                 aList.Add(result.lpGroup);
                 return result;
@@ -351,7 +383,7 @@ namespace Migracja
             else
             {
                 return null;
-            }
+            }*/
         }
 
         //public Bitmap getBitmap(Rectangle rect)
