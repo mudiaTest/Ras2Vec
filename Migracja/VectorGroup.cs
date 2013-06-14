@@ -399,8 +399,8 @@ namespace Migracja
             private Point[] MakePointArrFromEdge(VectorRectangeGroup aEdgeList, float aDpScale, float aDisplaceX, float aDisplaceY)
             {
                 //Point[] result = new Point[aEdgePxList.Count * 3];
-                List<GeoPoint> geoPointList = MakeVectorEdge(aEdgeList, GetColorArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
-                return GeoPointList2PxArray(geoPointList);
+                List<GeoPoint> pxPointList = MakeVectorEdge(aEdgeList, GetColorArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+                return PointList2PxArray(pxPointList);
             }
 
 
@@ -425,13 +425,104 @@ namespace Migracja
                 return result;
             }
 
-        public List<GeoPoint> SimplifyVectorEdge(List<GeoPoint> aArr)
+        internal void MakeSimplifyVectorEdge()
         {
             //to do
-            return new List<GeoPoint>();
-        }
+            simplifiedEdgeList = new VectorRectangeGroup();
+            List<int> sortedKeyList = edgeList.GetSortedKeyList();
+            Vector_Rectangle startRect = edgeList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
+            Vector_Rectangle middleRect = null;
+            Vector_Rectangle endRect = null;
+            int lastKey;
 
-        public Point[] GeoPointList2PxArray(List<GeoPoint> aGeoList)
+            int prevDiff;
+            //usunięcie punktów z linii poziomych i pionowych
+            if (sortedKeyList.Count >= 3)
+            {
+                lastKey = simplifiedEdgeList.NextKey();
+                simplifiedEdgeList.Add(lastKey, startRect);
+                if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
+                {
+                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
+                }
+                else /*if (edgeList[sortedKeyList[0]].p1.Y == edgeList[sortedKeyList[1]].p1.Y)*/
+                {
+                    prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
+                }
+
+                for (var i = 1; i < sortedKeyList.Count - 1; i++)
+                {                      
+                    middleRect = edgeList[sortedKeyList[i]];
+                    endRect = edgeList[sortedKeyList[i + 1]];
+                    if (InLineHorizontal(startRect, middleRect, endRect, prevDiff)) 
+                    {
+                        prevDiff = endRect.p1.Y - middleRect.p1.Y;
+                    }
+                    else if (InLineVertical(startRect, middleRect, endRect, prevDiff)) 
+                    {
+                        prevDiff = endRect.p1.X - middleRect.p1.X;
+                    }
+                    else
+                    {
+                        lastKey = simplifiedEdgeList.NextKey();
+                        simplifiedEdgeList.Add(lastKey, middleRect);
+                        startRect = middleRect;
+                        //jeśli krawędź zakręciła w kierunku poziomym, to prevDiff też w tym kierunku obliczamy
+                        if (middleRect.p1.X != endRect.p1.X)
+                        {
+                            prevDiff = endRect.p1.X - middleRect.p1.X;
+                        }
+                        else
+                        {
+                            prevDiff = endRect.p1.Y - middleRect.p1.Y;
+                        }
+                    }                    
+                }
+
+
+                startRect = simplifiedEdgeList[lastKey];
+                middleRect = edgeList[sortedKeyList[sortedKeyList.Count - 1]];
+                endRect = edgeList[sortedKeyList[0]];
+                if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
+                {
+                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
+                }
+                else /*if (edgeList[sortedKeyList[0]].p1.Y == edgeList[sortedKeyList[1]].p1.Y)*/
+                {
+                    prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
+                }
+
+                simplifiedEdgeList.Add(simplifiedEdgeList.NextKey(), edgeList[sortedKeyList[sortedKeyList.Count - 1]]);
+            }
+            else
+            {hjkhjkgjk
+                for (var i = 0; i < sortedKeyList.Count; i++)
+                {
+                    simplifiedEdgeList.Add(simplifiedEdgeList.NextKey(), edgeList[sortedKeyList[i]]);
+                }
+            }
+        }
+            //obiekty "podążają" w jednym kierunku w linii poziomej
+            internal bool InLineHorizontal(Vector_Rectangle aStartRect,
+                                    Vector_Rectangle aMiddleRect,
+                                    Vector_Rectangle aEndRect,
+                                    int aPrevDiff)
+            {
+                return aStartRect.p1.X == aMiddleRect.p1.X && aStartRect.p1.X == aEndRect.p1.X &&
+                       aPrevDiff == aEndRect.p1.Y - aMiddleRect.p1.Y;
+            }
+
+            //obiekty "podążają" w jednym kierunku w linii pionowej
+            internal bool InLineVertical(Vector_Rectangle aStartRect,
+                                    Vector_Rectangle aMiddleRect,
+                                    Vector_Rectangle aEndRect,
+                                    int aPrevDiff)
+            {
+                return aStartRect.p1.Y == aMiddleRect.p1.Y && aStartRect.p1.Y == aEndRect.p1.Y &&
+                       aPrevDiff == aEndRect.p1.X - aMiddleRect.p1.X;
+            }
+
+        public Point[] PointList2PxArray(List<GeoPoint> aGeoList)
         {
             Point[] result = new Point[aGeoList.Count];
             for (int i = 0; i < aGeoList.Count; i++)

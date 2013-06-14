@@ -240,17 +240,28 @@ namespace Migracja
                         //foreach (VectoredRectangleGroup group in mapFactory.Values)
                         if(group != null)
                         {
-                            /*if (group.pointArrFromEdge == null)
-                                group.MakePointArrFromEdge(Cst.maxZoom,
-                                                           resultRect.X - rect.X*aScale,
-                                                           resultRect.Y - rect.Y*aScale);*/
-                            Debug.Assert(group.pointArrFromFullEdge != null,
-                                         "Tablica pointArrFromFullEdge nie została zainicjalizowana.");
-                            Debug.Assert(group.pointArrFromFullEdge.Length != 0,
-                                         "Tablica pointArrFromFullEdge jest pusta.");
-                            Point[] granica = group.GetScaledPointArrFromFullEdge(aScale, 
-                                                                                  resultRect.X - rect.X * aScale,
-                                                                                  resultRect.Y - rect.Y * aScale);
+                            Point[] granica;
+                            if (settings.ShowSimplifiedEdge())
+                            {
+                                Debug.Assert(group.pointArrFromSimplifiedEdge != null,
+                                             "Tablica pointArrFromSimplifiedEdge nie została zainicjalizowana.");
+                                Debug.Assert(group.pointArrFromSimplifiedEdge.Length != 0,
+                                             "Tablica pointArrFromSimplifiedEdge jest pusta.");
+                                granica = group.GetScaledPointArrFromSimplifiedEdge(aScale,
+                                                                                            resultRect.X - rect.X * aScale,
+                                                                                            resultRect.Y - rect.Y * aScale);
+                            }
+                            else
+                            {
+                                Debug.Assert(group.pointArrFromFullEdge != null,
+                                             "Tablica pointArrFromFullEdge nie została zainicjalizowana.");
+                                Debug.Assert(group.pointArrFromFullEdge.Length != 0,
+                                             "Tablica pointArrFromFullEdge jest pusta.");
+                                granica = group.GetScaledPointArrFromFullEdge(aScale,
+                                                                                      resultRect.X - rect.X * aScale,
+                                                                                      resultRect.Y - rect.Y * aScale);
+                                                                                            
+                            }
 
 
                             graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);

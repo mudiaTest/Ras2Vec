@@ -28,9 +28,13 @@ namespace Migracja
 
             // połączenie granicznych grup rect
 
-            //budowanie granic
+            //budowanie krawędzi VectoredRectangleGroup.edgeList (lista kolejnych obiektów VectoredRectangle)
             singleThreadFactory.MakeEdgesForGroups();
             datePrv = aFunct("'MakeEdgesForGroups'", false, datePrv);
+
+            //budowanie uproszczonej krawędzi na podstawie VectoredRectangleGroup.edgeList
+            singleThreadFactory.MakeSimplifiedEdges();
+            datePrv = aFunct("MakeSimplifiedEdges", false, datePrv);
 
             //
             singleThreadFactory.UpdateColorArr();
@@ -40,9 +44,17 @@ namespace Migracja
             singleThreadFactory.MakeInnerEdgesForGroups();
             aFunct("'MakeInnerEdgesForGroups'", false, datePrv);
 
-            //budowanie list punktów dla rysowania polygonów
-            singleThreadFactory.MakePointArrFromEdgeForGroups();
-            aFunct("'MakePointArrFromEdgeForGroups'", false, datePrv);
+            //budowanie list punktów dla rysowania polygonów - dla NIEUPROSZCZONEJ krawędzi. 
+            //Jako mnożnika używamy maxymalnego dozwolonego powiększenia
+            //Wynik zapisywany jest do VectoredRectangleGroup.pointArrFromFullEdge
+            singleThreadFactory.MakePointArrFromFullEdgeForGroups();
+            aFunct("'MakePointArrFromFullEdgeForGroups'", false, datePrv);
+
+            //budowanie list punktów dla rysowania polygonów - dla UPROSZCZONEJ krawędzi. 
+            //Jako mnożnika używamy maxymalnego dozwolonego powiększenia
+            //Wynik zapisywany jest do VectoredRectangleGroup.pointArrFromSimplifiedEdge
+            singleThreadFactory.MakePointArrFromSimplifiedEdgeForGroups();
+            aFunct("'MakePointArrFromSimplifiedEdgeForGroups'", false, datePrv);
 
             //singleThreadFactory.Init(aSettings);
             return singleThreadFactory;

@@ -164,6 +164,11 @@ namespace Migracja
         {
             return StrExists("2");
         }
+
+        public bool ShowSimplifiedEdge()
+        {
+            return StrExists("3");
+        }
     }
 
     class MainWindowRegister

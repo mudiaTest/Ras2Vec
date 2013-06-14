@@ -20,6 +20,8 @@ namespace Migracja
         //numer grupy (w liście grup), która posiada dany obiekt vektorowy
         public int parentVectorGroupId { get; set; }
 
+
+
         public Vector_Gen()
         {
             points = new Dictionary<int, Point>();

@@ -289,6 +289,16 @@ namespace Migracja
             };            
         }
 
+        internal void MakeSimplifiedEdges()
+        {
+            VectoredRectangleGroup vectGroup;
+            foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+            {
+                vectGroup = pair.Value;
+                vectGroup.MakeSimplifyVectorEdge();
+            }
+        }
+
         //wybudowanie granic wewnętrznych. Przechodzimy po tablicy colorArr i dla
         //kandydatów dodajemy do ich grup nowe granice wewnętrzne - dlo listy
         public void MakeInnerEdgesForGroups()
@@ -321,13 +331,23 @@ namespace Migracja
                 }
         }
 
-        internal void MakePointArrFromEdgeForGroups()
+        internal void MakePointArrFromFullEdgeForGroups()
         {
             foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
             {
                 pair.Value.MakePointArrFromFullEdge(Cst.maxZoom, 
                                                     0,
                                                     0);
+            }
+        }
+
+        internal void MakePointArrFromSimplifiedEdgeForGroups()
+        {
+            foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+            {
+                pair.Value.MakePointArrFromSimplifiedEdge(Cst.maxZoom,
+                                                          0,
+                                                          0);
             }
         }
 

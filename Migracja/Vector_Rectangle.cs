@@ -26,7 +26,6 @@ namespace Migracja
             p2 = aP2;
         }
 
-
         public static void Zintegruj(Vector_Rectangle aObj1, Vector_Rectangle aObj2, MapFactory aMapFactory)
         {
             Vector_Rectangle obj1;
@@ -79,6 +78,15 @@ namespace Migracja
                 colorGroupList = aMapFactory.vectRectGroupsByColor[colorGroupListIdx];
                 colorGroupList.Remove(delId);
             };
+        }
+
+        // !! TO TYLKO PROTEZA KLONOWANIA !!
+        internal Vector_Rectangle Clone()
+        {
+            Vector_Rectangle result = new Vector_Rectangle(color, new Point(p1.X, p1.Y), new Point(p2.X, p2.Y));
+            result.parentVectorGroup = parentVectorGroup;
+            result.parentVectorGroupId = parentVectorGroupId;
+            return result;
         }
     }
 }

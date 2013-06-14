@@ -436,10 +436,11 @@
             this.chkBoxTestOptions.Items.AddRange(new object[] {
             "Polygons - po R2V (yes) / Rectangles - z Rastra (no)",
             "Edge (polygons) / Grid (rectangles)",
-            "Kolor testowy"});
-            this.chkBoxTestOptions.Location = new System.Drawing.Point(8, 240);
+            "Kolor testowy",
+            "Uproszczona krawędź"});
+            this.chkBoxTestOptions.Location = new System.Drawing.Point(8, 225);
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
-            this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 49);
+            this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 64);
             this.chkBoxTestOptions.TabIndex = 10;
             this.chkBoxTestOptions.SelectedIndexChanged += new System.EventHandler(this.chkBoxTestOptions_SelectedIndexChanged);
             // 
@@ -455,7 +456,7 @@
             // 
             // btnMainThread
             // 
-            this.btnMainThread.Location = new System.Drawing.Point(207, 173);
+            this.btnMainThread.Location = new System.Drawing.Point(207, 164);
             this.btnMainThread.Name = "btnMainThread";
             this.btnMainThread.Size = new System.Drawing.Size(99, 23);
             this.btnMainThread.TabIndex = 11;
@@ -479,7 +480,7 @@
             this.gbThreadChoice.Controls.Add(this.rbMainThread);
             this.gbThreadChoice.Controls.Add(this.btnStopR2V);
             this.gbThreadChoice.Controls.Add(this.btnStartR2V);
-            this.gbThreadChoice.Location = new System.Drawing.Point(8, 163);
+            this.gbThreadChoice.Location = new System.Drawing.Point(8, 154);
             this.gbThreadChoice.Margin = new System.Windows.Forms.Padding(0);
             this.gbThreadChoice.Name = "gbThreadChoice";
             this.gbThreadChoice.Padding = new System.Windows.Forms.Padding(0);
@@ -521,7 +522,7 @@
             // 
             // btnSeparateThread
             // 
-            this.btnSeparateThread.Location = new System.Drawing.Point(207, 201);
+            this.btnSeparateThread.Location = new System.Drawing.Point(207, 192);
             this.btnSeparateThread.Name = "btnSeparateThread";
             this.btnSeparateThread.Size = new System.Drawing.Size(99, 23);
             this.btnSeparateThread.TabIndex = 13;
