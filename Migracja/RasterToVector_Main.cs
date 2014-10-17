@@ -8,9 +8,9 @@ using System.Drawing;
 
 namespace Migracja
 {
-    class RasterToVectorRunner
+    class R2VRunner
     {
-        public static MapFactory RunRasterToVectorMainThread(RasterToVectorSettings aSettings, UpdateInfoBoxTimeDelegate aFunct)
+        public static MapFactory RunR2VMainThread(R2VSettings aSettings, UpdateInfoBoxTimeDelegate aFunct)
         {
             aSettings.sliceDisplacementX = 0;
             aSettings.sliceDisplacementY = 0;
@@ -62,9 +62,11 @@ namespace Migracja
 
         public static void RunRasterToVectorSeparateThread()
         {
-            RasterToVectorFactory separateThreadFactory = new RasterToVectorFactory();
+            RasterToVectorFactory separateThreadFactory = new RasterToVectorFactory();            
+            Debug.Assert(false, "Akcja nie została zimplementowana.");
         }
     }
+
     class RasterToVectorFactory : Dictionary<int, Vector_Gen>
     {
         /*private float fgeoLeftUpX;
@@ -72,11 +74,11 @@ namespace Migracja
         private float fgeoRightDownX;
         private float fgeoRightDownY;*/
         private Vector_Gen[][] vectorArray; //tablica z obektami wektorowymi
-        RasterToVectorSettings settings;
+        R2VSettings settings;
         //przechowuje key to kolor w postaci int, value to grupa obektów wektorowych w tym kolorze
         public Dictionary<int, ColorGroupList> vectRectGroupsByColor{ get; set; }
 
-        public void Init(RasterToVectorSettings aSettings)
+        public void Init(R2VSettings aSettings)
         {
             settings = aSettings;
             settings.CalculateGeoPx();

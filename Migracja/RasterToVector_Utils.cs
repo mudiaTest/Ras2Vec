@@ -71,11 +71,13 @@ namespace Migracja
 
     class ColorPx
     {
+        //kolor danego px            
         public int color{get;set;}
         public int? colorN {get;set;}
         public int? colorS {get;set;}
         public int? colorW {get;set;}
         public int? colorE {get;set;}
+        //numer grupy do której należy dany px. Tę daną wyełniamy już po grupowaniu px
         public int group  {get;set;}
         public int? groupN {get;set;}
         public int? groupS {get;set;}
@@ -85,7 +87,9 @@ namespace Migracja
         public bool borderSN {get;set;}
         public bool borderEW {get;set;}
         public bool borderWE {get;set;}
+        //kandydat do bycia cześcią granicy grupy
         public bool candidate {get;set;}
+        //px został użyty jako cześć granicy grupy
         public bool used {get;set;}
     }
 

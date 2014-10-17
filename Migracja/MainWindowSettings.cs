@@ -23,6 +23,8 @@ namespace Migracja
             else
                 loadLastSaveToolStripMenuItem.Visible = false;
         }
+
+        //Wczytanie ostanio zapisanego stanu pracy(plik i ustawienia - tylko przygotowanie do pracy, ale nie jej wyniki)
         private void LoadLastSave()
         {
             if (File.Exists(lastSavePath))
@@ -33,6 +35,8 @@ namespace Migracja
                 SettingsToScr(windowSettings);
             }
         }
+
+        //przycisk Save w menu
         private void MenuSave(object sender, EventArgs e)
         {
             if (windowSettings.thisSettingsPath != "")
@@ -44,6 +48,8 @@ namespace Migracja
                 saveAsToolStripMenuItem_Click(sender, e);
             RefreshLastSaveButton();
         }
+
+        //przycisk Load w Menu
         private void MenuLoad(object sender, EventArgs e)
         {
             DialogResult result = loadDialog.ShowDialog();
@@ -56,6 +62,8 @@ namespace Migracja
 
 
         }
+
+        //przycisk SaveAs w menu
         private void MenuSaveAs(object sender, EventArgs e)
         {
             DialogResult result = saveDialog.ShowDialog();
@@ -112,7 +120,7 @@ namespace Migracja
             xmlEngine.Serialize(file, this);
             file.Close();
             //zapamiętanie ostatniego save'u w rejestrze
-            MainWindowRegister reg = new MainWindowRegister();
+            SettingsRegister reg = new SettingsRegister();
             reg.SetLastSaveInfo(this);
         }
 
@@ -168,31 +176,6 @@ namespace Migracja
         public bool ShowSimplifiedEdge()
         {
             return StrExists("3");
-        }
-    }
-
-    class MainWindowRegister
-    {
-        public void SetLastSaveInfo(MainWindowSettings settings)
-        {
-            RegistryKey regKey = Registry.CurrentUser;
-            regKey.OpenSubKey(@"Software/R2V");
-            if (regKey == null)
-            {
-                regKey.CreateSubKey(@"Software/R2V");
-                regKey.OpenSubKey(@"Software/R2V");
-            }
-            regKey.SetValue("lastSave", settings.thisSettingsPath);
-        }
-
-        public string GetLastSaveInfo()
-        {
-            RegistryKey regKey = Registry.CurrentUser;
-            regKey.OpenSubKey(@"Software/R2V");
-            if (regKey.GetValue("lastSave") != null)
-                return regKey.GetValue("lastSave").ToString();
-            else
-                return "";
         }
     }
 }

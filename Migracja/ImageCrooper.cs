@@ -69,7 +69,7 @@ namespace Migracja
         }
 
         //ustala jaki wycinek oryginalnego obrazu ma zostać pokazany
-        protected Rectangle GetSourceRectangle(float aScale)
+        public Rectangle GetSourceRectangle(float aScale)
         {
             //aby x,y nie były mniejsze niż punkt (0,0) - ograniczenie o lewej strony. 
             //Od prawej strony nie wyjdą poza ramy obrazu, bo x zawsze będzie < centerX, 
@@ -86,7 +86,7 @@ namespace Migracja
 
         //ustala jak ma być położony oryginalny wycinek w nowopokazywanym fragmencie. Możliwe jest, że wycinek będzie 
         //przesunięty pokazując wolną przestrzeń na jednym z brzegów fragmentu.
-        protected Rectangle GetDestinationRectangle(float aScale, Rectangle srcRectangle)
+        public Rectangle GetDestinationRectangle(float aScale, Rectangle srcRectangle)
         {
             int resultRectX;
             int resultRectY;
@@ -94,7 +94,8 @@ namespace Migracja
             //prawdopodobnie postła wolna przestrzeń po lewej stronie do wypełnienia. Prawa soraona "wypełni" 
             //się automatycznie, bo mając przerwę z lewej strony i wklejony obrazek, przerwa po prawej stworzy się samoczynnie)
             if ((srcRectangle.Width * aScale < 3 * panelSize.Width) && (srcRectangle.X == 0))
-                resultRectX = (int)Math.Ceiling(-GetLeftAbsoluteOryg(aScale) * aScale);//GetAbsolute... oddaje wartości dla oryginalnej wielkości/skala, a my 
+                resultRectX = (int)Math.Ceiling(-GetLeftAbsoluteOryg(aScale) * aScale);
+            //GetAbsolute... oddaje wartości dla oryginalnej wielkości/skala, a my 
             //obliczamy teraz przesunięcie na rozciągniętym obrazie, więc trzeba 
             //pomnożyć to przez skalę
             else

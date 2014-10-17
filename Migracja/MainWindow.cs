@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 using System.Diagnostics;
 
 namespace Migracja
@@ -31,12 +23,16 @@ namespace Migracja
         MainWindowSettings windowSettings;
         private string lastSavePath;
         MapFactory mapFactory;
+        int srcLeftX;
+        int srcLeftY;
+        int resultLeftX;
+        float resultLeftY;
 
         public MainWindow()
         {
             InitializeComponent();
             //pobieranie informacji o ostatnim savie
-            MainWindowRegister reg = new MainWindowRegister();
+            SettingsRegister reg = new SettingsRegister();
             lastSavePath = reg.GetLastSaveInfo();
             RefreshLastSaveButton();
 
@@ -63,8 +59,8 @@ namespace Migracja
         }
 
         private void btnStartR2V_Click(object sender, EventArgs e)
-        {
-
+        {            
+            Debug.Assert(false, "Akcja nie została zimplementowana.");
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)
@@ -334,16 +330,16 @@ namespace Migracja
         private void btnStartR2V_Click_1(object sender, EventArgs e)
         {
             Debug.Assert(sourceBmp != null, "Nie wgrano obrazu źródłowego.");
-            RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings{ sourceBmp = sourceBmp };
-            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
+            R2VSettings r2vSettings = new R2VSettings{ sourceBmp = sourceBmp };
+            r2vSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
             if (rbMainThread.Checked)
             {
-                mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
+                mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
                // Bitmap res = mapFactory.getBitmap(new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height));
             }
             else if (rbSeparateThread.Checked)
             {
-                RasterToVectorRunner.RunRasterToVectorSeparateThread();
+                R2VRunner.RunRasterToVectorSeparateThread();
             }
             else
             {
@@ -353,17 +349,17 @@ namespace Migracja
 
         private void btnMainThread_Click(object sender, EventArgs e)
         {
-            RasterToVectorSettings rasterToVectorSettings = new RasterToVectorSettings();
-            rasterToVectorSettings.ReadGeoCorners(windowSettings.leftXCoord, 
-                                                  windowSettings.leftYCoord, 
-                                                  windowSettings.rightXCoord, 
-                                                  windowSettings.rightYCoord);
-            rasterToVectorSettings.sourceBmp = sourceBmp;
-            rasterToVectorSettings.CalculateGeoPx();
-            rasterToVectorSettings.sliceWidth = windowSettings.sliceWidth;
-            rasterToVectorSettings.sliceHeight = windowSettings.sliceHeight;
+            R2VSettings r2vSettings = new R2VSettings();
+            r2vSettings.ReadGeoCorners(windowSettings.leftXCoord, 
+                                       windowSettings.leftYCoord, 
+                                       windowSettings.rightXCoord, 
+                                       windowSettings.rightYCoord);
+            r2vSettings.sourceBmp = sourceBmp;
+            r2vSettings.CalculateGeoPx();
+            r2vSettings.sliceWidth = windowSettings.sliceWidth;
+            r2vSettings.sliceHeight = windowSettings.sliceHeight;
 
-            mapFactory = RasterToVectorRunner.RunRasterToVectorMainThread(rasterToVectorSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
+            mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
                                                             sourceImageCropper.centerX, sourceImageCropper.centerY,
                                                             windowSettings, sourceBmp);
@@ -373,12 +369,12 @@ namespace Migracja
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
         {
-           RasterToVectorRunner. RunRasterToVectorSeparateThread();
+           R2VRunner. RunRasterToVectorSeparateThread();
         }
 
         private void btnStopR2V_Click(object sender, EventArgs e)
         {
-
+            Debug.Assert(false, "Akcja nie została zimplementowana.");
         }
 
         private void btnRefreshResultImg_Click(object sender, EventArgs e)
@@ -411,6 +407,29 @@ namespace Migracja
         private void menuMain_MouseClick(object sender, MouseEventArgs e)
         {
             Focus();
+        }
+
+        private void destinationPB_Click(object sender, EventArgs e)
+        {
+            Focus();
+            /*windowSettings.dpScale;
+            windowSettings.leftXCoord;
+            windowSettings.centerX;
+            srcLeftX = srcRect.X;
+            srcLeftY = srcRect.Y;
+            resultLeftX = resultRect.X;
+            resultLeftY = resultRect.Y;*/
+            int x = (int)Math.Floor((((MouseEventArgs)e).X - resultLeftX) / windowSettings.dpScale) + srcLeftX;
+            int y = (int)Math.Floor((((MouseEventArgs)e).Y - resultLeftY) / windowSettings.dpScale) + srcLeftY;
+
+            string info = "";
+            Vector_Rectangle vr = mapFactory.vectArr[x][y];
+            info += string.Format("Point({0},{1}) color:{2}", vr.p1.X, vr.p1.Y, vr.color);
+            VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
+            info += '\n' + group.edgeList.GetPointsStr();
+
+            UpdateInfoBoxTime( info );
+          //  UpdateInfoBoxTime( mapFactory.colorArr[x][y]..ToString );
         }
 
 

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace Migracja
 {
@@ -112,6 +113,15 @@ namespace Migracja
         {
             DateTime dtTimePrv = DateTime.Now;
             Bitmap croppedSrcBmp = sourceImageCropper.GetCroppedImage(aDpScale);
+
+            //pozyskiwanie danych potrzebnych do odczytania, na który px kliknęliśmy
+            Rectangle srcRect = sourceImageCropper.GetSourceRectangle(aDpScale);
+            Rectangle resultRect = sourceImageCropper.GetDestinationRectangle(aDpScale, srcRect);
+            srcLeftX = srcRect.X;
+            srcLeftY = srcRect.Y;
+            resultLeftX = resultRect.X;
+            resultLeftY = resultRect.Y;
+
             dtTimePrv = aFunct("GetCroppedImage 1:", true, dtTimePrv);
             //tymczasowo przypisuję ten sam obraz
             //Bitmap croppedDstBmp = croppedSrcBmp;
@@ -174,12 +184,12 @@ namespace Migracja
                     LoadImage(windowSettings.stSourceImagePath);
                 else
                 {
-
+                    Debug.Assert(false, "Nie powiadła się próba wgrania pliku źrógłowego mapy: '" + windowSettings.stSourceImagePath + "'");
                 }
             }
             else
             {
-                
+                Debug.Assert(false, "Pusta zmianna ze ściżką do pliku źródłowego mapy.");
             }
         }
     }

@@ -26,7 +26,7 @@ namespace Migracja
         protected int inMod;
         public string stMessage;
         public string stTime;
-        private RasterToVectorSettings settings;
+        private R2VSettings settings;
         internal UpdateInfoBoxTimeDelegate infoBoxUpdateFunct;
 
         internal int maxKey;
@@ -292,9 +292,15 @@ namespace Migracja
         internal void MakeSimplifiedEdges()
         {
             VectoredRectangleGroup vectGroup;
+            long dummy;
+            int i = 0;
+
             foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
             {
                 vectGroup = pair.Value;
+                if ((int)Math.DivRem((long)i, (long)inMod, out dummy) == 0)
+                    UpdateInfoAction("Upraszczanie granicy dla grupy " + i.ToString() + "/" + (Count - 1).ToString());
+                i++;
                 vectGroup.MakeSimplifyVectorEdge();
             }
         }
@@ -351,7 +357,7 @@ namespace Migracja
             }
         }
 
-        public MapFactory(RasterToVectorSettings aSettings)
+        public MapFactory(R2VSettings aSettings)
         {
             settings = aSettings;
             vectRectGroupsByColor = new Dictionary<int, ColorGroupList>(256*4);

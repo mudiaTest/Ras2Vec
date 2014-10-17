@@ -7,3 +7,12 @@ D:\praca\Migracja\bin\Debug\WindowsApplication.exe
 D:\praca\Migracja\bin\Debug\WindowsApplication.pdb
 D:\praca\Migracja\obj\x86\Debug\WindowsApplication.exe
 D:\praca\Migracja\obj\x86\Debug\WindowsApplication.pdb
+D:\Praca\R2V\bin\Debug\WindowsApplication.exe.config
+D:\Praca\R2V\obj\x86\Debug\WindowsApplication.exe
+D:\Praca\R2V\obj\x86\Debug\WindowsApplication.pdb
+D:\Praca\R2V\obj\x86\Debug\Migracja.csprojResolveAssemblyReference.cache
+D:\Praca\R2V\obj\x86\Debug\Migracja.MainWindow.resources
+D:\Praca\R2V\obj\x86\Debug\Migracja.Migracja.Properties.Resources.resources
+D:\Praca\R2V\obj\x86\Debug\Migracja.csproj.GenerateResource.Cache
+D:\Praca\R2V\bin\Debug\WindowsApplication.exe
+D:\Praca\R2V\bin\Debug\WindowsApplication.pdb

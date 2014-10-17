@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Migracja
 {
-    class RasterToVectorSettings
+    class R2VSettings
     {
         //źródłowa bitmapa rastrowa
         private Bitmap fsourceBmp;

@@ -32,6 +32,27 @@ namespace Migracja
             Clear();
             maxKey = 0;
         }
+
+        public void Add(Vector_Rectangle avectorRect)
+        {
+            Add(NextKey(), avectorRect);
+        }
+
+        public string GetPointsStr()
+        {
+            string result = "";
+            List <int> keyList = GetSortedKeyList();
+            foreach (int key in keyList)
+            {
+                if (result != "") 
+                {
+                    result += ",";
+                }
+                Vector_Rectangle vr =  this[key];
+                result += string.Format("({0},{1})", vr.p1.X, vr.p1.Y); 
+            }
+            return(result);
+        }
     }
 
     partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
@@ -171,7 +192,6 @@ namespace Migracja
             //startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
             //arrivDir: integer;
             //dummyArr: TDynamicGeoPointArray;
-
             
             aEdgePxList.ClearReset();
             //startEdgePoint to pierwszy punkt na liście, bo idziemy ol lewej strony
@@ -186,10 +206,10 @@ namespace Migracja
             {
             //kończymy jeśli trafiamy na początek, lub na 1-pixelowy obiekt
                 Debug.Assert(aEdgePxList.Count == 0, "Dictionary aEdgePxList nie jest pusty.");
-                aEdgePxList.Add(aEdgePxList.NextKey(), null);
+                aEdgePxList.Add(null);
                 while (
                         ((nextEdgePoint != startEdgePoint) && (prevEdgePoint != null)) ||
-                        (CheckBottomPX(startEdgePoint) && (arrivDir == Cst.fromRight)) //przypadek gdy wracamy się do punktu startu, ale mamy do prawdzenia to co jest pod nim
+                        (CheckBottomPX(startEdgePoint) && (arrivDir == Cst.fromRight)) //przypadek gdy wracamy się do punktu startu, ale mamy do sprawdzenia to co jest pod nim
                         )
                 {
                     if (nextEdgePoint == startEdgePoint)
@@ -211,7 +231,7 @@ namespace Migracja
                                "," + prevEdgePoint.p1.Y.ToString() + "), liczba znalezionych kreawędzi:" +
                                aEdgePxList.Count.ToString());
 
-                    aEdgePxList.Add(aEdgePxList.NextKey(), nextEdgePoint);
+                    aEdgePxList.Add(nextEdgePoint);
                     //MakeUsed(nextEdgePoint aBlInnerBorder);
                     prevEdgePoint = nextEdgePoint;
                 }
@@ -222,14 +242,13 @@ namespace Migracja
             else
             {
                 //dodajemy punkty graniczne do listy
-                aEdgePxList.Add(aEdgePxList.NextKey(), startEdgePoint);
+                aEdgePxList.Add(startEdgePoint);
                 // MakeUsed(startEdgePoint aBlInnerBorder);
             };
             List<GeoPoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), true);
             MakeUsed(aEdgePxList, aBlInnerBorder);
             geoPointList.Clear();
-            //PxListToGeoList;
-            
+            //PxListToGeoList;            
         }
 
         //VectorRectangeGroup to mapa (kluczem jest int - kolejne wartości wyznaczają kolejność) obiektów Vector_Rectangle 

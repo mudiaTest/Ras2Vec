@@ -30,6 +30,7 @@ namespace Migracja
     {
         //cztery punkty geograficzne określanące rogi obrazka
         //leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
+
         //lista obiektów Vector_Rectangle tworzących krawędź (self, czyli grupy obiektów Vector_Rectangle). 
         //Kolejnośc wyznaczają klucze
         public VectorRectangeGroup edgeList{get;set;}
@@ -339,7 +340,7 @@ namespace Migracja
             innerEdgesList = new EdgeList();
         }
 
-        //tworzy tablicę punktów z ponktów zawartych w edgePxList
+        //tworzy tablicę punktów z punktów zawartych w edgePxList
         public List<GeoPoint> MakeVectorEdge(VectorRectangeGroup aEdgePxList,
                                              ColorPx[][] aColorArr,
                                              bool aBlOnlyFillColorArr,
@@ -492,13 +493,13 @@ namespace Migracja
                     prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
                 }
 
-                simplifiedEdgeList.Add(simplifiedEdgeList.NextKey(), edgeList[sortedKeyList[sortedKeyList.Count - 1]]);
+                simplifiedEdgeList.Add(edgeList[sortedKeyList[sortedKeyList.Count - 1]]);
             }
             else
-            {hjkhjkgjk
+            {//hjkhjkgjk
                 for (var i = 0; i < sortedKeyList.Count; i++)
                 {
-                    simplifiedEdgeList.Add(simplifiedEdgeList.NextKey(), edgeList[sortedKeyList[i]]);
+                    simplifiedEdgeList.Add(edgeList[sortedKeyList[i]]);
                 }
             }
         }

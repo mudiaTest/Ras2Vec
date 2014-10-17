@@ -46,6 +46,7 @@
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.panel9 = new System.Windows.Forms.Panel();
             this.panel8 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -66,10 +67,10 @@
             this.chkBoxTestOptions = new System.Windows.Forms.CheckedListBox();
             this.btnRefreshResultImg = new System.Windows.Forms.Button();
             this.btnMainThread = new System.Windows.Forms.Button();
-            this.btnStopR2V = new System.Windows.Forms.Button();
             this.gbThreadChoice = new System.Windows.Forms.GroupBox();
             this.rbSeparateThread = new System.Windows.Forms.RadioButton();
             this.rbMainThread = new System.Windows.Forms.RadioButton();
+            this.btnStopR2V = new System.Windows.Forms.Button();
             this.btnStartR2V = new System.Windows.Forms.Button();
             this.btnSeparateThread = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -86,7 +87,9 @@
             this.sourcePanel = new System.Windows.Forms.Panel();
             this.sourcePB = new System.Windows.Forms.PictureBox();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
-            this.panel9 = new System.Windows.Forms.Panel();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -220,12 +223,15 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(349, 517);
+            this.panel2.Size = new System.Drawing.Size(349, 514);
             this.panel2.TabIndex = 12;
             // 
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.checkBox3);
+            this.panel4.Controls.Add(this.checkBox2);
+            this.panel4.Controls.Add(this.checkBox1);
             this.panel4.Controls.Add(this.panel9);
             this.panel4.Controls.Add(this.panel8);
             this.panel4.Controls.Add(this.reloadSrcMapBtn);
@@ -241,9 +247,17 @@
             this.panel4.Location = new System.Drawing.Point(34, 0);
             this.panel4.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(315, 517);
+            this.panel4.Size = new System.Drawing.Size(315, 514);
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
+            // 
+            // panel9
+            // 
+            this.panel9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel9.Location = new System.Drawing.Point(156, 43);
+            this.panel9.Name = "panel9";
+            this.panel9.Size = new System.Drawing.Size(152, 81);
+            this.panel9.TabIndex = 30;
             // 
             // panel8
             // 
@@ -312,9 +326,9 @@
             // 
             // infoBox
             // 
-            this.infoBox.Location = new System.Drawing.Point(5, 326);
+            this.infoBox.Location = new System.Drawing.Point(5, 343);
             this.infoBox.Name = "infoBox";
-            this.infoBox.Size = new System.Drawing.Size(295, 178);
+            this.infoBox.Size = new System.Drawing.Size(295, 161);
             this.infoBox.TabIndex = 25;
             this.infoBox.Text = "";
             // 
@@ -464,16 +478,6 @@
             this.btnMainThread.UseVisualStyleBackColor = true;
             this.btnMainThread.Click += new System.EventHandler(this.btnMainThread_Click);
             // 
-            // btnStopR2V
-            // 
-            this.btnStopR2V.Location = new System.Drawing.Point(111, 39);
-            this.btnStopR2V.Name = "btnStopR2V";
-            this.btnStopR2V.Size = new System.Drawing.Size(75, 23);
-            this.btnStopR2V.TabIndex = 15;
-            this.btnStopR2V.Text = "Stop R2V";
-            this.btnStopR2V.UseVisualStyleBackColor = true;
-            this.btnStopR2V.Click += new System.EventHandler(this.btnStopR2V_Click);
-            // 
             // gbThreadChoice
             // 
             this.gbThreadChoice.Controls.Add(this.rbSeparateThread);
@@ -510,6 +514,16 @@
             this.rbMainThread.Text = "MainThread";
             this.rbMainThread.UseVisualStyleBackColor = true;
             // 
+            // btnStopR2V
+            // 
+            this.btnStopR2V.Location = new System.Drawing.Point(111, 39);
+            this.btnStopR2V.Name = "btnStopR2V";
+            this.btnStopR2V.Size = new System.Drawing.Size(75, 23);
+            this.btnStopR2V.TabIndex = 15;
+            this.btnStopR2V.Text = "Stop R2V";
+            this.btnStopR2V.UseVisualStyleBackColor = true;
+            this.btnStopR2V.Click += new System.EventHandler(this.btnStopR2V_Click);
+            // 
             // btnStartR2V
             // 
             this.btnStartR2V.Location = new System.Drawing.Point(111, 10);
@@ -537,7 +551,7 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(34, 517);
+            this.panel3.Size = new System.Drawing.Size(34, 514);
             this.panel3.TabIndex = 25;
             // 
             // btnMenuHide
@@ -547,7 +561,7 @@
             this.btnMenuHide.Location = new System.Drawing.Point(0, 0);
             this.btnMenuHide.Margin = new System.Windows.Forms.Padding(0);
             this.btnMenuHide.Name = "btnMenuHide";
-            this.btnMenuHide.Size = new System.Drawing.Size(30, 517);
+            this.btnMenuHide.Size = new System.Drawing.Size(30, 514);
             this.btnMenuHide.TabIndex = 0;
             this.btnMenuHide.Text = "<<";
             this.btnMenuHide.UseVisualStyleBackColor = true;
@@ -621,7 +635,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(880, 517);
+            this.panel1.Size = new System.Drawing.Size(880, 514);
             this.panel1.TabIndex = 11;
             // 
             // panel7
@@ -632,7 +646,7 @@
             this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel7.Location = new System.Drawing.Point(349, 38);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(531, 479);
+            this.panel7.Size = new System.Drawing.Size(531, 476);
             this.panel7.TabIndex = 14;
             this.panel7.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
             // 
@@ -641,7 +655,7 @@
             this.destinationPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Location = new System.Drawing.Point(6, 241);
+            this.destinationPanel.Location = new System.Drawing.Point(6, 240);
             this.destinationPanel.Name = "destinationPanel";
             this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
             this.destinationPanel.Size = new System.Drawing.Size(517, 210);
@@ -654,6 +668,7 @@
             this.destinationPB.Size = new System.Drawing.Size(152, 98);
             this.destinationPB.TabIndex = 14;
             this.destinationPB.TabStop = false;
+            this.destinationPB.Click += new System.EventHandler(this.destinationPB_Click);
             this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
             this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
             this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
@@ -681,19 +696,41 @@
             this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
             this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
             // 
-            // panel9
+            // checkBox1
             // 
-            this.panel9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel9.Location = new System.Drawing.Point(156, 43);
-            this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(152, 81);
-            this.panel9.TabIndex = 30;
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(5, 322);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(80, 17);
+            this.checkBox1.TabIndex = 31;
+            this.checkBox1.Text = "checkBox1";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(89, 322);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(80, 17);
+            this.checkBox2.TabIndex = 32;
+            this.checkBox2.Text = "checkBox2";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(175, 322);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(80, 17);
+            this.checkBox3.TabIndex = 33;
+            this.checkBox3.Text = "checkBox3";
+            this.checkBox3.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(880, 541);
+            this.ClientSize = new System.Drawing.Size(880, 538);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;
@@ -703,6 +740,7 @@
             this.menuMain.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             this.panel8.ResumeLayout(false);
             this.panel8.PerformLayout();
             this.panel5.ResumeLayout(false);
@@ -784,6 +822,9 @@
         private System.Windows.Forms.MaskedTextBox edtSliceHeight;
         private System.Windows.Forms.MaskedTextBox edtSliceWidth;
         private System.Windows.Forms.Panel panel9;
+        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
