@@ -7,3 +7,6 @@ D:\Praca\R2V\Migracja\bin\Debug\WindowsApplication.pdb
 D:\Praca\R2V\Migracja\obj\x86\Debug\WindowsApplication.exe
 D:\Praca\R2V\Migracja\obj\x86\Debug\WindowsApplication.pdb
 D:\Praca\R2V\Migracja\obj\x86\Debug\Migracja.csprojResolveAssemblyReference.cache
+D:\praca\Ras2Vec\Migracja\bin\Debug\WindowsApplication.exe.config
+D:\praca\Ras2Vec\Migracja\obj\x86\Debug\WindowsApplication.exe
+D:\praca\Ras2Vec\Migracja\obj\x86\Debug\WindowsApplication.pdb

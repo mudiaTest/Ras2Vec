@@ -20,5 +20,13 @@ namespace Migracja
         internal const string progName = "Ras2Vec";
 
         internal const int maxZoom = 10;
+
+        //typ geoPunktu
+        internal const int c_geoPxSimple = 1; /*punkt "zwykły" zero obostrzeń. Z początku może być ich wiele. 
+                                               *Podczas pierwszego upraszczania granicy usunięte zostaną wszystkie punkty 
+                                               *zwykłe, które nie są rogami granicy
+                                               */
+        internal const int c_geoPxStartEnd = 2; //punkt będacy startem/końcem granicy
+        internal const int c_geoPxGroupBorder = 3; //punkt w najbliższej okolicy którego zachodzi zmiana grup
     }
 }

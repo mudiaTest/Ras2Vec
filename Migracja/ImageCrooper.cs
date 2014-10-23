@@ -216,6 +216,9 @@ namespace Migracja
                 int tmpPointR;
                 int tmpPointG;
                 int tmpPointB;
+                int tmpPointBorderR;
+                int tmpPointBorderG;
+                int tmpPointBorderB;
 
                 Boolean[][] usedArray = new Boolean[rect.Width + rect.X][];
                 for (int i = 0; i < rect.Width + rect.X; i++)
@@ -241,7 +244,7 @@ namespace Migracja
                         //foreach (VectoredRectangleGroup group in mapFactory.Values)
                         if(group != null)
                         {
-                            Point[] granica;
+                            PointAdv[] granica;
                             if (settings.ShowSimplifiedEdge())
                             {
                                 Debug.Assert(group.pointArrFromSimplifiedEdge != null,
@@ -264,8 +267,8 @@ namespace Migracja
                                                                                             
                             }
 
-
-                            graphics.FillPolygon(new SolidBrush(group.sourceColor), granica);
+                            Point[] pointArr = GetPointArr(granica);
+                            graphics.FillPolygon(new SolidBrush(group.sourceColor), pointArr);
                             if (settings.Edges())
                             {
                                 if (!settings.TestColor())
@@ -277,6 +280,10 @@ namespace Migracja
                                     Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointR);
                                     Math.DivRem(group.sourceColor.G + 10, 256, out tmpPointG);
                                     Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
+
+                                    Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointBorderR);
+                                    Math.DivRem(group.sourceColor.G + 100, 256, out tmpPointBorderG);
+                                    Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointBorderB);
                                 }
                                 else
                                 {
@@ -286,14 +293,20 @@ namespace Migracja
                                     tmpPointR = 100;
                                     tmpPointG = 255;
                                     tmpPointB = 255;
+                                    tmpPointBorderR = 100;
+                                    tmpPointBorderG = 255;
+                                    tmpPointBorderB = 255;
                                 }
 
-                                graphics.DrawPolygon(new Pen(Color.FromArgb(tmpLineR, tmpLineG, tmpLineB)), granica);
-                                foreach (Point p in granica)
+                                graphics.DrawPolygon(new Pen(Color.FromArgb(tmpLineR, tmpLineG, tmpLineB)), pointArr);
+                                foreach (PointAdv p in granica)
                                 {
                                     //graphics.DrawLine(new Pen(Color.Blue), p, p);
                                     if (p.X < result.Width && p.Y < result.Height && p.X > 0 && p.Y > 0)
-                                        result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointR, tmpPointG, tmpPointB));
+                                        if (p.GetKdPointType() == Cst.c_geoPxSimple)
+                                            result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointR, tmpPointG, tmpPointB));
+                                        else
+                                            result.SetPixel(p.X, p.Y, Color.FromArgb(tmpPointBorderR, tmpPointBorderG, tmpPointBorderB));
                                 }
                             }
                             //group.edgeList
@@ -304,7 +317,8 @@ namespace Migracja
 
 
 
-                /*//ustawia, że result będzie płótnem graphics
+                /*
+                //ustawia, że result będzie płótnem graphics
                 Graphics graphics = Graphics.FromImage(result);
                 //ustawia sposób zmiękczania przy powiększaniu - NN da brak zmiękczania
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
@@ -318,6 +332,18 @@ namespace Migracja
 
                 return result;
 
+        }
+
+        private Point[] GetPointArr(PointAdv[] aArr)
+        {
+            Point[] result = new Point[aArr.Length];
+            int i=0;
+            foreach (PointAdv pointAdv in aArr)
+            {
+                result[i] = pointAdv.GetPoint();
+                i++;
+            }
+            return result;
         }
     }
 }

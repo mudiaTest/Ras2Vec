@@ -55,8 +55,8 @@ namespace Migracja
     //na razie nie jest rozbudowany, ale bedzie potem
     class GeoPoint
     {
-        private float X;
-        private float Y;
+        internal float X;
+        internal float Y;
         public GeoPoint() { }
         public GeoPoint(float x, float y)
         {
@@ -66,6 +66,20 @@ namespace Migracja
         public Point ToPoint()
         {
             return new Point(RasterToVector_Utils.Round(X), RasterToVector_Utils.Round(Y));
+        }
+    }
+
+    class GeoEdgePoint : GeoPoint
+    {
+        private int kdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxStartEnd
+        public GeoEdgePoint(float x, float y, int akdPointType /*= Cst.c_geoPxSimple*/): base(x, y)
+        {
+            kdPointType = akdPointType;
+        }
+
+        public PointAdv ToPointAdv()
+        {
+            return new PointAdv(RasterToVector_Utils.Round(X), RasterToVector_Utils.Round(Y), kdPointType);
         }
     }
 

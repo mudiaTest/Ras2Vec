@@ -90,6 +90,7 @@
     <Compile Include="Migracja\MainWindowImages.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Migracja\PointAdv.cs" />
     <Compile Include="Migracja\SettingsRegister.cs" />
     <Compile Include="Migracja\MainWindowSettings.cs">
       <SubType>Form</SubType>

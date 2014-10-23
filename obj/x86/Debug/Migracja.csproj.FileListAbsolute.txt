@@ -16,3 +16,12 @@ D:\Praca\R2V\obj\x86\Debug\Migracja.Migracja.Properties.Resources.resources
 D:\Praca\R2V\obj\x86\Debug\Migracja.csproj.GenerateResource.Cache
 D:\Praca\R2V\bin\Debug\WindowsApplication.exe
 D:\Praca\R2V\bin\Debug\WindowsApplication.pdb
+D:\praca\Ras2Vec\bin\Debug\WindowsApplication.exe.config
+D:\praca\Ras2Vec\obj\x86\Debug\WindowsApplication.exe
+D:\praca\Ras2Vec\obj\x86\Debug\WindowsApplication.pdb
+D:\praca\Ras2Vec\bin\Debug\WindowsApplication.exe
+D:\praca\Ras2Vec\bin\Debug\WindowsApplication.pdb
+D:\praca\Ras2Vec\obj\x86\Debug\Migracja.csprojResolveAssemblyReference.cache
+D:\praca\Ras2Vec\obj\x86\Debug\Migracja.MainWindow.resources
+D:\praca\Ras2Vec\obj\x86\Debug\Migracja.Migracja.Properties.Resources.resources
+D:\praca\Ras2Vec\obj\x86\Debug\Migracja.csproj.GenerateResource.Cache

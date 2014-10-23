@@ -245,7 +245,7 @@ namespace Migracja
                 aEdgePxList.Add(startEdgePoint);
                 // MakeUsed(startEdgePoint aBlInnerBorder);
             };
-            List<GeoPoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), true);
+            List<GeoEdgePoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), true);
             MakeUsed(aEdgePxList, aBlInnerBorder);
             geoPointList.Clear();
             //PxListToGeoList;            
@@ -255,7 +255,7 @@ namespace Migracja
         private void PxListToGeoList(VectorRectangeGroup aEdgePxList)
         {
             Vector_Rectangle edgePoint;
-            GeoPoint geoPoint;
+            GeoEdgePoint geoPoint;
             for (int i=0; i < aEdgePxList.Count; i++) 
             {
                 edgePoint = aEdgePxList[i];
