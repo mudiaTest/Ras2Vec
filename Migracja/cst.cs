@@ -28,5 +28,14 @@ namespace Migracja
                                                */
         internal const int c_geoPxStartEnd = 2; //punkt będacy startem/końcem granicy
         internal const int c_geoPxGroupBorder = 3; //punkt w najbliższej okolicy którego zachodzi zmiana grup
+
+        internal const int N = 1;
+        internal const int S = 2;
+        internal const int W = 3;
+        internal const int E = 4;
+        internal const int NW = 5;
+        internal const int NE = 6;
+        internal const int SW = 7;
+        internal const int SE = 8;
     }
 }

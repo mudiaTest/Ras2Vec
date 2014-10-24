@@ -423,11 +423,31 @@ namespace Migracja
             int y = (int)Math.Floor((((MouseEventArgs)e).Y - resultLeftY) / windowSettings.dpScale) + srcLeftY;
 
             string info = "";
-            Vector_Rectangle vr = mapFactory.vectArr[x][y];
-            info += string.Format("Point({0},{1}) color:{2}", vr.p1.X, vr.p1.Y, vr.color);
-            VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
-            info += '\n' + group.edgeList.GetPointsStr();
-
+            info += string.Format("Point({0},{1}):", x, y);
+            Vector_Rectangle vr = null;
+            if (x >= 0 && x < mapFactory.vectArr.Length && y >= 0 && y < mapFactory.vectArr[0].Length)
+            {
+                vr = mapFactory.vectArr[x][y];
+            }
+            if (vr != null)
+                info += string.Format("color={0}", vr.color);
+            PointAdv pointAdv = null;
+            if (x >= 0 && x <= mapFactory.vectArr.Length && y >= 0 && y <= mapFactory.vectArr[0].Length)
+            {
+                pointAdv = mapFactory.pointAdvArr[x][y];
+            }
+            if (pointAdv != null)
+            {
+                info += string.Format("type={0}", mapFactory.pointAdvArr[x][y].GetKdPointType());
+            }
+            else
+                info += string.Format("Punkt poza obszarem mapy.");     
+            if (vr != null)
+            {
+                VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
+                info += '\n' + group.edgeList.GetPointsStr();
+            }
+            
             UpdateInfoBoxTime( info );
           //  UpdateInfoBoxTime( mapFactory.colorArr[x][y]..ToString );
         }

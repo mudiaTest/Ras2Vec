@@ -23,6 +23,7 @@ namespace Migracja
         public float YeGoPX { get; set; } //ile stopni zawiera zmiana o jeden px poziomo
         public Dictionary<int, ColorGroupList> vectRectGroupsByColor { get; set; } //key - kolor; obj - lista grup w tym kolorze
         public ColorPx[][] colorArr{ get; set; } //kolor każdego pixela
+        public PointAdv[][] pointAdvArr{ get; set; } //mapa odzwierciedlająca "narożniki" pixeli
         protected int inMod;
         public string stMessage;
         public string stTime;
@@ -55,9 +56,16 @@ namespace Migracja
             vectArr = new Vector_Rectangle[srcWidth][];
             for (int i = 0; i < srcWidth; i++)
                 vectArr[i] = new Vector_Rectangle[srcHeight];
+
+            //tworzenie colorArr
             colorArr = new ColorPx[srcWidth][];
             for (int i = 0; i < srcWidth; i++)
                 colorArr[i] = new ColorPx[srcHeight];
+
+            //tworzenie pointAdvArr. Wymiary pointAdvArr odpowiadają wymiarom colorArr + 1, bo pointAdvArr to narożniki pixeli 
+            pointAdvArr = new PointAdv[srcWidth+1][];
+            for (int i = 0; i < srcWidth+1; i++)
+                pointAdvArr[i] = new PointAdv[srcHeight + 1];
             
             for (int y=0; y<srcHeight; y++) 
                 for (int x=0; x<srcWidth; x++) 

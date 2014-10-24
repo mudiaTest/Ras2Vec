@@ -15,6 +15,11 @@ namespace Migracja
             fpoint = new Point(X, Y);
             fkdPointType = akdPointType;
         }
+        public PointAdv(Point point, int akdPointType)
+        {
+            fpoint = point;
+            fkdPointType = akdPointType;
+        }
 
         public Point GetPoint()
         {
