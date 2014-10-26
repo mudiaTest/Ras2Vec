@@ -592,7 +592,7 @@ namespace Migracja
             List<GeoEdgePoint> result = new List<GeoEdgePoint>(aEdgePxList.Count * 3);
             int counter = 0;
             //if (!aBlOnlyFillColorArr)
-            //    SetLength(result, aEdgePxList.Count*3);
+            //    SetLength(result, aEdgePxList.Count*3);           
             if (aEdgePxList.Count > 1)
             {
                 //SetLength(result, self.rectList.Count+30);
@@ -629,6 +629,13 @@ namespace Migracja
                                         aColorArr, aBlOnlyFillColorArr);
                 counter = 4;
             }
+            //Z powodu kolejności dodawania punktów w metodzie MakePartEdge, do listy jako pierwszy dodamy 
+            //ostatni punkt, a potem dopiero pierwszy, drugi etc. Dlatego przesówamy całą listę o jedną pozycję.
+            if (result.Count > 0)
+            {
+                result.Add(result[0]);
+                result.RemoveAt(0);
+            }
             return result;
         }
 
@@ -660,11 +667,18 @@ namespace Migracja
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
                 //int ileMiddlePoints = 0;
-                for (int i = 0; i < aGeoEdgePointList.Count - 2; i++)
+                for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
                     //startPoint = aGeoEdgePointList[i];
                     middlePoint = aGeoEdgePointList[i + 1];
-                    endPoint = aGeoEdgePointList[i + 2];
+                    if (i < aGeoEdgePointList.Count - 2)
+                    {
+                        endPoint = aGeoEdgePointList[i + 2];
+                    }
+                    else
+                    {
+                        endPoint = aGeoEdgePointList[0];
+                    }
 
                     //Jeśli punkt środkowy NIE MOŻE być usunięty
                     if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
