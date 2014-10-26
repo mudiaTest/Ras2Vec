@@ -247,9 +247,9 @@ namespace Migracja
                             PointAdv[] granica;
                             if (settings.ShowSimplifiedEdge())
                             {
-                                Debug.Assert(group.pointArrFromSimplifiedEdge != null,
+                                Debug.Assert(group.pointAdvMapFromSimplifiedEdge != null,
                                              "Tablica pointArrFromSimplifiedEdge nie została zainicjalizowana.");
-                                Debug.Assert(group.pointArrFromSimplifiedEdge.Length != 0,
+                                Debug.Assert(group.pointAdvMapFromSimplifiedEdge.Length != 0,
                                              "Tablica pointArrFromSimplifiedEdge jest pusta.");
                                 granica = group.GetScaledPointArrFromSimplifiedEdge(aScale,
                                                                                             resultRect.X - rect.X * aScale,
@@ -257,9 +257,9 @@ namespace Migracja
                             }
                             else
                             {
-                                Debug.Assert(group.pointArrFromFullEdge != null,
+                                Debug.Assert(group.pointAdvMapFromFullEdge != null,
                                              "Tablica pointArrFromFullEdge nie została zainicjalizowana.");
-                                Debug.Assert(group.pointArrFromFullEdge.Length != 0,
+                                Debug.Assert(group.pointAdvMapFromFullEdge.Length != 0,
                                              "Tablica pointArrFromFullEdge jest pusta.");
                                 granica = group.GetScaledPointArrFromFullEdge(aScale,
                                                                                       resultRect.X - rect.X * aScale,
@@ -273,17 +273,17 @@ namespace Migracja
                             {
                                 if (!settings.TestColor())
                                 {
-                                    Math.DivRem(group.sourceColor.R + 100, 256, out tmpLineR);
-                                    Math.DivRem(group.sourceColor.G + 200, 256, out tmpLineG);
-                                    Math.DivRem(group.sourceColor.B + 10, 256, out tmpLineB);
+                                    Math.DivRem(group.sourceColor.R + 50, 256, out tmpLineR);
+                                    Math.DivRem(group.sourceColor.G + 50, 256, out tmpLineG);
+                                    Math.DivRem(group.sourceColor.B + 50, 256, out tmpLineB);
 
-                                    Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointR);
-                                    Math.DivRem(group.sourceColor.G + 10, 256, out tmpPointG);
+                                    Math.DivRem(group.sourceColor.R + 100, 256, out tmpPointR);
+                                    Math.DivRem(group.sourceColor.G + 100, 256, out tmpPointG);
                                     Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
 
-                                    Math.DivRem(group.sourceColor.R + 200, 256, out tmpPointBorderR);
-                                    Math.DivRem(group.sourceColor.G + 100, 256, out tmpPointBorderG);
-                                    Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointBorderB);
+                                    Math.DivRem(group.sourceColor.R + 150, 256, out tmpPointBorderR);
+                                    Math.DivRem(group.sourceColor.G + 150, 256, out tmpPointBorderG);
+                                    Math.DivRem(group.sourceColor.B + 150, 256, out tmpPointBorderB);
                                 }
                                 else
                                 {

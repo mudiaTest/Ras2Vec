@@ -55,8 +55,8 @@ namespace Migracja
         //rodzic
         public MapFactory parentMapFactory{get;set;}
 
-        internal PointAdv[] pointArrFromFullEdge = null;
-        internal PointAdv[] pointArrFromSimplifiedEdge = null;
+        internal PointAdv[] pointAdvMapFromFullEdge = null;
+        internal PointAdv[] pointAdvMapFromSimplifiedEdge = null;
 
         Point[] GetEdgeListAsArray(float aScale)
         {
@@ -96,7 +96,8 @@ namespace Migracja
                                     float aMultiX, float aMultiY, float aDisplaceX, float aDisplaceY,
                                     ColorPx[][] aColorArr,
                                     PointAdv[][] aPointAdvArr,
-                                    bool aBlOnlyFillColorArr)
+                                    bool aBlOnlyFillColorArr,
+                                    bool aIsFirstEdgeVectRect = false)
         {
             ColorPx colorPx = GetColorPx(aColorArr, aActPoint, null) as ColorPx;
             
@@ -115,11 +116,11 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.NW, Cst.N);          
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false, Cst.NW, Cst.N);          
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY, 
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
 
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.N, Cst.NE, Cst.E);
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.N, Cst.NE, Cst.E);
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
@@ -133,7 +134,7 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X) * aMultiX + aDisplaceX, (aActPoint.Y) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
                         lpCounter = lpCounter + 1;
@@ -145,14 +146,14 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X) * aMultiX + aDisplaceX, (aActPoint.Y) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.N, Cst.NE, Cst.E);
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.N, Cst.NE, Cst.E);
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.E, Cst.SE, Cst.S);
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.E, Cst.SE, Cst.S);
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
@@ -172,10 +173,10 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.SE, Cst.S);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.SE, Cst.S);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.S, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.S, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
@@ -194,7 +195,7 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.SE, Cst.S);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.SE, Cst.S);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1))));
                         lpCounter = lpCounter + 1;
@@ -206,14 +207,14 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.SE, Cst.S);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.SE, Cst.S);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.S, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.S, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.W, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false, Cst.W, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
@@ -237,10 +238,10 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.NE, Cst.E);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.NE, Cst.E);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.E, Cst.SE, Cst.S);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.E, Cst.SE, Cst.S);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1))));
@@ -254,7 +255,7 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.NE, Cst.E);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.NE, Cst.E);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
                         lpCounter = lpCounter + 1;
@@ -266,14 +267,14 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.NE, Cst.E);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.NE, Cst.E);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, Cst.E, Cst.SE, Cst.S);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.E, Cst.SE, Cst.S);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.S, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.S, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
@@ -293,10 +294,10 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.W, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, aIsFirstEdgeVectRect, Cst.W, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
@@ -315,7 +316,7 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
                         lpCounter = lpCounter + 1;
@@ -327,14 +328,14 @@ namespace Migracja
                 {
                     if (!aBlOnlyFillColorArr) 
                     {
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, Cst.SW, Cst.W);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.SW, Cst.W);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, Cst.W, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, aIsFirstEdgeVectRect, Cst.W, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, Cst.N, Cst.NE, Cst.E);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.N, Cst.NE, Cst.E);  
                         //aGeoArr.Add(new GeoEdgePoint((aActPoint.X + 1) * aMultiX + aDisplaceX, aActPoint.Y * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X + 1, aActPoint.Y))));
@@ -358,6 +359,7 @@ namespace Migracja
                                            int? aDisplaceForGeoArr, //pozycja punktu dodawanego do aGeoArr względem aPoint. Null oznaza aPoint
                                            PointAdv[][] aPointAdvArr, //mapa dla PointAdv
                                            ColorPx[][] aColorArr, //mapa dla ColorPx
+                                           bool aIsFirstEdgeVectRect, //Czy jest pierwszym punktem krawędzi
                                            //Sprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu pary punktów 1,2 i 2,3( o ile 3 != null) 
                                            int pxToTypeCheck1, //1 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
                                            int pxToTypeCheck2, //2 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
@@ -365,13 +367,26 @@ namespace Migracja
             {
                 int X = aPoint.X;
                 int Y = aPoint.Y;
-                int kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, Cst.S), GetColorPx(aColorArr, aPoint, Cst.SE),
-                                         GetColorPx(aColorArr, aPoint, Cst.SE), GetColorPx(aColorArr, aPoint, Cst.E));
+                int kdPxType = 0;
+                if (aIsFirstEdgeVectRect)
+                {
+                    kdPxType = Cst.c_geoPxStartEnd;
+                }
+                else if (pxToTypeCheck3 == null)
+                {
+                    kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1), GetColorPx(aColorArr, aPoint, pxToTypeCheck2));
+                }
+                else
+                {
+                    kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1), GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                                            GetColorPx(aColorArr, aPoint, pxToTypeCheck2), GetColorPx(aColorArr, aPoint, pxToTypeCheck3));
+                }
                 Point? tmpGeoPoint = GetDisplacedPoint(aPoint, aDisplaceForGeoArr);
                 Debug.Assert(tmpGeoPoint != null, "newGeoPoint jest 'Point.Empty'");
-                Point newGeoPoint = (Point)tmpGeoPoint; 
-                aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, kdPxType));
-                aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv((Point)newGeoPoint, kdPxType);
+                Point newGeoPoint = (Point)tmpGeoPoint; //newGeoPoint ma jeszcze zmienne X,Y odpowiadające px. Przekształcenie ma prawdzowe zmienne geograficzne następuje poniżej
+                aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType));
+                if (aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] == null)
+                    aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv((Point)newGeoPoint, kdPxType);
             }
 
             private ColorPx GetColorPx(ColorPx[][] aColorArr, Point aPoint, int? aDisplace)//int X, int Y)
@@ -427,12 +442,12 @@ namespace Migracja
                 }  
                 else if (aDisplace == Cst.SW)
                 {
-                    dX = 1;
+                    dX = -1;
                     dY = 1;
                 }  
                 else if (aDisplace == Cst.W)
                 {
-                    dX = 1;
+                    dX = -1;
                     dY = 0;
                 } 
                 else
@@ -489,16 +504,16 @@ namespace Migracja
         {
             if (!aBlOnlyFillColorArr)
             {
-                aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y) * aDPMultiY + aDpDisplaceY,
+                aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
                                              GetPxType(aColorArr[aPoint.X - 1][aPoint.Y], aColorArr[aPoint.X - 1][aPoint.Y - 1],
                                                        aColorArr[aPoint.X - 1][aPoint.Y - 1], aColorArr[aPoint.X][aPoint.Y - 1])));
-                aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, aPoint.Y * aDPMultiY + aDpDisplaceY,
+                aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, aPoint.Y * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
                                              GetPxType(aColorArr[aPoint.X][aPoint.Y - 1], aColorArr[aPoint.X + 1][aPoint.Y - 1],
                                                        aColorArr[aPoint.X + 1][aPoint.Y - 1], aColorArr[aPoint.X + 1][aPoint.Y])));
-                aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY,
+                aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
                                              GetPxType(aColorArr[aPoint.X + 1][aPoint.Y], aColorArr[aPoint.X + 1][aPoint.Y + 1],
                                                        aColorArr[aPoint.X + 1][aPoint.Y + 1], aColorArr[aPoint.X][aPoint.Y + 1])));
-                aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY,
+                aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
                                              GetPxType(aColorArr[aPoint.X][aPoint.Y + 1], aColorArr[aPoint.X - 1][aPoint.Y + 1],
                                                        aColorArr[aPoint.X - 1][aPoint.Y + 1], aColorArr[aPoint.X - 1][aPoint.Y])));
             }
@@ -557,7 +572,7 @@ namespace Migracja
         private GeoEdgePoint PxPointToGeoPoint(Vector_Rectangle aPxPoint)
         {
             //P1 i P2 będą takie same, bo aPxPoint reprezentuje pojedynczy pixel, więc wartośći x i y możemy wziąć z p1
-            return new GeoEdgePoint(aPxPoint.p1.X, aPxPoint.p1.Y, Cst.c_geoPxSimple);
+            return new GeoEdgePoint(aPxPoint.p1.X, aPxPoint.p1.Y, aPxPoint.p1.X, aPxPoint.p1.Y, Cst.c_geoPxSimple);
         }
 
         public VectoredRectangleGroup()
@@ -585,7 +600,7 @@ namespace Migracja
                 Point o1 = aEdgePxList[aEdgePxList.Count-1].GetP(0);
                 Point o2 = aEdgePxList[0].GetP(0);
                 Point o3 = aEdgePxList[1].GetP(0);
-                MakePartEdge(o1, o2, o3, ref counter, result, aMultiX, aMultiY, aDisplaceX, aDisplaceY, aColorArr, aPointAdvArr, aBlOnlyFillColorArr);
+                MakePartEdge(o1, o2, o3, ref counter, result, aMultiX, aMultiY, aDisplaceX, aDisplaceY, aColorArr, aPointAdvArr, aBlOnlyFillColorArr, true);
 
                 //jest tyle iteracji, ile rect tworzących granicę. Pierwsza i ostatnia iteracja są szczególne, więc pozostało n-2 iteracji
                 for (int i=1; i<aEdgePxList.Count-1; i++)
@@ -619,12 +634,17 @@ namespace Migracja
 
         internal void MakePointArrFromFullEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
         {
-            pointArrFromFullEdge = MakePointArrFromEdge(edgeList, aDpScale, aDisplaceX, aDisplaceY);
+            pointAdvMapFromFullEdge = MakePointArrFromEdge(edgeList, aDpScale, aDisplaceX, aDisplaceY);
         }
 
         internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
         {
-            pointArrFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
+            //pointAdvMapFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
+            //SimplifyPointAdvMapPhase1(pointAdvMapFromSimplifiedEdge);
+
+            List<GeoEdgePoint> pxPointList = MakeVectorEdge(simplifiedEdgeList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+            SimplifyPointAdvListPhase1(pxPointList);
+            pointAdvMapFromSimplifiedEdge = PointList2PxArray(pxPointList);
         }
 
             private PointAdv[] MakePointArrFromEdge(VectorRectangeGroup aEdgeList, float aDpScale, float aDisplaceX, float aDisplaceY)
@@ -634,28 +654,136 @@ namespace Migracja
                 return PointList2PxArray(pxPointList);
             }
 
+            private void SimplifyPointAdvListPhase1(List<GeoEdgePoint> aGeoEdgePointList)
+            {
+                GeoEdgePoint startPoint = aGeoEdgePointList[0];
+                GeoEdgePoint middlePoint;
+                GeoEdgePoint endPoint;
+                //int ileMiddlePoints = 0;
+                for (int i = 0; i < aGeoEdgePointList.Count - 2; i++)
+                {
+                    //startPoint = aGeoEdgePointList[i];
+                    middlePoint = aGeoEdgePointList[i + 1];
+                    endPoint = aGeoEdgePointList[i + 2];
+
+                    //Jeśli punkt środkowy NIE MOŻE być usunięty
+                    if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+                    {
+                        startPoint = aGeoEdgePointList[i + 1];
+                    }
+                    //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
+                    else if (ArePointsInVector(startPoint.ToPictPoint(), middlePoint.ToPictPoint(), endPoint.ToPictPoint()))
+                    {
+                        //uproszczenie punktu poprzez jego usunięcie
+                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplified())
+                        {
+                            parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].DelSimplifyPhase1();
+                        }
+                        aGeoEdgePointList[i + 1] = null;                     
+                    }
+                    //Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
+                    else
+                    {
+                        startPoint = aGeoEdgePointList[i + 1];
+                    }
+                }
+                aGeoEdgePointList.RemoveAll(x => x == null);
+    
+            }
+
+            private void SimplifyPointAdvMapPhase1(PointAdv[] pointAdvMap)
+            {
+                PointAdv startPoint = pointAdvMap[0];
+                PointAdv middlePoint;
+                PointAdv endPoint;
+                int ileMiddlePoints = 0;
+                for (int i = 0; i < pointAdvMap.Length - 2; i++)
+                {
+                    //startPoint = pointAdvMap[i];
+                    middlePoint = pointAdvMap[i + 1];
+                    endPoint = pointAdvMap[i + 2];
+                    
+                    //Jeśli punkt środkowy NIE MOŻE być usunięty
+                    if (!parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].CanBeDelSimplified())
+                    {
+                        startPoint = pointAdvMap[i + 1];
+                    }
+                    //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
+                    else if (ArePointsInVector(startPoint.GetPoint(), middlePoint.GetPoint(), endPoint.GetPoint()))
+                    {
+                        //uproszczenie punktu poprzez jego usunięcie
+                        if (!parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].IsDelSimplified())
+                        {
+                            parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].DelSimplifyPhase1();
+                        }
+                        pointAdvMap[i + 1] = null;
+                    }
+                    //Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
+                    else
+                    {
+                        startPoint = pointAdvMap[i + 1];
+                    }
+                }
+
+
+
+
+
+                /*int prevDirection = Cst.fromLeft;
+                foreach(KeyValuePair<int, PointAdv> pair in pointAdvList)
+                {
+                    PointAdv currentPoint = pair.Value;
+                    if (startPoint != currentPoint && )  
+                }*/
+            }
+
+                private bool ArePointsInVector(Point aPoint1, Point aPoint2, Point aPoint3)
+                {
+                    return (aPoint1.X < aPoint2.X && aPoint2.X < aPoint3.X && aPoint1.Y == aPoint2.Y && aPoint2.Y == aPoint3.Y) ||
+                           (aPoint1.X > aPoint2.X && aPoint2.X > aPoint3.X && aPoint1.Y == aPoint2.Y && aPoint2.Y == aPoint3.Y) ||
+                           (aPoint1.X == aPoint2.X && aPoint2.X == aPoint3.X && aPoint1.Y < aPoint2.Y && aPoint2.Y < aPoint3.Y) ||
+                           (aPoint1.X == aPoint2.X && aPoint2.X == aPoint3.X && aPoint1.Y > aPoint2.Y && aPoint2.Y > aPoint3.Y);
+                }
+        
+                private bool IsVerticalVector(Point aPoint1, Point aPoint2, int aDirection)
+                {
+                    return (aDirection == Cst.fromLeft && aPoint1.X < aPoint2.X && aPoint1.Y == aPoint2.Y) ||
+                           (aDirection == Cst.fromRight && aPoint1.X > aPoint2.X && aPoint1.Y == aPoint2.Y);
+                }
+
+                private bool IsHorizontalVector(Point aPoint1, Point aPoint2, int aDirection)
+                {
+                    return (aDirection == Cst.fromTop && aPoint1.X == aPoint2.X && aPoint1.Y > aPoint2.Y) ||
+                           (aDirection == Cst.fromBottom && aPoint1.X == aPoint2.X && aPoint1.Y < aPoint2.Y);
+                }
+
+                private bool IsStraightVector(Point aPoint1, Point aPoint2, int aDirection)
+                {
+                    return IsVerticalVector(aPoint1, aPoint2, aDirection) || IsHorizontalVector(aPoint1, aPoint2, aDirection);
+                }
+
 
         internal PointAdv[] GetScaledPointArrFromFullEdge(float adpScale, float aDisplaceX, float aDisplaceY)
         {
-            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointArrFromFullEdge);
+            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointAdvMapFromFullEdge);
         }
 
         internal PointAdv[] GetScaledPointArrFromSimplifiedEdge(float adpScale, float aDisplaceX, float aDisplaceY)
         {
-            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointArrFromSimplifiedEdge);
+            return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointAdvMapFromSimplifiedEdge);
         }
 
         private PointAdv[] GetScaledPointArrFromEdge(float adpScale, float aDisplaceX, float aDisplaceY, PointAdv[] aPointArr)
+        {
+            PointAdv[] result = new PointAdv[aPointArr.Length];
+            for(int i=0; i< aPointArr.Length; i++)
             {
-                PointAdv[] result = new PointAdv[aPointArr.Length];
-                for(int i=0; i< aPointArr.Length; i++)
-                {
-                    result[i] = new PointAdv((int)Math.Round(aPointArr[i].X * adpScale / Cst.maxZoom + aDisplaceX), 
-                                             (int)Math.Round(aPointArr[i].Y * adpScale / Cst.maxZoom + aDisplaceY),
-                                             aPointArr[i].GetKdPointType());
-                }
-                return result;
+                result[i] = new PointAdv((int)Math.Round(aPointArr[i].X * adpScale / Cst.maxZoom + aDisplaceX), 
+                                            (int)Math.Round(aPointArr[i].Y * adpScale / Cst.maxZoom + aDisplaceY),
+                                            aPointArr[i].GetKdPointType());
             }
+            return result;
+        }
 
         internal void MakeSimplifyVectorEdge()
         {
@@ -758,7 +886,15 @@ namespace Migracja
         {
             PointAdv[] result = new PointAdv[aGeoList.Count];
             for (int i = 0; i < aGeoList.Count; i++)
-               result[i] = aGeoList[i].ToPointAdv();
+               result[i] = aGeoList[i].PointToPointAdv();
+            return result;
+        }
+
+        public PointAdv[] PictPointList2PxArray(List<GeoEdgePoint> aGeoList)
+        {
+            PointAdv[] result = new PointAdv[aGeoList.Count];
+            for (int i = 0; i < aGeoList.Count; i++)
+                result[i] = aGeoList[i].PictPointToPointAdv();
             return result;
         }
 

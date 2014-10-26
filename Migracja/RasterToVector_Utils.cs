@@ -55,31 +55,48 @@ namespace Migracja
     //na razie nie jest rozbudowany, ale bedzie potem
     class GeoPoint
     {
-        internal float X;
+        //współrzędne geograficzne punktu 
+        internal float X; 
         internal float Y;
+        //współrzędne punktu na źródłowej bitmapie
+        internal int fPictX;
+        internal int fPictY;
         public GeoPoint() { }
-        public GeoPoint(float x, float y)
+        public GeoPoint(float x, float y, int aPictX, int aPictY)
         {
             X = x;
             Y = y;
+            fPictX = aPictX;
+            fPictY = aPictY;
         }
         public Point ToPoint()
         {
             return new Point(RasterToVector_Utils.Round(X), RasterToVector_Utils.Round(Y));
         }
+        public Point ToPictPoint()
+        {
+            return new Point(fPictX, fPictY);
+        }
+
+        public int pictX { get { return fPictX; } }
+        public int pictY { get { return fPictY; } }
     }
 
     class GeoEdgePoint : GeoPoint
     {
         private int kdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxStartEnd
-        public GeoEdgePoint(float x, float y, int akdPointType /*= Cst.c_geoPxSimple*/): base(x, y)
+        public GeoEdgePoint(float x, float y, int aPictX, int aPictY, int akdPointType /*= Cst.c_geoPxSimple*/): base(x, y, aPictX, aPictY)
         {
             kdPointType = akdPointType;
         }
 
-        public PointAdv ToPointAdv()
+        public PointAdv PointToPointAdv()
         {
             return new PointAdv(RasterToVector_Utils.Round(X), RasterToVector_Utils.Round(Y), kdPointType);
+        }
+        public PointAdv PictPointToPointAdv()
+        {
+            return new PointAdv(fPictX, fPictY, kdPointType);
         }
     }
 
