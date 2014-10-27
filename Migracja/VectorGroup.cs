@@ -801,7 +801,6 @@ namespace Migracja
 
         internal void MakeSimplifyVectorEdge()
         {
-            //to do
             simplifiedEdgeList = new VectorRectangeGroup();
             List<int> sortedKeyList = edgeList.GetSortedKeyList();
             Vector_Rectangle startRect = edgeList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
@@ -817,24 +816,31 @@ namespace Migracja
                 simplifiedEdgeList.Add(lastKey, startRect);
                 if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
                 {
-                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
-                }
-                else /*if (edgeList[sortedKeyList[0]].p1.Y == edgeList[sortedKeyList[1]].p1.Y)*/
-                {
                     prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
                 }
+                else 
+                {
+                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
+                }
 
-                for (var i = 1; i < sortedKeyList.Count - 1; i++)
+                for (var i = 1; i < sortedKeyList.Count; i++)
                 {                      
                     middleRect = edgeList[sortedKeyList[i]];
-                    endRect = edgeList[sortedKeyList[i + 1]];
+                    if (i < sortedKeyList.Count - 1)
+                    {
+                        endRect = edgeList[sortedKeyList[i + 1]];
+                    }
+                    else
+                    {
+                        endRect = edgeList[sortedKeyList[0]];
+                    }
                     if (InLineHorizontal(startRect, middleRect, endRect, prevDiff)) 
                     {
-                        prevDiff = endRect.p1.Y - middleRect.p1.Y;
+                        prevDiff = endRect.p1.X - middleRect.p1.X;
                     }
                     else if (InLineVertical(startRect, middleRect, endRect, prevDiff)) 
                     {
-                        prevDiff = endRect.p1.X - middleRect.p1.X;
+                        prevDiff = endRect.p1.Y - middleRect.p1.Y;
                     }
                     else
                     {
@@ -852,24 +858,9 @@ namespace Migracja
                         }
                     }                    
                 }
-
-
-                startRect = simplifiedEdgeList[lastKey];
-                middleRect = edgeList[sortedKeyList[sortedKeyList.Count - 1]];
-                endRect = edgeList[sortedKeyList[0]];
-                if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
-                {
-                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
-                }
-                else /*if (edgeList[sortedKeyList[0]].p1.Y == edgeList[sortedKeyList[1]].p1.Y)*/
-                {
-                    prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
-                }
-
-                simplifiedEdgeList.Add(edgeList[sortedKeyList[sortedKeyList.Count - 1]]);
             }
             else
-            {//hjkhjkgjk
+            {
                 for (var i = 0; i < sortedKeyList.Count; i++)
                 {
                     simplifiedEdgeList.Add(edgeList[sortedKeyList[i]]);
@@ -882,8 +873,8 @@ namespace Migracja
                                     Vector_Rectangle aEndRect,
                                     int aPrevDiff)
             {
-                return aStartRect.p1.X == aMiddleRect.p1.X && aStartRect.p1.X == aEndRect.p1.X &&
-                       aPrevDiff == aEndRect.p1.Y - aMiddleRect.p1.Y;
+                return aStartRect.p1.Y == aMiddleRect.p1.Y && aStartRect.p1.Y == aEndRect.p1.Y &&
+                       aPrevDiff == aEndRect.p1.X - aMiddleRect.p1.X;
             }
 
             //obiekty "podążają" w jednym kierunku w linii pionowej
@@ -892,8 +883,8 @@ namespace Migracja
                                     Vector_Rectangle aEndRect,
                                     int aPrevDiff)
             {
-                return aStartRect.p1.Y == aMiddleRect.p1.Y && aStartRect.p1.Y == aEndRect.p1.Y &&
-                       aPrevDiff == aEndRect.p1.X - aMiddleRect.p1.X;
+                return aStartRect.p1.X == aMiddleRect.p1.X && aStartRect.p1.X == aEndRect.p1.X &&
+                       aPrevDiff == aEndRect.p1.Y - aMiddleRect.p1.Y;
             }
 
         public PointAdv[] PointList2PxArray(List<GeoEdgePoint> aGeoList)
