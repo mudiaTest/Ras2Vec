@@ -110,6 +110,7 @@ namespace Migracja
                 if (Direction(aActPoint, aNextPoint) == Cst.fromBottom) 
                 {
                     //nic
+                    NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false);
                 }
                 //►▼
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromTop) 
@@ -189,6 +190,7 @@ namespace Migracja
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromTop) 
                 {
                     //nic
+                    NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false);
                 }
                 //◄◄
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromRight) 
@@ -214,7 +216,7 @@ namespace Migracja
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y + 1) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y + 1), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y))));
-                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, false, Cst.W, Cst.NW, Cst.N);  
+                        NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, null, aPointAdvArr, aColorArr, aIsFirstEdgeVectRect, Cst.W, Cst.NW, Cst.N);  
                         //aGeoArr.Add(new GeoEdgePoint(aActPoint.X * aMultiX + aDisplaceX, (aActPoint.Y) * aMultiY + aDisplaceY,
                         //                             GetPxType(GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y), GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1),
                         //                                       GetColorPx(aColorArr, aActPoint.X - 1, aActPoint.Y - 1), GetColorPx(aColorArr, aActPoint.X, aActPoint.Y - 1))));
@@ -232,6 +234,7 @@ namespace Migracja
                 if (Direction(aActPoint, aNextPoint) == Cst.fromLeft) 
                 {
                     //nic
+                    NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.E, aPointAdvArr, aColorArr, false);
                 }
                 //▼◄
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromRight) 
@@ -310,6 +313,7 @@ namespace Migracja
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromRight) 
                 {
                     //nic
+                    NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false);  
                 }
                 //▲▲
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromBottom) 
@@ -361,32 +365,46 @@ namespace Migracja
                                            ColorPx[][] aColorArr, //mapa dla ColorPx
                                            bool aIsFirstEdgeVectRect, //Czy jest pierwszym punktem krawędzi
                                            //Sprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu pary punktów 1,2 i 2,3( o ile 3 != null) 
-                                           int pxToTypeCheck1, //1 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
-                                           int pxToTypeCheck2, //2 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
+                                           int? pxToTypeCheck1 = null, //1 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
+                                           int? pxToTypeCheck2 = null, //2 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
                                            int? pxToTypeCheck3 = null)  //3 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
             {
-                int X = aPoint.X;
-                int Y = aPoint.Y;
-                int kdPxType = 0;
-                if (aIsFirstEdgeVectRect)
+                int kdPxType = 0; 
+                if (pxToTypeCheck1 != null && pxToTypeCheck2 != null)
                 {
-                    kdPxType = Cst.c_geoPxStartEnd;
-                }
-                else if (pxToTypeCheck3 == null)
-                {
-                    kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1), GetColorPx(aColorArr, aPoint, pxToTypeCheck2));
+                    if (aIsFirstEdgeVectRect)
+                    {
+                        kdPxType = Cst.c_geoPxStartEnd;
+                    }
+                    else if (pxToTypeCheck3 == null)
+                    {
+                        kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1),
+                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                             aColorArr[aPoint.X][aPoint.Y].group);
+                    }
+                    else
+                    {
+                        kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1),
+                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck3),
+                                             aColorArr[aPoint.X][aPoint.Y].group);
+                    }
                 }
                 else
                 {
-                    kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1), GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
-                                                            GetColorPx(aColorArr, aPoint, pxToTypeCheck2), GetColorPx(aColorArr, aPoint, pxToTypeCheck3));
+                    kdPxType = Cst.c_geoPxGroupBorder;
                 }
                 Point? tmpGeoPoint = GetDisplacedPoint(aPoint, aDisplaceForGeoArr);
                 Debug.Assert(tmpGeoPoint != null, "newGeoPoint jest 'Point.Empty'");
                 Point newGeoPoint = (Point)tmpGeoPoint; //newGeoPoint ma jeszcze zmienne X,Y odpowiadające px. Przekształcenie ma prawdzowe zmienne geograficzne następuje poniżej
-                aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType));
-                if (aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] == null)
-                    aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv((Point)newGeoPoint, kdPxType);
+
+                if (!(aGeoArr.Count > 0 && aGeoArr[aGeoArr.Count - 1].pictX == newGeoPoint.X && aGeoArr[aGeoArr.Count - 1].pictY == newGeoPoint.Y))
+                { 
+                    aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType));
+                    if (aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] == null)
+                        aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv((Point)newGeoPoint, kdPxType);
+                }
             }
 
             private ColorPx GetColorPx(ColorPx[][] aColorArr, Point aPoint, int? aDisplace)//int X, int Y)
@@ -463,19 +481,19 @@ namespace Migracja
                     return null;
             }
 
-            private bool IsThaSameGroup(ColorPx apx1, ColorPx apx2)
+            private bool IsThaSameGroup(ColorPx apx1, ColorPx apx2, int aEdgeGroup)
             {
                 if (apx1 == null || apx2 == null)
                 {
                     return true;
                 }
-                else { 
-                    return (apx1.group == apx2.group);
+                else {
+                    return (apx1.group == apx2.group || apx1.group == aEdgeGroup || apx2.group == aEdgeGroup);
                 }               
             }
-            private int GetPxType(ColorPx apx1, ColorPx apx2)
+            private int GetPxType(ColorPx apx1, ColorPx apx2, int aEdgeGroup)
             {
-                if (IsThaSameGroup(apx1, apx2))
+                if (IsThaSameGroup(apx1, apx2, aEdgeGroup))
                 {
                     return Cst.c_geoPxSimple;
                 }
@@ -484,9 +502,9 @@ namespace Migracja
                     return Cst.c_geoPxGroupBorder;
                 }
             }
-            private int GetPxType(ColorPx apx1, ColorPx apx2, ColorPx apx3, ColorPx apx4)
+            private int GetPxType(ColorPx apx1, ColorPx apx2, ColorPx apx3, ColorPx apx4, int aEdgeGroup)
             {
-                if (IsThaSameGroup(apx1, apx2) && IsThaSameGroup(apx3, apx4))
+                if (IsThaSameGroup(apx1, apx2, aEdgeGroup) && IsThaSameGroup(apx3, apx4, aEdgeGroup))
                 {
                     return Cst.c_geoPxSimple;
                 }
@@ -505,17 +523,29 @@ namespace Migracja
             if (!aBlOnlyFillColorArr)
             {
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X - 1][aPoint.Y], aColorArr[aPoint.X - 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X - 1][aPoint.Y - 1], aColorArr[aPoint.X][aPoint.Y - 1])));
+                                             GetPxType(aColorArr[aPoint.X - 1][aPoint.Y], 
+                                                       aColorArr[aPoint.X - 1][aPoint.Y - 1],
+                                                       aColorArr[aPoint.X - 1][aPoint.Y - 1],
+                                                       aColorArr[aPoint.X][aPoint.Y - 1],
+                                                       aColorArr[aPoint.X][aPoint.Y].group)));
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, aPoint.Y * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X][aPoint.Y - 1], aColorArr[aPoint.X + 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X + 1][aPoint.Y - 1], aColorArr[aPoint.X + 1][aPoint.Y])));
+                                             GetPxType(aColorArr[aPoint.X][aPoint.Y - 1], 
+                                                       aColorArr[aPoint.X + 1][aPoint.Y - 1],
+                                                       aColorArr[aPoint.X + 1][aPoint.Y - 1],
+                                                       aColorArr[aPoint.X + 1][aPoint.Y],
+                                                       aColorArr[aPoint.X][aPoint.Y].group)));
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X + 1][aPoint.Y], aColorArr[aPoint.X + 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X + 1][aPoint.Y + 1], aColorArr[aPoint.X][aPoint.Y + 1])));
+                                             GetPxType(aColorArr[aPoint.X + 1][aPoint.Y], 
+                                                       aColorArr[aPoint.X + 1][aPoint.Y + 1],
+                                                       aColorArr[aPoint.X + 1][aPoint.Y + 1],
+                                                       aColorArr[aPoint.X][aPoint.Y + 1],
+                                                       aColorArr[aPoint.X][aPoint.Y].group)));
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X][aPoint.Y + 1], aColorArr[aPoint.X - 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X - 1][aPoint.Y + 1], aColorArr[aPoint.X - 1][aPoint.Y])));
+                                             GetPxType(aColorArr[aPoint.X][aPoint.Y + 1], 
+                                                       aColorArr[aPoint.X - 1][aPoint.Y + 1],
+                                                       aColorArr[aPoint.X - 1][aPoint.Y + 1],
+                                                       aColorArr[aPoint.X - 1][aPoint.Y],
+                                                       aColorArr[aPoint.X][aPoint.Y].group)));
             }
             ColorPx colorPx = aColorArr[aPoint.X][aPoint.Y];
             colorPx.borderNS = true;

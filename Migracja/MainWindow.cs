@@ -430,7 +430,7 @@ namespace Migracja
                 vr = mapFactory.vectArr[x][y];
             }
             if (vr != null)
-                info += string.Format("color={0}", vr.color);
+                info += '\n' + string.Format("color={0}", vr.color);
             PointAdv pointAdv = null;
             if (x >= 0 && x <= mapFactory.vectArr.Length && y >= 0 && y <= mapFactory.vectArr[0].Length)
             {
@@ -438,10 +438,10 @@ namespace Migracja
             }
             if (pointAdv != null)
             {
-                info += string.Format("type={0}", mapFactory.pointAdvArr[x][y].GetKdPointType());
+                info += '\n' + string.Format("type={0}", mapFactory.pointAdvArr[x][y].GetKdPointType());
             }
             else
-                info += string.Format("Punkt poza obszarem mapy.");     
+                info += '\n' + string.Format("Punkt poza obszarem mapy.");     
             if (vr != null)
             {
                 VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
