@@ -44,6 +44,10 @@ namespace Migracja
         internal int sliceDisplacementX ;
         internal int sliceDisplacementY;
 
+        public bool simplifyPhase1 { get; set; }
+        public bool simplifyPhase2 { get; set; }
+        public bool simplifyPhase3 { get; set; }
+
         public void ReadGeoCorners(String stLeftUpX, String stLeftUpY, String stRightDownX, String stRightDownY)
         {
             geoLeftUpX = DecodeGeoStr(stLeftUpX);

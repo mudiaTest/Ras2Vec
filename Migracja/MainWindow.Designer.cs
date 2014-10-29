@@ -46,9 +46,6 @@
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.panel9 = new System.Windows.Forms.Panel();
             this.panel8 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
@@ -229,9 +226,6 @@
             // panel4
             // 
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.checkBox3);
-            this.panel4.Controls.Add(this.checkBox2);
-            this.panel4.Controls.Add(this.checkBox1);
             this.panel4.Controls.Add(this.panel9);
             this.panel4.Controls.Add(this.panel8);
             this.panel4.Controls.Add(this.reloadSrcMapBtn);
@@ -250,36 +244,6 @@
             this.panel4.Size = new System.Drawing.Size(315, 514);
             this.panel4.TabIndex = 26;
             this.panel4.Click += new System.EventHandler(this.w);
-            // 
-            // checkBox3
-            // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(175, 322);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(80, 17);
-            this.checkBox3.TabIndex = 33;
-            this.checkBox3.Text = "checkBox3";
-            this.checkBox3.UseVisualStyleBackColor = true;
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(89, 322);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(80, 17);
-            this.checkBox2.TabIndex = 32;
-            this.checkBox2.Text = "checkBox2";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(5, 322);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(80, 17);
-            this.checkBox1.TabIndex = 31;
-            this.checkBox1.Text = "checkBox1";
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // panel9
             // 
@@ -346,7 +310,7 @@
             // 
             // reloadSrcMapBtn
             // 
-            this.reloadSrcMapBtn.Location = new System.Drawing.Point(193, 293);
+            this.reloadSrcMapBtn.Location = new System.Drawing.Point(193, 318);
             this.reloadSrcMapBtn.Name = "reloadSrcMapBtn";
             this.reloadSrcMapBtn.Size = new System.Drawing.Size(112, 23);
             this.reloadSrcMapBtn.TabIndex = 26;
@@ -358,9 +322,9 @@
             // 
             this.infoBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.infoBox.Location = new System.Drawing.Point(5, 343);
+            this.infoBox.Location = new System.Drawing.Point(8, 366);
             this.infoBox.Name = "infoBox";
-            this.infoBox.Size = new System.Drawing.Size(295, 161);
+            this.infoBox.Size = new System.Drawing.Size(295, 135);
             this.infoBox.TabIndex = 25;
             this.infoBox.Text = "";
             // 
@@ -466,7 +430,7 @@
             // 
             // loadSrcMapBtn
             // 
-            this.loadSrcMapBtn.Location = new System.Drawing.Point(89, 293);
+            this.loadSrcMapBtn.Location = new System.Drawing.Point(89, 318);
             this.loadSrcMapBtn.Name = "loadSrcMapBtn";
             this.loadSrcMapBtn.Size = new System.Drawing.Size(98, 23);
             this.loadSrcMapBtn.TabIndex = 14;
@@ -483,16 +447,19 @@
             "Polygons - po R2V (yes) / Rectangles - z Rastra (no)",
             "Edge (polygons) / Grid (rectangles)",
             "Kolor testowy",
-            "Uproszczona krawędź"});
-            this.chkBoxTestOptions.Location = new System.Drawing.Point(8, 225);
+            "Uproszczona krawędź",
+            "Faza 1 upraszczania (rectangle)",
+            "Faza 2 upraszczania (punkty w liniach Vert. i Hor.)",
+            "Faza 3 upraszczania (punkty w okilicach linii prostych)"});
+            this.chkBoxTestOptions.Location = new System.Drawing.Point(8, 200);
             this.chkBoxTestOptions.Name = "chkBoxTestOptions";
-            this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 64);
+            this.chkBoxTestOptions.Size = new System.Drawing.Size(297, 109);
             this.chkBoxTestOptions.TabIndex = 10;
             this.chkBoxTestOptions.SelectedIndexChanged += new System.EventHandler(this.chkBoxTestOptions_SelectedIndexChanged);
             // 
             // btnRefreshResultImg
             // 
-            this.btnRefreshResultImg.Location = new System.Drawing.Point(8, 293);
+            this.btnRefreshResultImg.Location = new System.Drawing.Point(8, 318);
             this.btnRefreshResultImg.Name = "btnRefreshResultImg";
             this.btnRefreshResultImg.Size = new System.Drawing.Size(75, 23);
             this.btnRefreshResultImg.TabIndex = 16;
@@ -502,7 +469,7 @@
             // 
             // btnMainThread
             // 
-            this.btnMainThread.Location = new System.Drawing.Point(207, 164);
+            this.btnMainThread.Location = new System.Drawing.Point(206, 142);
             this.btnMainThread.Name = "btnMainThread";
             this.btnMainThread.Size = new System.Drawing.Size(99, 23);
             this.btnMainThread.TabIndex = 11;
@@ -516,7 +483,7 @@
             this.gbThreadChoice.Controls.Add(this.rbMainThread);
             this.gbThreadChoice.Controls.Add(this.btnStopR2V);
             this.gbThreadChoice.Controls.Add(this.btnStartR2V);
-            this.gbThreadChoice.Location = new System.Drawing.Point(8, 154);
+            this.gbThreadChoice.Location = new System.Drawing.Point(7, 132);
             this.gbThreadChoice.Margin = new System.Windows.Forms.Padding(0);
             this.gbThreadChoice.Name = "gbThreadChoice";
             this.gbThreadChoice.Padding = new System.Windows.Forms.Padding(0);
@@ -568,7 +535,7 @@
             // 
             // btnSeparateThread
             // 
-            this.btnSeparateThread.Location = new System.Drawing.Point(207, 192);
+            this.btnSeparateThread.Location = new System.Drawing.Point(206, 170);
             this.btnSeparateThread.Name = "btnSeparateThread";
             this.btnSeparateThread.Size = new System.Drawing.Size(99, 23);
             this.btnSeparateThread.TabIndex = 13;
@@ -742,7 +709,6 @@
             this.menuMain.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
             this.panel8.ResumeLayout(false);
             this.panel8.PerformLayout();
             this.panel5.ResumeLayout(false);
@@ -824,9 +790,6 @@
         private System.Windows.Forms.MaskedTextBox edtSliceHeight;
         private System.Windows.Forms.MaskedTextBox edtSliceWidth;
         private System.Windows.Forms.Panel panel9;
-        private System.Windows.Forms.CheckBox checkBox3;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

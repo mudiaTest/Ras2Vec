@@ -177,5 +177,20 @@ namespace Migracja
         {
             return StrExists("3");
         }
+
+        public bool SimplifyPhase1()
+        {
+            return StrExists("4");
+        }
+
+        public bool SimplifyPhase2()
+        {
+            return StrExists("5");
+        }
+
+        public bool SimplifyPhase3()
+        {
+            return StrExists("6");
+        }
     }
 }

@@ -277,13 +277,13 @@ namespace Migracja
                                     Math.DivRem(group.sourceColor.G + 50, 256, out tmpLineG);
                                     Math.DivRem(group.sourceColor.B + 50, 256, out tmpLineB);
 
-                                    Math.DivRem(group.sourceColor.R + 100, 256, out tmpPointR);
-                                    Math.DivRem(group.sourceColor.G + 100, 256, out tmpPointG);
-                                    Math.DivRem(group.sourceColor.B + 100, 256, out tmpPointB);
+                                    Math.DivRem(2 * group.sourceColor.R, 256, out tmpPointR);
+                                    Math.DivRem(2 * group.sourceColor.G, 256, out tmpPointG);
+                                    Math.DivRem(2 * group.sourceColor.B, 256, out tmpPointB);
 
-                                    Math.DivRem(group.sourceColor.R + 150, 256, out tmpPointBorderR);
-                                    Math.DivRem(group.sourceColor.G + 150, 256, out tmpPointBorderG);
-                                    Math.DivRem(group.sourceColor.B + 150, 256, out tmpPointBorderB);
+                                    Math.DivRem(2 * group.sourceColor.R + 150, 256, out tmpPointBorderR);
+                                    Math.DivRem(2 * group.sourceColor.G + 150, 256, out tmpPointBorderG);
+                                    Math.DivRem(2 * group.sourceColor.B + 150, 256, out tmpPointBorderB);
                                 }
                                 else
                                 {

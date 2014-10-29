@@ -27,7 +27,7 @@ namespace Migracja
         protected int inMod;
         public string stMessage;
         public string stTime;
-        private R2VSettings settings;
+        private R2VSettings settingsR2V;
         internal UpdateInfoBoxTimeDelegate infoBoxUpdateFunct;
 
         internal int maxKey;
@@ -309,7 +309,7 @@ namespace Migracja
                 if ((int)Math.DivRem((long)i, (long)inMod, out dummy) == 0)
                     UpdateInfoAction("Upraszczanie granicy dla grupy " + i.ToString() + "/" + (Count - 1).ToString());
                 i++;
-                vectGroup.MakeSimplifyVectorEdge();
+                vectGroup.MakeSimplifyVectorEdge(settingsR2V.simplifyPhase1);
             }
         }
 
@@ -361,13 +361,15 @@ namespace Migracja
             {
                 pair.Value.MakePointArrFromSimplifiedEdge(Cst.maxZoom,
                                                           0,
-                                                          0);
+                                                          0,
+                                                          settingsR2V.simplifyPhase2,
+                                                          settingsR2V.simplifyPhase3);
             }
         }
 
         public MapFactory(R2VSettings aSettings)
         {
-            settings = aSettings;
+            settingsR2V = aSettings;
             vectRectGroupsByColor = new Dictionary<int, ColorGroupList>(256*4);
             inMod = 1;
             maxKey = 0;
@@ -382,11 +384,11 @@ namespace Migracja
         public void PrzygotujMapFactory()
         {
             ClearReset();
-            ReadFromImgIntoRectArray(settings.sourceBmp);
-            geoLeftUpX = settings.geoLeftUpX;
-            geoLeftUpY = settings.geoLeftUpY;
-            geoRightDownX = settings.geoRightDownX;
-            geoRightDownY = settings.geoRightDownY;
+            ReadFromImgIntoRectArray(settingsR2V.sourceBmp);
+            geoLeftUpX = settingsR2V.geoLeftUpX;
+            geoLeftUpY = settingsR2V.geoLeftUpY;
+            geoRightDownX = settingsR2V.geoRightDownX;
+            geoRightDownY = settingsR2V.geoRightDownY;
         }
 
         public VectoredRectangleGroup GetGroupByXY(int x, int y, Boolean[][] aUsedArray)

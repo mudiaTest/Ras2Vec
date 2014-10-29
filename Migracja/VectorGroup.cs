@@ -393,7 +393,7 @@ namespace Migracja
                 }
                 else
                 {
-                    kdPxType = Cst.c_geoPxGroupBorder;
+                    kdPxType = Cst.c_geoPxSimple;
                 }
                 Point? tmpGeoPoint = GetDisplacedPoint(aPoint, aDisplaceForGeoArr);
                 Debug.Assert(tmpGeoPoint != null, "newGeoPoint jest 'Point.Empty'");
@@ -518,34 +518,42 @@ namespace Migracja
         private void MakePartEdgeForOnePoint(Point aPoint, List<GeoEdgePoint> aGeoArr,
                                             float aDpMultiX, float aDPMultiY, float aDpDisplaceX, float aDpDisplaceY,
                                             ColorPx[][] aColorArr,
+                                            PointAdv[][] aPointAdvArr,
                                             bool aBlOnlyFillColorArr)
         {
             if (!aBlOnlyFillColorArr)
             {
-                aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X - 1][aPoint.Y], 
-                                                       aColorArr[aPoint.X - 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X - 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X][aPoint.Y - 1],
+                /*aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
+                                             GetPxType(GetColorPx(aColorArr, aPoint, Cst.W), 
+                                                       GetColorPx(aColorArr, aPoint, Cst.NW),
+                                                       GetColorPx(aColorArr, aPoint, Cst.NW),
+                                                       GetColorPx(aColorArr, aPoint, Cst.N),
                                                        aColorArr[aPoint.X][aPoint.Y].group)));
+                 * 
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, aPoint.Y * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X][aPoint.Y - 1], 
-                                                       aColorArr[aPoint.X + 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X + 1][aPoint.Y - 1],
-                                                       aColorArr[aPoint.X + 1][aPoint.Y],
+                                             GetPxType(GetColorPx(aColorArr, aPoint, Cst.N), 
+                                                       GetColorPx(aColorArr, aPoint, Cst.NE),
+                                                       GetColorPx(aColorArr, aPoint, Cst.NE),
+                                                       GetColorPx(aColorArr, aPoint, Cst.E),
                                                        aColorArr[aPoint.X][aPoint.Y].group)));
+
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X + 1) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X + 1][aPoint.Y], 
-                                                       aColorArr[aPoint.X + 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X + 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X][aPoint.Y + 1],
+                                             GetPxType(GetColorPx(aColorArr, aPoint, Cst.E), 
+                                                       GetColorPx(aColorArr, aPoint, Cst.SE),
+                                                       GetColorPx(aColorArr, aPoint, Cst.SE),
+                                                       GetColorPx(aColorArr, aPoint, Cst.S),
                                                        aColorArr[aPoint.X][aPoint.Y].group)));
+
                 aGeoArr.Add(new GeoEdgePoint((aPoint.X) * aDpMultiX + aDpDisplaceX, (aPoint.Y + 1) * aDPMultiY + aDpDisplaceY, aPoint.X, aPoint.Y,
-                                             GetPxType(aColorArr[aPoint.X][aPoint.Y + 1], 
-                                                       aColorArr[aPoint.X - 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X - 1][aPoint.Y + 1],
-                                                       aColorArr[aPoint.X - 1][aPoint.Y],
-                                                       aColorArr[aPoint.X][aPoint.Y].group)));
+                                             GetPxType(GetColorPx(aColorArr, aPoint, Cst.S), 
+                                                       GetColorPx(aColorArr, aPoint, Cst.SW),
+                                                       GetColorPx(aColorArr, aPoint, Cst.SW),
+                                                       GetColorPx(aColorArr, aPoint, Cst.W),
+                                                       aColorArr[aPoint.X][aPoint.Y].group)));*/
+                NewBorderGeoPoint(aGeoArr, aPoint, aDpMultiX, aDPMultiY, aDpDisplaceX, aDpDisplaceY, null, aPointAdvArr, aColorArr, true, Cst.W, Cst.NW, Cst.N);
+                NewBorderGeoPoint(aGeoArr, aPoint, aDpMultiX, aDPMultiY, aDpDisplaceX, aDpDisplaceY, Cst.E, aPointAdvArr, aColorArr, false, Cst.N, Cst.NE, Cst.E);
+                NewBorderGeoPoint(aGeoArr, aPoint, aDpMultiX, aDPMultiY, aDpDisplaceX, aDpDisplaceY, Cst.SE, aPointAdvArr, aColorArr, false, Cst.E, Cst.SE, Cst.S);
+                NewBorderGeoPoint(aGeoArr, aPoint, aDpMultiX, aDPMultiY, aDpDisplaceX, aDpDisplaceY, Cst.S, aPointAdvArr, aColorArr, false, Cst.S, Cst.SW, Cst.W);
             }
             ColorPx colorPx = aColorArr[aPoint.X][aPoint.Y];
             colorPx.borderNS = true;
@@ -576,16 +584,16 @@ namespace Migracja
 
         /*
          *     A           B             C
-         * |(x2-x1)x0 + (y1-y2)y0 + (y2x1-x2y1)|
+         * |(y1-y2)*x0 + (x2-x1)*y0 + (y2x1-x2y1)|
          * -------------------------------------
          *            _________D__________
-         *           V(x2-x1)2 + (y1-y2)2|
+         *           V(y1-y2)2 + (x2-x1)2|
          * 
          */
         private float DistancePointToLine(Point p1/*(x1,y1)*/, Point p2/*(x2,y2)*/, Point p3/*(x0,y0)*/)
         {
-            int A = p2.X - p1.X;
-            int B = p1.Y - p2.Y;
+            int A = p1.Y - p2.Y;
+            int B = p2.X - p1.X;
             int C = p2.Y*p1.X - p2.X*p1.Y;
             float D = (float)Math.Sqrt(A * A + B * B);
             return Math.Abs(A*p3.X + B*p3.Y + C) / D;
@@ -673,7 +681,7 @@ namespace Migracja
                 //    SetLength(result, 4);
                 MakePartEdgeForOnePoint(aEdgePxList[0].GetP(0),
                                         result, aMultiX, aMultiY, aDisplaceX, aDisplaceY,
-                                        aColorArr, aBlOnlyFillColorArr);
+                                        aColorArr, aPointAdvArr, aBlOnlyFillColorArr);
                 counter = 4;
             }
             //Z powodu kolejności dodawania punktów w metodzie MakePartEdge, do listy jako pierwszy dodamy 
@@ -691,14 +699,16 @@ namespace Migracja
             pointAdvMapFromFullEdge = MakePointArrFromEdge(edgeList, aDpScale, aDisplaceX, aDisplaceY);
         }
 
-        internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
+        internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY, bool asimplifyPhase1, bool asimplifyPhase3)
         {
             //pointAdvMapFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
             //SimplifyPointAdvMapPhase1(pointAdvMapFromSimplifiedEdge);
 
             List<GeoEdgePoint> pxPointList = MakeVectorEdge(simplifiedEdgeList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
-            SimplifyPointAdvListPhase1(pxPointList);
-            SimplifyPointAdvListPhase2(pxPointList);
+            if (asimplifyPhase1)
+                SimplifyPointAdvListPhase1(pxPointList);
+            if (asimplifyPhase3)
+                SimplifyPointAdvListPhase2(pxPointList);
             pointAdvMapFromSimplifiedEdge = PointList2PxArray(pxPointList);
         }
 
@@ -764,7 +774,7 @@ namespace Migracja
                 List<int> lstIdStartEnd = new List<int>();
                 lstIdStartEnd.Add(0);
                 //int ileMiddlePoints = 0;
-                float distance = 1;
+                float distance = (float)1;
 
                 for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
@@ -784,11 +794,17 @@ namespace Migracja
 
                     if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
                     {
-                        //nie robimy nic, bo punkt jest na liście Check i potem przejdzie na na listę Delete
+                        //właściwie nie powinniśmy nic robić, ale może się okazać, że middle
+                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+                        {
+                            lstPointsToCheck.RemoveAll(x => true);
+                        }
                     }
                     //Jeśli ostatnio dodany punkt środkowy NIE MOŻE być usunięty - ta sytuacja może zajśc tylko gdy 
-                    else if ((!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified() && lstPointsToCheck.Count == 1) ||
-                              DistancePointToLine(startPoint.ToPictPoint(), endPoint.ToPictPoint(), middlePoint.ToPictPoint()) > distance) //Funkcja sprawdzająca odległośc punktu middle od linii
+                    else if ((!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified() /*&& lstPointsToCheck.Count == 1*/) ||
+                              //Funkcja sprawdzająca odległośc punktu middle od linii
+                              DistancePointToLine(startPoint.ToPictPoint(), endPoint.ToPictPoint(), middlePoint.ToPictPoint()) >= distance ||
+                              DistanceOfPoints(startPoint.ToPictPoint(), middlePoint.ToPictPoint()) > 4)
                     {
                         startPoint = middlePoint;
                         //startId = i + 1;
@@ -815,6 +831,11 @@ namespace Migracja
                 }
                 DeletePoints(lstPointsToDelete, aGeoEdgePointList);
             }
+
+                private float DistanceOfPoints(Point p1, Point p2)
+                {
+                    return (float)Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
+                }
 
                 private void DeletePoints(List<GeoEdgePoint> alstPointsToDelete, List<GeoEdgePoint> aGeoEdgePointList)
                 {
@@ -873,71 +894,82 @@ namespace Migracja
             return result;
         }
 
-        internal void MakeSimplifyVectorEdge()
+        internal void MakeSimplifyVectorEdge(bool asimplifyPhase1)
         {
             simplifiedEdgeList = new VectorRectangeGroup();
-            List<int> sortedKeyList = edgeList.GetSortedKeyList();
-            Vector_Rectangle startRect = edgeList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
-            Vector_Rectangle middleRect = null;
-            Vector_Rectangle endRect = null;
-            int lastKey;
 
-            int prevDiff;
-            //usunięcie punktów z linii poziomych i pionowych
-            if (sortedKeyList.Count >= 3)
+            if (asimplifyPhase1)
             {
-                lastKey = simplifiedEdgeList.NextKey();
-                simplifiedEdgeList.Add(lastKey, startRect);
-                if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
-                {
-                    prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
-                }
-                else 
-                {
-                    prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
-                }
+                List<int> sortedKeyList = edgeList.GetSortedKeyList();
+                Vector_Rectangle startRect = edgeList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
+                Vector_Rectangle middleRect = null;
+                Vector_Rectangle endRect = null;
+                int lastKey;
 
-                for (var i = 1; i < sortedKeyList.Count; i++)
-                {                      
-                    middleRect = edgeList[sortedKeyList[i]];
-                    if (i < sortedKeyList.Count - 1)
+                int prevDiff;
+                //usunięcie punktów z linii poziomych i pionowych
+                if (sortedKeyList.Count >= 3)
+                {
+                    lastKey = simplifiedEdgeList.NextKey();
+                    simplifiedEdgeList.Add(lastKey, startRect);
+                    if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
                     {
-                        endRect = edgeList[sortedKeyList[i + 1]];
+                        prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
                     }
                     else
                     {
-                        endRect = edgeList[sortedKeyList[0]];
+                        prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
                     }
-                    if (InLineHorizontal(startRect, middleRect, endRect, prevDiff)) 
+
+                    for (var i = 1; i < sortedKeyList.Count; i++)
                     {
-                        prevDiff = endRect.p1.X - middleRect.p1.X;
-                    }
-                    else if (InLineVertical(startRect, middleRect, endRect, prevDiff)) 
-                    {
-                        prevDiff = endRect.p1.Y - middleRect.p1.Y;
-                    }
-                    else
-                    {
-                        lastKey = simplifiedEdgeList.NextKey();
-                        simplifiedEdgeList.Add(lastKey, middleRect);
-                        startRect = middleRect;
-                        //jeśli krawędź zakręciła w kierunku poziomym, to prevDiff też w tym kierunku obliczamy
-                        if (middleRect.p1.X != endRect.p1.X)
+                        middleRect = edgeList[sortedKeyList[i]];
+                        if (i < sortedKeyList.Count - 1)
                         {
-                            prevDiff = endRect.p1.X - middleRect.p1.X;
+                            endRect = edgeList[sortedKeyList[i + 1]];
                         }
                         else
                         {
+                            endRect = edgeList[sortedKeyList[0]];
+                        }
+                        if (InLineHorizontal(startRect, middleRect, endRect, prevDiff))
+                        {
+                            prevDiff = endRect.p1.X - middleRect.p1.X;
+                        }
+                        else if (InLineVertical(startRect, middleRect, endRect, prevDiff))
+                        {
                             prevDiff = endRect.p1.Y - middleRect.p1.Y;
                         }
-                    }                    
+                        else
+                        {
+                            lastKey = simplifiedEdgeList.NextKey();
+                            simplifiedEdgeList.Add(lastKey, middleRect);
+                            startRect = middleRect;
+                            //jeśli krawędź zakręciła w kierunku poziomym, to prevDiff też w tym kierunku obliczamy
+                            if (middleRect.p1.X != endRect.p1.X)
+                            {
+                                prevDiff = endRect.p1.X - middleRect.p1.X;
+                            }
+                            else
+                            {
+                                prevDiff = endRect.p1.Y - middleRect.p1.Y;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < sortedKeyList.Count; i++)
+                    {
+                        simplifiedEdgeList.Add(edgeList[sortedKeyList[i]]);
+                    }
                 }
             }
             else
             {
-                for (var i = 0; i < sortedKeyList.Count; i++)
+                foreach (KeyValuePair<int, Vector_Rectangle> pair in edgeList)
                 {
-                    simplifiedEdgeList.Add(edgeList[sortedKeyList[i]]);
+                    simplifiedEdgeList.Add(pair.Value);
                 }
             }
         }

@@ -358,6 +358,9 @@ namespace Migracja
             r2vSettings.CalculateGeoPx();
             r2vSettings.sliceWidth = windowSettings.sliceWidth;
             r2vSettings.sliceHeight = windowSettings.sliceHeight;
+            r2vSettings.simplifyPhase1 = windowSettings.SimplifyPhase1();
+            r2vSettings.simplifyPhase2 = windowSettings.SimplifyPhase2();
+            r2vSettings.simplifyPhase3 = windowSettings.SimplifyPhase3();
 
             mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
             desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
@@ -442,11 +445,11 @@ namespace Migracja
             }
             else
                 info += '\n' + string.Format("Punkt poza obszarem mapy.");     
-            if (vr != null)
+            /*if (vr != null)
             {
                 VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
                 info += '\n' + group.edgeList.GetPointsStr();
-            }
+            }*/
             
             UpdateInfoBoxTime( info );
           //  UpdateInfoBoxTime( mapFactory.colorArr[x][y]..ToString );
