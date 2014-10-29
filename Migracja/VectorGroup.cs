@@ -574,6 +574,23 @@ namespace Migracja
             mian = GetMianownik(A);            
         }
 
+        /*
+         *     A           B             C
+         * |(x2-x1)x0 + (y1-y2)y0 + (y2x1-x2y1)|
+         * -------------------------------------
+         *            _________D__________
+         *           V(x2-x1)2 + (y1-y2)2|
+         * 
+         */
+        private float DistancePointToLine(Point p1/*(x1,y1)*/, Point p2/*(x2,y2)*/, Point p3/*(x0,y0)*/)
+        {
+            int A = p2.X - p1.X;
+            int B = p1.Y - p2.Y;
+            int C = p2.Y*p1.X - p2.X*p1.Y;
+            float D = (float)Math.Sqrt(A * A + B * B);
+            return Math.Abs(A*p3.X + B*p3.Y + C) / D;
+        }
+
         private int SrcHeight()
         {
             return parentMapFactory.srcHeight;
@@ -681,6 +698,7 @@ namespace Migracja
 
             List<GeoEdgePoint> pxPointList = MakeVectorEdge(simplifiedEdgeList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
             SimplifyPointAdvListPhase1(pxPointList);
+            SimplifyPointAdvListPhase2(pxPointList);
             pointAdvMapFromSimplifiedEdge = PointList2PxArray(pxPointList);
         }
 
@@ -731,55 +749,81 @@ namespace Migracja
                         startPoint = aGeoEdgePointList[i + 1];
                     }
                 }
-                aGeoEdgePointList.RemoveAll(x => x == null);
-    
+                aGeoEdgePointList.RemoveAll(x => x == null);    
             }
-
-            private void SimplifyPointAdvMapPhase1(PointAdv[] pointAdvMap)
+        
+            private void SimplifyPointAdvListPhase2(List<GeoEdgePoint> aGeoEdgePointList)
             {
-                PointAdv startPoint = pointAdvMap[0];
-                PointAdv middlePoint;
-                PointAdv endPoint;
-                int ileMiddlePoints = 0;
-                for (int i = 0; i < pointAdvMap.Length - 2; i++)
+                GeoEdgePoint startPoint = aGeoEdgePointList[0];
+                GeoEdgePoint middlePoint;
+                GeoEdgePoint endPoint;
+                //int startId = 0;
+                int endId;
+                List<GeoEdgePoint> lstPointsToDelete = new List<GeoEdgePoint>();
+                List<GeoEdgePoint> lstPointsToCheck = new List<GeoEdgePoint>();
+                List<int> lstIdStartEnd = new List<int>();
+                lstIdStartEnd.Add(0);
+                //int ileMiddlePoints = 0;
+                float distance = 1;
+
+                for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
-                    //startPoint = pointAdvMap[i];
-                    middlePoint = pointAdvMap[i + 1];
-                    endPoint = pointAdvMap[i + 2];
-                    
-                    //Jeśli punkt środkowy NIE MOŻE być usunięty
-                    if (!parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].CanBeDelSimplified())
+                    //startPoint = aGeoEdgePointList[i];
+                    middlePoint = aGeoEdgePointList[i + 1];
+                    lstPointsToCheck.Add(middlePoint);
+                    if (i < aGeoEdgePointList.Count - 2)
                     {
-                        startPoint = pointAdvMap[i + 1];
+                        endPoint = aGeoEdgePointList[i + 2];
+                        endId = i + 2;
                     }
-                    //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
-                    else if (ArePointsInVector(startPoint.GetPoint(), middlePoint.GetPoint(), endPoint.GetPoint()))
-                    {
-                        //uproszczenie punktu poprzez jego usunięcie
-                        if (!parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].IsDelSimplified())
-                        {
-                            parentMapFactory.pointAdvArr[middlePoint.X][middlePoint.Y].DelSimplifyPhase1();
-                        }
-                        pointAdvMap[i + 1] = null;
-                    }
-                    //Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
                     else
                     {
-                        startPoint = pointAdvMap[i + 1];
+                        endPoint = aGeoEdgePointList[0];
+                        endId = 0;
+                    }
+
+                    if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
+                    {
+                        //nie robimy nic, bo punkt jest na liście Check i potem przejdzie na na listę Delete
+                    }
+                    //Jeśli ostatnio dodany punkt środkowy NIE MOŻE być usunięty - ta sytuacja może zajśc tylko gdy 
+                    else if ((!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified() && lstPointsToCheck.Count == 1) ||
+                              DistancePointToLine(startPoint.ToPictPoint(), endPoint.ToPictPoint(), middlePoint.ToPictPoint()) > distance) //Funkcja sprawdzająca odległośc punktu middle od linii
+                    {
+                        startPoint = middlePoint;
+                        //startId = i + 1;
+                        lstIdStartEnd.Add(i + 1);                        
+                        //przepisujemy wszystkie punkty z listy Check do Delete, poza ostatnim, bo kończymy na punkcie middle
+                        for (int j = 0; j < lstPointsToCheck.Count - 1; j++)
+                        {
+                            lstPointsToDelete.Add(lstPointsToCheck[j]);
+                        }
+                        lstPointsToCheck.RemoveAll(x => true);
+                    }
+                    else if (!parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].CanBeDelSimplified() )
+                    {
+                        //ustawaimy na nowo startPoint na pozycję z endPoint
+                        startPoint = endPoint;
+                        //przepisujemy punkty z listy Check do Delete
+                        foreach(GeoEdgePoint checkPoint in lstPointsToCheck)
+                        {
+                            lstPointsToDelete.Add(checkPoint);
+                        }
+                        lstPointsToCheck.RemoveAll(x => true);
+                        i++;
                     }
                 }
-
-
-
-
-
-                /*int prevDirection = Cst.fromLeft;
-                foreach(KeyValuePair<int, PointAdv> pair in pointAdvList)
-                {
-                    PointAdv currentPoint = pair.Value;
-                    if (startPoint != currentPoint && )  
-                }*/
+                DeletePoints(lstPointsToDelete, aGeoEdgePointList);
             }
+
+                private void DeletePoints(List<GeoEdgePoint> alstPointsToDelete, List<GeoEdgePoint> aGeoEdgePointList)
+                {
+                    foreach (GeoEdgePoint point in alstPointsToDelete)
+                    {
+                        parentMapFactory.pointAdvArr[point.pictX][point.pictY].DelSimplifyPhase2();
+                    }
+                    aGeoEdgePointList.RemoveAll(x => alstPointsToDelete.Contains(x));
+                }
 
                 private bool ArePointsInVector(Point aPoint1, Point aPoint2, Point aPoint3)
                 {
