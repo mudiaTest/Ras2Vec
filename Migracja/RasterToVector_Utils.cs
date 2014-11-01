@@ -124,5 +124,22 @@ namespace Migracja
         public bool used {get;set;}
     }
 
+    class R2VUtils
+    {
+        public static string PointListToString(List<Point> aPointList) 
+        {
+            string result = "";
+            foreach (Point point in aPointList)
+            {
+                if (result != "")
+                {
+                    result += ", ";
+                }
+                result += String.Format("({0}, (1))", point.X, point.Y);
+            }
+            return result;
+        }
+    }
+
     internal delegate DateTime UpdateInfoBoxTimeDelegate(string aText = "", bool aBlNewLine = true, DateTime? aDatePrv = null);
 }

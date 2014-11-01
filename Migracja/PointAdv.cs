@@ -13,6 +13,7 @@ namespace Migracja
         private int fkdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxGroupBorder
         private bool DelSimplifiedPhase1 = false; // usunięty w 1 fazie upraszczania
         private bool DelSimplifiedPhase2 = false; // usunięty w 2 fazie upraszczania
+        internal List<GeoEdgePart> geoEdgePartList = new List<GeoEdgePart>();
         public PointAdv(int X, int Y, int akdPointType)
         {
             fpoint = new Point(X, Y);

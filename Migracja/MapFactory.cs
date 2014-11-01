@@ -22,8 +22,10 @@ namespace Migracja
         public float XGeoPX { get; set; } //ile stopni zawiera zmiana o jeden px pionowo
         public float YeGoPX { get; set; } //ile stopni zawiera zmiana o jeden px poziomo
         public Dictionary<int, ColorGroupList> vectRectGroupsByColor { get; set; } //key - kolor; obj - lista grup w tym kolorze
-        public ColorPx[][] colorArr{ get; set; } //kolor każdego pixela
-        public PointAdv[][] pointAdvArr{ get; set; } //mapa odzwierciedlająca "narożniki" pixeli
+        public ColorPx[][] colorArr{ get; set; } //tablica zawierająca kolor, grupę każdego pixela i jego sasiadów
+        public PointAdv[][] pointAdvArr{ get; set; } //tablica odzwierciedlająca "narożniki" pixeli
+        public List<GeoEdgePart> EdgeGeoPointListList;
+        public GeoEdgePart[][][][] edgeGeoPointListArr { get; set; } //mapa przechowująca obiekty EdgeGeoPointList, czyli fragmenty granic złożonych z punktów 
         protected int inMod;
         public string stMessage;
         public string stTime;
@@ -66,6 +68,20 @@ namespace Migracja
             pointAdvArr = new PointAdv[srcWidth+1][];
             for (int i = 0; i < srcWidth+1; i++)
                 pointAdvArr[i] = new PointAdv[srcHeight + 1];
+
+            edgeGeoPointListArr = new GeoEdgePart[srcWidth + 1][][][];
+            for (int i = 0; i < srcWidth + 1; i++)
+            { 
+                edgeGeoPointListArr[i] = new GeoEdgePart[srcHeight + 1][][];
+                for (int j = 0; j < srcHeight + 1; j++)
+                {
+                    edgeGeoPointListArr[i][j] = new GeoEdgePart[srcWidth + 1][];
+                    for (int k = 0; k < srcWidth + 1; k++)
+                    {
+                        edgeGeoPointListArr[i][j][k] = new GeoEdgePart[srcHeight + 1];
+                    }
+                }
+            }
             
             for (int y=0; y<srcHeight; y++) 
                 for (int x=0; x<srcWidth; x++) 
@@ -124,7 +140,7 @@ namespace Migracja
                         vectObj.parentVectorGroup.testColor = Color.FromArgb(random.Next(255), random.Next(255), random.Next(255));
                         vectObj.parentVectorGroup.sourceColor = vectObj.color;
                         vectObj.parentVectorGroup.Add(0, vectObj);
-                        vectObj.parentVectorGroup.edgeList.Add(0, vectObj);
+                        vectObj.parentVectorGroup.edgeVectRectList.Add(0, vectObj);
                         DateTime d1 = DateTime.Now;
                         int key = this.NextKey();
                         ts += (DateTime.Now - d1);
@@ -293,7 +309,7 @@ namespace Migracja
                 if ((int)Math.DivRem((long)i, (long)inMod, out dummy) == 0)
                     UpdateInfoAction("Tworzenie granicy dla grupy " + i.ToString() + "/" + (Count - 1).ToString());
                 i++;
-                vectGroup.MakeEdges(vectGroup.edgeList);
+                vectGroup.MakeEdges(vectGroup.edgeVectRectList);
             };            
         }
 

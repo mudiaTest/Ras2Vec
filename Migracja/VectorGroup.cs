@@ -8,10 +8,6 @@ using System.Diagnostics;
 
 namespace Migracja
 {
-    //DynamicGeoPointArray = List<GeoPoint>;
-    //TDynamicPointArray = Vector_Gen[];
-    //TDynamicPxColorPointArray = ColorPx[,];
-
     class  EdgeList: Dictionary<int, VectorRectangeGroup>
     {
         private int maxKey;
@@ -25,6 +21,33 @@ namespace Migracja
         }
     }
 
+    class GeoEdgePart: List<GeoEdgePoint>
+    {        
+        public static int id = -1;
+        public GeoEdgePart(): base()
+        {
+            id = NextKey();
+        }
+        public int NextKey()
+        {
+            return ++id;
+        }
+
+        public List<Point> ToPictPointList()
+        {
+            List<Point> result = new List<Point>();
+            foreach (GeoEdgePoint geoEdgePoint in this)
+                result.Add(new Point(geoEdgePoint.pictX, geoEdgePoint.pictY));
+            return result;
+        }
+
+        public string GeoEdgePointToString()
+        {
+            return R2VUtils.PointListToString(ToPictPointList()); 
+        }
+            
+    }
+
     //Grupa rectangli tworzacych jedną płąszczyznę. Pozwala obliczyć swoją granicę
     partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
     {
@@ -33,13 +56,13 @@ namespace Migracja
 
         //lista obiektów Vector_Rectangle tworzących krawędź (self, czyli grupy obiektów Vector_Rectangle). 
         //Kolejnośc wyznaczają klucze
-        public VectorRectangeGroup edgeList{get;set;}
+        public VectorRectangeGroup edgeVectRectList{get;set;}
         //lista wewnętrznych krawędzi. Każda z nich ma konstrukcję jak edgePxList
         public EdgeList innerEdgesList { get; set; }
         //lista krawędzi punktów Double
         public Dictionary<int, GeoEdgePoint> edgeGeoList { get; set; }
         //lista krawędzi punktów-pixeli (kolejnych), które zostały poddane uproszczaniu - jest to okrojona edgePxList
-        public VectorRectangeGroup simplifiedEdgeList{get;set;}
+        public VectorRectangeGroup simplifiedEdgeVectRectList{get;set;}
         //lista uroszczonych wewnętrznych krawędzi. Każda z nich ma konstrukcję jak edgePxList
         public Dictionary<int, VectorRectangeGroup> simplifiedInnerEdgesList{get;set;}
 
@@ -62,11 +85,11 @@ namespace Migracja
         {
             Debug.Assert(aScale >= 1, "GetEdgeListAsArray nie może utworzyć polygonu dla skali <= 1.");
 
-            Point[] result = new Point[edgeList.Count];
+            Point[] result = new Point[edgeVectRectList.Count];
             int i = 0;
-            foreach(int key in edgeList.GetSortedKeyList())
+            foreach(int key in edgeVectRectList.GetSortedKeyList())
             {
-                result[i] = edgeList[key].p1;
+                result[i] = edgeVectRectList[key].p1;
                 i++;
             }
            // jkl;
@@ -624,6 +647,11 @@ namespace Migracja
             return parentMapFactory.pointAdvArr;
         }
 
+        private GeoEdgePart[][][][] GetEdgeGeoPointListArr()
+        {
+            return parentMapFactory.edgeGeoPointListArr;
+        }
+
         private GeoEdgePoint PxPointToGeoPoint(Vector_Rectangle aPxPoint)
         {
             //P1 i P2 będą takie same, bo aPxPoint reprezentuje pojedynczy pixel, więc wartośći x i y możemy wziąć z p1
@@ -632,7 +660,7 @@ namespace Migracja
 
         public VectoredRectangleGroup()
         {
-            edgeList = new VectorRectangeGroup();
+            edgeVectRectList = new VectorRectangeGroup();
             innerEdgesList = new EdgeList();
         }
 
@@ -696,7 +724,7 @@ namespace Migracja
 
         internal void MakePointArrFromFullEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
         {
-            pointAdvMapFromFullEdge = MakePointArrFromEdge(edgeList, aDpScale, aDisplaceX, aDisplaceY);
+            pointAdvMapFromFullEdge = MakePointArrFromEdge(edgeVectRectList, aDpScale, aDisplaceX, aDisplaceY);
         }
 
         internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY, bool asimplifyPhase1, bool asimplifyPhase3)
@@ -704,13 +732,143 @@ namespace Migracja
             //pointAdvMapFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
             //SimplifyPointAdvMapPhase1(pointAdvMapFromSimplifiedEdge);
 
-            List<GeoEdgePoint> pxPointList = MakeVectorEdge(simplifiedEdgeList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+            List<GeoEdgePoint> geoPointList = MakeVectorEdge(simplifiedEdgeVectRectList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+            //Lista obiektów List<GeoEdgePoint>, czyli fragmentów granic. Dzieli wejściową listę List<GeoEdgePoint> na pomniejsze listy. 
+            //Koniec jednej listy jest poczatkiem kolejnej (punkty powtarzają się)
+            //List<EdgeGeoPointList> simplifiedEdgeGeoPointListList = SplitGeoEdgePointList(geoPointList, GetEdgeGeoPointListArr());
             if (asimplifyPhase1)
-                SimplifyPointAdvListPhase1(pxPointList);
+               parentMapFactory.EdgeGeoPointListList = SimplifyPointAdvListPhase1(geoPointList);
             if (asimplifyPhase3)
-                SimplifyPointAdvListPhase2(pxPointList);
-            pointAdvMapFromSimplifiedEdge = PointList2PxArray(pxPointList);
+                SimplifyPointAdvListPhase2(geoPointList);
+            pointAdvMapFromSimplifiedEdge = PointList2PxArray(geoPointList);
         }
+
+           /* private List<EdgeGeoPointList> SplitGeoEdgePointList(List<GeoEdgePoint> aGeoEdgePointList, EdgeGeoPointList[][][][] aEdgeGeoPointListArr)
+            {
+                List<List<GeoEdgePoint>> result = new List<List<GeoEdgePoint>>();
+                GeoEdgePoint startPoint = aGeoEdgePointList[0];
+                //tworzymy pierwszy fragment granicy...
+                EdgeGeoPointList geoEdgePart = new EdgeGeoPointList();
+                EdgeGeoPointList geoEdgePartFromArr = null;
+                //...i nadziewamy na niego pierwszy punkt
+                geoEdgePart.Add(startPoint);
+                GeoEdgePoint nextPoint;
+                GeoEdgePoint endPoint;
+                //List<GeoEdgePoint> lstPointsToDelete = new List<GeoEdgePoint>();
+                List<GeoEdgePoint> lstPointsToCheck = new List<GeoEdgePoint>();
+                List<int> lstIdStartEnd = new List<int>();
+                lstIdStartEnd.Add(0);
+                float distance = (float)1;
+
+                for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
+                {
+                    nextPoint = aGeoEdgePointList[i + 1];
+                    
+
+                    if (geoEdgePartFromArr == null)
+                    {
+                        geoEdgePartFromArr = GetGeoEdgePart(startPoint, nextPoint);
+                    }
+                    if (geoEdgePartFromArr == null)
+                    {
+                        if (!parentMapFactory.pointAdvArr[nextPoint.pictX][nextPoint.pictY].CanBeDelSimplified())
+                        {
+
+                        }
+                        lstPointsToCheck.Add(nextPoint);
+                    }
+
+
+
+
+
+
+                    if (geoEdgePartFromArr == null)
+                    {
+                        geoEdgePart.Add(nextPoint);
+                    }
+
+
+
+
+
+                    if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
+                    {
+                        //właściwie nie powinniśmy nic robić, ale może się okazać, że middle
+                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+                        {
+                            lstPointsToCheck.RemoveAll(x => true);
+                        }
+                    }
+                    //Jeśli ostatnio dodany punkt środkowy NIE MOŻE być usunięty - ta sytuacja może zajśc tylko gdy 
+                    else if ((!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified() ) ||
+                        //Funkcja sprawdzająca odległośc punktu middle od linii
+                              DistancePointToLine(startPoint.ToPictPoint(), endPoint.ToPictPoint(), middlePoint.ToPictPoint()) >= distance ||
+                              DistanceOfPoints(startPoint.ToPictPoint(), middlePoint.ToPictPoint()) > 4)
+                    {
+                        startPoint = middlePoint;
+                        //startId = i + 1;
+                        lstIdStartEnd.Add(i + 1);
+                        //przepisujemy wszystkie punkty z listy Check do Delete, poza ostatnim, bo kończymy na punkcie middle
+                        for (int j = 0; j < lstPointsToCheck.Count - 1; j++)
+                        {
+                            //lstPointsToDelete.Add(lstPointsToCheck[j]);
+                        }
+                        lstPointsToCheck.RemoveAll(x => true);
+                    }
+                    else if (!parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].CanBeDelSimplified())
+                    {
+                        //ustawaimy na nowo startPoint na pozycję z endPoint
+                        startPoint = endPoint;
+                        //przepisujemy punkty z listy Check do Delete
+                        foreach (GeoEdgePoint checkPoint in lstPointsToCheck)
+                        {
+                            //lstPointsToDelete.Add(checkPoint);
+                        }
+                        lstPointsToCheck.RemoveAll(x => true);
+                        i++;
+                    }
+                }
+                //DeletePoints(lstPointsToDelete, aGeoEdgePointList);   
+
+
+
+
+
+
+
+
+
+                return result;
+            }*/
+
+                private void PlaceGeoEdgePartIntoArr(GeoEdgePart aGeoEdgePart)
+                {
+                    GeoEdgePoint firstPoint = aGeoEdgePart[0];
+                    GeoEdgePoint secondPoint = aGeoEdgePart[1];
+                    GeoEdgePoint lastPoint = aGeoEdgePart[aGeoEdgePart.Count-2];
+                    GeoEdgePoint theLastButOnePoint = aGeoEdgePart[aGeoEdgePart.Count-1];
+                    GetEdgeGeoPointListArr()[firstPoint.pictX][firstPoint.pictY][secondPoint.pictX][firstPoint.pictY] = aGeoEdgePart;
+                    GetEdgeGeoPointListArr()[lastPoint.pictX][lastPoint.pictY][theLastButOnePoint.pictX][theLastButOnePoint.pictY] = aGeoEdgePart;
+                    foreach (GeoEdgePoint edgeGeoPoint in aGeoEdgePart)
+                        GetPointAdvArr()[edgeGeoPoint.pictX][edgeGeoPoint.pictY].geoEdgePartList.Add(aGeoEdgePart);
+                }
+
+                private GeoEdgePart GetGeoEdgePart(GeoEdgePoint p1, GeoEdgePoint p2)
+                {
+                    GeoEdgePart result1 = GetEdgeGeoPointListArr()[p1.pictX][p1.pictY][p2.pictX][p2.pictY];
+                    GeoEdgePart result2 = GetEdgeGeoPointListArr()[p2.pictX][p2.pictY][p1.pictX][p1.pictY];
+                    //Debug.Assert(result1 == null || result2 == null, "");
+                    if (result1 != null)
+                    {
+                        return result1;
+                    }
+                    else
+                    {
+                        return result2;
+                    }
+
+                }
 
             private PointAdv[] MakePointArrFromEdge(VectorRectangeGroup aEdgeList, float aDpScale, float aDisplaceX, float aDisplaceY)
             {
@@ -719,15 +877,21 @@ namespace Migracja
                 return PointList2PxArray(pxPointList);
             }
 
-            private void SimplifyPointAdvListPhase1(List<GeoEdgePoint> aGeoEdgePointList)
+            private List<GeoEdgePart> SimplifyPointAdvListPhase1(List<GeoEdgePoint> aGeoEdgePointList)
             {
+                
+                GeoEdgePart geoEdgePart = null; /*Nowy fragmenet granicy, nad którym aktualnie pracujemy. 
+                                                      *Może to być nowow zakładany fragment, lub wczytany z tablicy EdgeGeoPointListArr
+                                                      */ 
+                bool blGeoEdgePartFromArr = false; //Czy granica została wczytana z tablicy EdgeGeoPointListArr
+                int lpPartEdgeInnerCounter = 0;
+                List<GeoEdgePart> result = new List<GeoEdgePart>();
                 GeoEdgePoint startPoint = aGeoEdgePointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
-                //int ileMiddlePoints = 0;
                 for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
-                    //startPoint = aGeoEdgePointList[i];
+ 
                     middlePoint = aGeoEdgePointList[i + 1];
                     if (i < aGeoEdgePointList.Count - 2)
                     {
@@ -738,10 +902,49 @@ namespace Migracja
                         endPoint = aGeoEdgePointList[0];
                     }
 
+                    //Jeśli geoEdgePart == null to znaczy, że dopiero zaczynamy pracę nad nowym ocdcinkiem lub w ogóle nad całą granicą
+                    if (geoEdgePart == null)
+                    {
+                        //Próbujemy znaleźć istniejący już fragmeny granicy
+                        geoEdgePart = GetGeoEdgePart(startPoint, middlePoint);
+                        //Jeśli fragmeny granicy już istnieje, to będziemy po nim się poruszać aż do jego końca
+                        if (geoEdgePart != null)
+                        {
+                            blGeoEdgePartFromArr = true;
+                            lpPartEdgeInnerCounter = 1;
+                            //Fragment granicy został odnalexiony, tzn, ze jeśli mamy trafienie i GetGeoEdgePart oddało fragment, to teraz będzie on czytany od końca.
+                            if (geoEdgePart[0].pictX == startPoint.pictX && geoEdgePart[0].pictY == startPoint.pictY)
+                            {
+                                Debug.Assert(false, String.Format("Znaleziono fragment granicy rozpoczynający się od punktów ({0},{1}), ({2},{3}).", 
+                                                                  startPoint.pictX, startPoint.pictY, middlePoint.pictX, middlePoint.pictY));
+                            }
+                            else
+                            {
+                                Debug.Assert(false, String.Format("Fragment granicy nie rozpoczyna się lub kończący na punktach ({0},{1}), ({2},{3})", 
+                                                                   startPoint.pictX, startPoint.pictY, middlePoint.pictX, middlePoint.pictY));
+                            }
+                        }
+                        //Jeśli fragmeny granicy jeszcze nie istnieje, to zakładamy nowy
+                        else
+                        {
+                            geoEdgePart = new GeoEdgePart();
+                            geoEdgePart.Add(startPoint);
+                        }
+                        result.Add(geoEdgePart);
+                    }
+                    //Jeśli znależliśmy odpowiedni fragment granicy na abliczy to bedziemy sie po nim cofać, aby upewnić sie co do jego zgosności z 
+                    geoEdgePart.Add(middlePoint);
                     //Jeśli punkt środkowy NIE MOŻE być usunięty
                     if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
                     {
                         startPoint = aGeoEdgePointList[i + 1];
+                        if (!blGeoEdgePartFromArr)
+                        {
+                            PlaceGeoEdgePartIntoArr(geoEdgePart);
+                        }
+                        blGeoEdgePartFromArr = false;
+                        lpPartEdgeInnerCounter = 0;
+                        
                     }
                     //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
                     else if (ArePointsInVector(startPoint.ToPictPoint(), middlePoint.ToPictPoint(), endPoint.ToPictPoint()))
@@ -757,9 +960,19 @@ namespace Migracja
                     else
                     {
                         startPoint = aGeoEdgePointList[i + 1];
+                        //następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
+                        geoEdgePart.Add(endPoint);
+                        if (!blGeoEdgePartFromArr)
+                        {
+                            PlaceGeoEdgePartIntoArr(geoEdgePart);
+                        }
+                        blGeoEdgePartFromArr = false;                           
+                        lpPartEdgeInnerCounter = 0;
+                        geoEdgePart = null;
                     }
                 }
                 aGeoEdgePointList.RemoveAll(x => x == null);    
+                return result;
             }
         
             private void SimplifyPointAdvListPhase2(List<GeoEdgePoint> aGeoEdgePointList)
@@ -767,18 +980,15 @@ namespace Migracja
                 GeoEdgePoint startPoint = aGeoEdgePointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
-                //int startId = 0;
                 int endId;
                 List<GeoEdgePoint> lstPointsToDelete = new List<GeoEdgePoint>();
                 List<GeoEdgePoint> lstPointsToCheck = new List<GeoEdgePoint>();
                 List<int> lstIdStartEnd = new List<int>();
                 lstIdStartEnd.Add(0);
-                //int ileMiddlePoints = 0;
                 float distance = (float)1;
 
                 for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
-                    //startPoint = aGeoEdgePointList[i];
                     middlePoint = aGeoEdgePointList[i + 1];
                     lstPointsToCheck.Add(middlePoint);
                     if (i < aGeoEdgePointList.Count - 2)
@@ -896,12 +1106,12 @@ namespace Migracja
 
         internal void MakeSimplifyVectorEdge(bool asimplifyPhase1)
         {
-            simplifiedEdgeList = new VectorRectangeGroup();
+            simplifiedEdgeVectRectList = new VectorRectangeGroup();
 
             if (asimplifyPhase1)
             {
-                List<int> sortedKeyList = edgeList.GetSortedKeyList();
-                Vector_Rectangle startRect = edgeList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
+                List<int> sortedKeyList = edgeVectRectList.GetSortedKeyList();
+                Vector_Rectangle startRect = edgeVectRectList[sortedKeyList[0]]; // punkt, wobec którego sprawdzamy położenie kolejnych
                 Vector_Rectangle middleRect = null;
                 Vector_Rectangle endRect = null;
                 int lastKey;
@@ -910,27 +1120,27 @@ namespace Migracja
                 //usunięcie punktów z linii poziomych i pionowych
                 if (sortedKeyList.Count >= 3)
                 {
-                    lastKey = simplifiedEdgeList.NextKey();
-                    simplifiedEdgeList.Add(lastKey, startRect);
-                    if (edgeList[sortedKeyList[0]].p1.X == edgeList[sortedKeyList[1]].p1.X)
+                    lastKey = simplifiedEdgeVectRectList.NextKey();
+                    simplifiedEdgeVectRectList.Add(lastKey, startRect);
+                    if (edgeVectRectList[sortedKeyList[0]].p1.X == edgeVectRectList[sortedKeyList[1]].p1.X)
                     {
-                        prevDiff = edgeList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
+                        prevDiff = edgeVectRectList[sortedKeyList[1]].p1.Y - startRect.p1.Y;
                     }
                     else
                     {
-                        prevDiff = edgeList[sortedKeyList[1]].p1.X - startRect.p1.X;
+                        prevDiff = edgeVectRectList[sortedKeyList[1]].p1.X - startRect.p1.X;
                     }
 
                     for (var i = 1; i < sortedKeyList.Count; i++)
                     {
-                        middleRect = edgeList[sortedKeyList[i]];
+                        middleRect = edgeVectRectList[sortedKeyList[i]];
                         if (i < sortedKeyList.Count - 1)
                         {
-                            endRect = edgeList[sortedKeyList[i + 1]];
+                            endRect = edgeVectRectList[sortedKeyList[i + 1]];
                         }
                         else
                         {
-                            endRect = edgeList[sortedKeyList[0]];
+                            endRect = edgeVectRectList[sortedKeyList[0]];
                         }
                         if (InLineHorizontal(startRect, middleRect, endRect, prevDiff))
                         {
@@ -942,8 +1152,8 @@ namespace Migracja
                         }
                         else
                         {
-                            lastKey = simplifiedEdgeList.NextKey();
-                            simplifiedEdgeList.Add(lastKey, middleRect);
+                            lastKey = simplifiedEdgeVectRectList.NextKey();
+                            simplifiedEdgeVectRectList.Add(lastKey, middleRect);
                             startRect = middleRect;
                             //jeśli krawędź zakręciła w kierunku poziomym, to prevDiff też w tym kierunku obliczamy
                             if (middleRect.p1.X != endRect.p1.X)
@@ -961,15 +1171,15 @@ namespace Migracja
                 {
                     for (var i = 0; i < sortedKeyList.Count; i++)
                     {
-                        simplifiedEdgeList.Add(edgeList[sortedKeyList[i]]);
+                        simplifiedEdgeVectRectList.Add(edgeVectRectList[sortedKeyList[i]]);
                     }
                 }
             }
             else
             {
-                foreach (KeyValuePair<int, Vector_Rectangle> pair in edgeList)
+                foreach (KeyValuePair<int, Vector_Rectangle> pair in edgeVectRectList)
                 {
-                    simplifiedEdgeList.Add(pair.Value);
+                    simplifiedEdgeVectRectList.Add(pair.Value);
                 }
             }
         }
