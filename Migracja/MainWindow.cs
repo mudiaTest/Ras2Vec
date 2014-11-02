@@ -444,12 +444,21 @@ namespace Migracja
                 info += '\n' + string.Format("type={0}", mapFactory.pointAdvArr[x][y].GetKdPointType());
             }
             else
-                info += '\n' + string.Format("Punkt poza obszarem mapy.");     
+                info += '\n' + string.Format("Punkt poza obszarem mapy."); 
+
+            //Granica całkowita
             /*if (vr != null)
             {
                 VectoredRectangleGroup group = mapFactory[mapFactory.colorArr[x][y].group];
                 info += '\n' + group.edgeList.GetPointsStr();
             }*/
+
+            //Fragmenty granic
+            if (pointAdv != null)
+            {
+                foreach (GeoEdgePart geoEdgePart in pointAdv.geoEdgePartList)
+                    info += '\n' + string.Format("PartEdge: {0}", geoEdgePart.GeoEdgePointPictToString());
+            }
             
             UpdateInfoBoxTime( info );
           //  UpdateInfoBoxTime( mapFactory.colorArr[x][y]..ToString );

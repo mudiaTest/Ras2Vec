@@ -135,7 +135,7 @@ namespace Migracja
                 {
                     result += ", ";
                 }
-                result += String.Format("({0}, (1))", point.X, point.Y);
+                result += String.Format("({0},{1})", point.X, point.Y);
             }
             return result;
         }

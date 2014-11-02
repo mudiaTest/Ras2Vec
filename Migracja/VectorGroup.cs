@@ -41,7 +41,7 @@ namespace Migracja
             return result;
         }
 
-        public string GeoEdgePointToString()
+        public string GeoEdgePointPictToString()
         {
             return R2VUtils.PointListToString(ToPictPointList()); 
         }
@@ -714,10 +714,21 @@ namespace Migracja
             }
             //Z powodu kolejności dodawania punktów w metodzie MakePartEdge, do listy jako pierwszy dodamy 
             //ostatni punkt, a potem dopiero pierwszy, drugi etc. Dlatego przesówamy całą listę o jedną pozycję.
+            //Jako, że granica powinna zaczynac się od najbardziej lewego rect w najwyższym rzędzie, to z powodu 
+            //możliwych kształtów może zajść monieczność przesnięcia jednego lub 2 punktów
+            //Np w granicy (0,1) !(0,0) (1,0) ... przesówamy tylko pierwszy punkt na koniec (war. 1)
+            //ale dla (2,2) (1,2) !(1,1) (2,1) ... przesówamy 2 (war. 2)
+            //Aby wyjaśnicz dlaczego najlepiej narysować podane granice przyjrzeć się jak przebiegają
             if (result.Count > 0)
             {
                 result.Add(result[0]);
                 result.RemoveAt(0);
+                //Jeśli zachodzi (war. 2), to przes owamy 2 punkty
+                if (result.Count>=2 && result[0].Y != result[1].Y)
+                {
+                    result.Add(result[0]);
+                    result.RemoveAt(0);
+                }
             }
             return result;
         }
@@ -888,7 +899,7 @@ namespace Migracja
                 List<GeoEdgePart> result = new List<GeoEdgePart>();
                 GeoEdgePoint startPoint = aGeoEdgePointList[0];
                 GeoEdgePoint middlePoint;
-                GeoEdgePoint endPoint;
+                GeoEdgePoint endPoint = null;
                 for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
                 {
  
@@ -960,8 +971,8 @@ namespace Migracja
                     else
                     {
                         startPoint = aGeoEdgePointList[i + 1];
-                        //następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
-                        geoEdgePart.Add(endPoint);
+                        /*//następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
+                        geoEdgePart.Add(endPoint);*/
                         if (!blGeoEdgePartFromArr)
                         {
                             PlaceGeoEdgePartIntoArr(geoEdgePart);
@@ -971,7 +982,20 @@ namespace Migracja
                         geoEdgePart = null;
                     }
                 }
-                aGeoEdgePointList.RemoveAll(x => x == null);    
+                aGeoEdgePointList.RemoveAll(x => x == null);
+
+                //Ostatni fragment granicy nie zostanie dodany w pętli, ale po jej zakończeniu możemy być pewni, że istnieje
+                //następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
+                Debug.Assert(endPoint != null, "EndPoint jest null.");
+                geoEdgePart.Add(endPoint);
+                if (!blGeoEdgePartFromArr)
+                {
+                    PlaceGeoEdgePartIntoArr(geoEdgePart);
+                }
+                blGeoEdgePartFromArr = false;
+                lpPartEdgeInnerCounter = 0;
+                geoEdgePart = null;
+
                 return result;
             }
         
