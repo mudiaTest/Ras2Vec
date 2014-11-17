@@ -742,8 +742,11 @@ namespace Migracja
         {
             //pointAdvMapFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
             //SimplifyPointAdvMapPhase1(pointAdvMapFromSimplifiedEdge);
-
+            
+            //  tworzymy listę geoPunktów z listy rectangli(będących granicą)
             List<GeoEdgePoint> geoPointList = MakeVectorEdge(simplifiedEdgeVectRectList, GetColorArr(), GetPointAdvArr(), false, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
+            
+            //  Dzielimy listę geopunktów na mniejsze listy tak, aby jeden fragment dotykał tylko 2 grup
             //Lista obiektów List<GeoEdgePoint>, czyli fragmentów granic. Dzieli wejściową listę List<GeoEdgePoint> na pomniejsze listy. 
             //Koniec jednej listy jest poczatkiem kolejnej (punkty powtarzają się)
             //List<EdgeGeoPointList> simplifiedEdgeGeoPointListList = SplitGeoEdgePointList(geoPointList, GetEdgeGeoPointListArr());
@@ -913,7 +916,7 @@ namespace Migracja
                         endPoint = aGeoEdgePointList[0];
                     }
 
-                    //Jeśli geoEdgePart == null to znaczy, że dopiero zaczynamy pracę nad nowym ocdcinkiem lub w ogóle nad całą granicą
+                    //Jeśli geoEdgePart == null to znaczy, że dopiero zaczynamy pracę nad nowym odcinkiem lub w ogóle nad całą granicą
                     if (geoEdgePart == null)
                     {
                         //Próbujemy znaleźć istniejący już fragmeny granicy
@@ -924,62 +927,82 @@ namespace Migracja
                             blGeoEdgePartFromArr = true;
                             lpPartEdgeInnerCounter = 1;
                             //Fragment granicy został odnalexiony, tzn, ze jeśli mamy trafienie i GetGeoEdgePart oddało fragment, to teraz będzie on czytany od końca.
+                            //Poniższe sprawdzenie testuje, czy przypadkiem znaleziony fragment nie ma dokładnie takiego samego kierunku, jak ten co chemy zbudować. 
+                            //Tak być nie powinno, bo jego zwrot powinien być odwrotny
                             if (geoEdgePart[0].pictX == startPoint.pictX && geoEdgePart[0].pictY == startPoint.pictY)
                             {
                                 Debug.Assert(false, String.Format("Znaleziono fragment granicy rozpoczynający się od punktów ({0},{1}), ({2},{3}).", 
                                                                   startPoint.pictX, startPoint.pictY, middlePoint.pictX, middlePoint.pictY));
                             }
-                            else
+                            /*else
+                            if (geoEdgePart[geoEdgePart.Count - 1].pictX == startPoint.pictX && geoEdgePart[geoEdgePart.Count - 1].pictY == startPoint.pictY)
                             {
-                                Debug.Assert(false, String.Format("Fragment granicy nie rozpoczyna się lub kończący na punktach ({0},{1}), ({2},{3})", 
+                                Debug.Assert(false, String.Format("Fragment granicy nie kończy się na punktach ({0},{1}), ({2},{3})", 
                                                                    startPoint.pictX, startPoint.pictY, middlePoint.pictX, middlePoint.pictY));
-                            }
+                            }*/
                         }
                         //Jeśli fragmeny granicy jeszcze nie istnieje, to zakładamy nowy
                         else
                         {
                             geoEdgePart = new GeoEdgePart();
                             geoEdgePart.Add(startPoint);
+                            blGeoEdgePartFromArr = false;
+                            lpPartEdgeInnerCounter = 0;
                         }
                         result.Add(geoEdgePart);
                     }
-                    //Jeśli znależliśmy odpowiedni fragment granicy na abliczy to bedziemy sie po nim cofać, aby upewnić sie co do jego zgosności z 
-                    geoEdgePart.Add(middlePoint);
-                    //Jeśli punkt środkowy NIE MOŻE być usunięty
-                    if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+
+                    //Jeśli fragment granicy już istnieje, to przechodzimy po nim od końca sprawdzając, czy punkty pokrywają się
+                    if (!blGeoEdgePartFromArr)
                     {
-                        startPoint = aGeoEdgePointList[i + 1];
-                        if (!blGeoEdgePartFromArr)
+
+                        lpPartEdgeInnerCounter++;
+                        //Jeśli dotarliśmy do końca fragmentu granicy
+                        if (geoEdgePart.Count == lpPartEdgeInnerCounter)
                         {
-                            PlaceGeoEdgePartIntoArr(geoEdgePart);
+
                         }
-                        blGeoEdgePartFromArr = false;
-                        lpPartEdgeInnerCounter = 0;
-                        
                     }
-                    //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
-                    else if (ArePointsInVector(startPoint.ToPictPoint(), middlePoint.ToPictPoint(), endPoint.ToPictPoint()))
-                    {
-                        //uproszczenie punktu poprzez jego usunięcie
-                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplified())
-                        {
-                            parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].DelSimplifyPhase1();
-                        }
-                        aGeoEdgePointList[i + 1] = null;                     
-                    }
-                    //Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
+                    //Jeśli fragment granicy jest nowy (nie został odnaleziony w tablicy), to będziemy go dalej budować
                     else
                     {
-                        startPoint = aGeoEdgePointList[i + 1];
-                        /*//następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
-                        geoEdgePart.Add(endPoint);*/
-                        if (!blGeoEdgePartFromArr)
+                        //Punk środkowy nie ma prawa być uproszczony bo nie był jeszcze w żadnej granicy
+                        Debug.Assert(!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplified(),
+                                     "Punkt ({0},{1}) został już uproszczony", middlePoint.pictX, middlePoint.pictY);
+
+                        //fragmenty zawierają wszystkie punkty (także te usunięte), ale usunięte punkty będa odpowiednio oznaczone na tablicy parentMapFactory.pointAdvArr
+                        geoEdgePart.Add(middlePoint);
+
+                        //Jeśli punkt środkowy NIE MOŻE być usunięty, tzn, ze jest początkiem/końcem linii lub graniczy z więcej niż jedną grupą. 
+                        //Kończymy na nim jeden fragment granicy i zaraz ropoczniemy budowę kolejnego
+                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
                         {
+                            //przesuwamy początek sprawdzenia "czy punkty są w jednej linii" na punkt środkowy
+                            startPoint = middlePoint;
                             PlaceGeoEdgePartIntoArr(geoEdgePart);
+                            //blGeoEdgePartFromArr = false;
+                            //lpPartEdgeInnerCounter = 0;
+                            geoEdgePart = null;
                         }
-                        blGeoEdgePartFromArr = false;                           
-                        lpPartEdgeInnerCounter = 0;
-                        geoEdgePart = null;
+                        //Jeśli 3 punkty sa w jednej lini to mozna usunąć środkowy
+                        else if (ArePointsInVector(startPoint.ToPictPoint(), middlePoint.ToPictPoint(), endPoint.ToPictPoint()))
+                        {
+                            //uproszczenie punktu poprzez jego usunięcie
+                            parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].DelSimplifyPhase1();
+                            aGeoEdgePointList[i + 1] = null;
+                        }
+                        /*//Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
+                        else
+                        {
+                            startPoint = middlePoint;
+                            if (!blGeoEdgePartFromArr)
+                            {
+                                PlaceGeoEdgePartIntoArr(geoEdgePart);
+                            }
+                            blGeoEdgePartFromArr = false;
+                            lpPartEdgeInnerCounter = 0;
+                            2geoEdgePart = null;
+                        }*/
                     }
                 }
                 aGeoEdgePointList.RemoveAll(x => x == null);
