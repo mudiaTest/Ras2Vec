@@ -48,8 +48,8 @@ namespace Migracja
             
     }
 
-    //Grupa rectangli tworzacych jedną płąszczyznę. Pozwala obliczyć swoją granicę
-    partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
+    //Grupa rectangli tworzacych jedną grupę. Pozwala obliczyć swoją granicę
+    partial class VectoredRectangleGroup : VectorRectangeGroup
     {
         //cztery punkty geograficzne określanące rogi obrazka
         //leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
@@ -65,6 +65,8 @@ namespace Migracja
         public VectorRectangeGroup simplifiedEdgeVectRectList{get;set;}
         //lista uroszczonych wewnętrznych krawędzi. Każda z nich ma konstrukcję jak edgePxList
         public Dictionary<int, VectorRectangeGroup> simplifiedInnerEdgesList{get;set;}
+        //Lista geoPunktów z listy rectangli(będących granicą) - jest to lista techniczna wykorzystywana w 
+        public List<GeoEdgePoint> geoPointList{get;set;}
 
         //niepotrzebe bo obiekt jedt grupą samą w sobie
         //lista 'kwadratów' należących do grupy
@@ -336,7 +338,7 @@ namespace Migracja
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromRight) 
                 {
                     //nic
-                    NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false);  
+                     NewBorderGeoPoint(aGeoArr, aActPoint, aMultiX, aMultiY, aDisplaceX, aDisplaceY, Cst.S, aPointAdvArr, aColorArr, false);  
                 }
                 //▲▲
                 else if (Direction(aActPoint, aNextPoint) == Cst.fromBottom) 
@@ -405,13 +407,22 @@ namespace Migracja
                                              GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
                                              aColorArr[aPoint.X][aPoint.Y].group);
                     }
+                    //Przypadek dla punktu (nie mam tu na myśli pixela, ale punkt geograficzny, czyli styki pixeli) narożnego
+                    //Może się zdażyć, że punkt graniczy krawędzią obrazka. W takim przypadku bedzie on uznany za punkt nie do usunięcia
                     else
                     {
-                        kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1),
-                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
-                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
-                                             GetColorPx(aColorArr, aPoint, pxToTypeCheck3),
-                                             aColorArr[aPoint.X][aPoint.Y].group);
+                        if ((pxToTypeCheck1 == Cst.W && pxToTypeCheck2 == Cst.NW && pxToTypeCheck3 == Cst.N && (aPoint.X ==0                   || aPoint.Y==0)                      ) ||
+                            (pxToTypeCheck1 == Cst.N && pxToTypeCheck2 == Cst.NE && pxToTypeCheck3 == Cst.E && (aPoint.X == aColorArr.Length-1 || aPoint.Y == 0)                    ) ||
+                            (pxToTypeCheck1 == Cst.E && pxToTypeCheck2 == Cst.SE && pxToTypeCheck3 == Cst.S && (aPoint.X == aColorArr.Length-1 || aPoint.Y == aColorArr[0].Length-1)) ||
+                            (pxToTypeCheck1 == Cst.S && pxToTypeCheck2 == Cst.SW && pxToTypeCheck3 == Cst.W && (aPoint.X == 0                  || aPoint.Y == aColorArr[0].Length-1))
+                            )
+                            kdPxType = Cst.c_geoPxDontDelete;
+                        else
+                            kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1),
+                                                 GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                                 GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
+                                                 GetColorPx(aColorArr, aPoint, pxToTypeCheck3),
+                                                 aColorArr[aPoint.X][aPoint.Y].group);
                     }
                 }
                 else
@@ -422,11 +433,26 @@ namespace Migracja
                 Debug.Assert(tmpGeoPoint != null, "newGeoPoint jest 'Point.Empty'");
                 Point newGeoPoint = (Point)tmpGeoPoint; //newGeoPoint ma jeszcze zmienne X,Y odpowiadające px. Przekształcenie ma prawdzowe zmienne geograficzne następuje poniżej
 
-                if (!(aGeoArr.Count > 0 && aGeoArr[aGeoArr.Count - 1].pictX == newGeoPoint.X && aGeoArr[aGeoArr.Count - 1].pictY == newGeoPoint.Y))
-                { 
-                    aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType));
-                    if (aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] == null)
-                        aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv((Point)newGeoPoint, kdPxType);
+                //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim kroku i jest to zgodne z algorytmem, ale nie logiką. 
+                //Taka sytuacja może zajść np dla granicy ...(26,1),(27,1),(27,0),(27,1)... Sprawdzenie (26,1),(27,1),(27,0) doda (27,1), a kolejne 
+                //(27,1),(27,0),(27,1) doda (27,1),(27,0),(28,0), więc (27,1) byłby dodany 2 razy pod rząd
+                if (aGeoArr.Count ==0 ||
+                    aGeoArr[aGeoArr.Count - 1].X != newGeoPoint.X || 
+                    aGeoArr[aGeoArr.Count - 1].Y != newGeoPoint.Y
+                    )
+                {
+                    if (!(aGeoArr.Count > 0 && aGeoArr[aGeoArr.Count - 1].pictX == newGeoPoint.X && aGeoArr[aGeoArr.Count - 1].pictY == newGeoPoint.Y))
+                    {
+                        // aGeoArr.Add(new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType));                    
+                        if (aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] == null)
+                        {
+                            GeoEdgePoint newGeoEdgePoint = new GeoEdgePoint(newGeoPoint.X * aMultiX + aDisplaceX, newGeoPoint.Y * aMultiY + aDisplaceY, newGeoPoint.X, newGeoPoint.Y, kdPxType);
+                            aPointAdvArr[newGeoPoint.X][newGeoPoint.Y] = new PointAdv(newGeoEdgePoint);
+                            aGeoArr.Add(newGeoEdgePoint);
+                        }
+                        else
+                            aGeoArr.Add(aPointAdvArr[newGeoPoint.X][newGeoPoint.Y].GetGeoEdgePoint());
+                    }
                 }
             }
 
@@ -522,7 +548,7 @@ namespace Migracja
                 }
                 else
                 {
-                    return Cst.c_geoPxGroupBorder;
+                    return Cst.c_geoPxDontDelete;
                 }
             }
             private int GetPxType(ColorPx apx1, ColorPx apx2, ColorPx apx3, ColorPx apx4, int aEdgeGroup)
@@ -533,7 +559,7 @@ namespace Migracja
                 }
                 else
                 {
-                    return Cst.c_geoPxGroupBorder;
+                    return Cst.c_geoPxDontDelete;
                 }
             }
 
@@ -702,6 +728,33 @@ namespace Migracja
                 //SetLength(result, Min(counter,10));
                 //if (!aBlOnlyFillColorArr) then
                 //   SetLength(result, counter);
+
+                //Z powodu kolejności dodawania punktów w metodzie MakePartEdge, do listy jako pierwszy dodamy 
+                //ostatni punkt, a potem dopiero pierwszy, drugi etc. Dlatego przesówamy całą listę o jedną pozycję.
+                //Jako, że granica powinna zaczynac się od najbardziej lewego rect w najwyższym rzędzie, to z powodu 
+                //możliwych kształtów może zajść konieczność przesnięcia jednego lub 2 punktów
+                //Np w granicy (0,1) !(0,0) (1,0) ... przesówamy tylko pierwszy punkt na koniec (war. 1)
+                //ale dla (2,2) (1,2) !(1,1) (2,1) ... przesówamy 2 (war. 2)
+                //Aby wyjaśnicz dlaczego najlepiej narysować podane granice przyjrzeć się jak przebiegają
+                if (result.Count > 0)
+                {
+                    //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim kroku i jest to zgodne z algorytmem, ale nie logiką. 
+                    //Taka sytuacja może zajść np dla granicy ...(26,1),(27,1),(27,0),(27,1)... Sprawdzenie (26,1),(27,1),(27,0) doda (27,1), a kolejne 
+                    //(27,1),(27,0),(27,1) doda (27,1),(27,0),(28,0), więc (27,1) byłby dodany 2 razy pod rząd
+                    //Jednak sprawdzenie wykonywane w powyższej pętli nie zadziała jeśli te punkty bedą na 2 końcach granicy. Można to wykryć
+                    //poniższymi sprawdzeniami i zapobiec powielaniu punktów
+                    if (result[0].pictX != result[result.Count - 1].pictX || result[0].pictY != result[result.Count - 1].pictY)
+                        result.Add(result[0]);
+                    result.RemoveAt(0);
+                    //Jeśli zachodzi (war. 2), to przes owamy 2 punkty
+                    if (result.Count >= 2 && result[0].pictY != result[1].pictY) //porównujemy pictX/Y a nie X/Y bo 
+                    {
+                        if (result[0].pictX != result[result.Count - 1].pictX || result[0].pictY != result[result.Count - 1].pictY)
+                            result.Add(result[0]);
+                        result.Add(result[0]);
+                        result.RemoveAt(0);
+                    }
+                }
             } 
             else
             {
@@ -711,25 +764,7 @@ namespace Migracja
                                         result, aMultiX, aMultiY, aDisplaceX, aDisplaceY,
                                         aColorArr, aPointAdvArr, aBlOnlyFillColorArr);
                 counter = 4;
-            }
-            //Z powodu kolejności dodawania punktów w metodzie MakePartEdge, do listy jako pierwszy dodamy 
-            //ostatni punkt, a potem dopiero pierwszy, drugi etc. Dlatego przesówamy całą listę o jedną pozycję.
-            //Jako, że granica powinna zaczynac się od najbardziej lewego rect w najwyższym rzędzie, to z powodu 
-            //możliwych kształtów może zajść monieczność przesnięcia jednego lub 2 punktów
-            //Np w granicy (0,1) !(0,0) (1,0) ... przesówamy tylko pierwszy punkt na koniec (war. 1)
-            //ale dla (2,2) (1,2) !(1,1) (2,1) ... przesówamy 2 (war. 2)
-            //Aby wyjaśnicz dlaczego najlepiej narysować podane granice przyjrzeć się jak przebiegają
-            if (result.Count > 0)
-            {
-                result.Add(result[0]);
-                result.RemoveAt(0);
-                //Jeśli zachodzi (war. 2), to przes owamy 2 punkty
-                if (result.Count>=2 && result[0].Y != result[1].Y)
-                {
-                    result.Add(result[0]);
-                    result.RemoveAt(0);
-                }
-            }
+            }            
             return result;
         }
 
@@ -738,7 +773,7 @@ namespace Migracja
             pointAdvMapFromFullEdge = MakePointArrFromEdge(edgeVectRectList, aDpScale, aDisplaceX, aDisplaceY);
         }
 
-        internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY, bool asimplifyPhase1, bool asimplifyPhase3)
+        internal void MakePointArrFromSimplifiedEdge(float aDpScale, float aDisplaceX, float aDisplaceY, bool asimplifyPhase2, bool asimplifyPhase3)
         {
             //pointAdvMapFromSimplifiedEdge = MakePointArrFromEdge(simplifiedEdgeList, aDpScale, aDisplaceX, aDisplaceY);
             //SimplifyPointAdvMapPhase1(pointAdvMapFromSimplifiedEdge);
@@ -750,11 +785,12 @@ namespace Migracja
             //Lista obiektów List<GeoEdgePoint>, czyli fragmentów granic. Dzieli wejściową listę List<GeoEdgePoint> na pomniejsze listy. 
             //Koniec jednej listy jest poczatkiem kolejnej (punkty powtarzają się)
             //List<EdgeGeoPointList> simplifiedEdgeGeoPointListList = SplitGeoEdgePointList(geoPointList, GetEdgeGeoPointListArr());
-            if (asimplifyPhase1)
-               parentMapFactory.EdgeGeoPointListList = SimplifyPointAdvListPhase1(geoPointList);
+            /*if (asimplifyPhase2)
+               /=parentMapFactory.EdgeGeoPointListList = 
+              SimplifyPointAdvListPhase1(geoPointList);
             if (asimplifyPhase3)
                 SimplifyPointAdvListPhase2(geoPointList);
-            pointAdvMapFromSimplifiedEdge = PointList2PxArray(geoPointList);
+            pointAdvMapFromSimplifiedEdge = PointList2PxArray(geoPointList);*/
         }
 
            /* private List<EdgeGeoPointList> SplitGeoEdgePointList(List<GeoEdgePoint> aGeoEdgePointList, EdgeGeoPointList[][][][] aEdgeGeoPointListArr)
@@ -860,9 +896,9 @@ namespace Migracja
                 {
                     GeoEdgePoint firstPoint = aGeoEdgePart[0];
                     GeoEdgePoint secondPoint = aGeoEdgePart[1];
-                    GeoEdgePoint lastPoint = aGeoEdgePart[aGeoEdgePart.Count-2];
-                    GeoEdgePoint theLastButOnePoint = aGeoEdgePart[aGeoEdgePart.Count-1];
-                    GetEdgeGeoPointListArr()[firstPoint.pictX][firstPoint.pictY][secondPoint.pictX][firstPoint.pictY] = aGeoEdgePart;
+                    GeoEdgePoint lastPoint = aGeoEdgePart[aGeoEdgePart.Count-1];
+                    GeoEdgePoint theLastButOnePoint = aGeoEdgePart[aGeoEdgePart.Count-2];
+                    GetEdgeGeoPointListArr()[firstPoint.pictX][firstPoint.pictY][secondPoint.pictX][secondPoint.pictY] = aGeoEdgePart;
                     GetEdgeGeoPointListArr()[lastPoint.pictX][lastPoint.pictY][theLastButOnePoint.pictX][theLastButOnePoint.pictY] = aGeoEdgePart;
                     foreach (GeoEdgePoint edgeGeoPoint in aGeoEdgePart)
                         GetPointAdvArr()[edgeGeoPoint.pictX][edgeGeoPoint.pictY].geoEdgePartList.Add(aGeoEdgePart);
@@ -891,7 +927,7 @@ namespace Migracja
                 return PointList2PxArray(pxPointList);
             }
 
-            private List<GeoEdgePart> SimplifyPointAdvListPhase1(List<GeoEdgePoint> aGeoEdgePointList)
+            public List<GeoEdgePart> SimplifyPointAdvListPhase1()
             {
                 
                 GeoEdgePart geoEdgePart = null; /*Nowy fragmenet granicy, nad którym aktualnie pracujemy. 
@@ -900,20 +936,20 @@ namespace Migracja
                 bool blGeoEdgePartFromArr = false; //Czy granica została wczytana z tablicy EdgeGeoPointListArr
                 int lpPartEdgeInnerCounter = 0;
                 List<GeoEdgePart> result = new List<GeoEdgePart>();
-                GeoEdgePoint startPoint = aGeoEdgePointList[0];
+                GeoEdgePoint startPoint = geoPointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint = null;
-                for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
+                for (int i = 0; i < geoPointList.Count - 1; i++)
                 {
- 
-                    middlePoint = aGeoEdgePointList[i + 1];
-                    if (i < aGeoEdgePointList.Count - 2)
+
+                    middlePoint = geoPointList[i + 1];
+                    if (i < geoPointList.Count - 2)
                     {
-                        endPoint = aGeoEdgePointList[i + 2];
+                        endPoint = geoPointList[i + 2];
                     }
                     else
                     {
-                        endPoint = aGeoEdgePointList[0];
+                        endPoint = geoPointList[0];
                     }
 
                     //Jeśli geoEdgePart == null to znaczy, że dopiero zaczynamy pracę nad nowym odcinkiem lub w ogóle nad całą granicą
@@ -953,14 +989,19 @@ namespace Migracja
                     }
 
                     //Jeśli fragment granicy już istnieje, to przechodzimy po nim od końca sprawdzając, czy punkty pokrywają się
-                    if (!blGeoEdgePartFromArr)
+                    if (blGeoEdgePartFromArr)
                     {
 
                         lpPartEdgeInnerCounter++;
+                        if (parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplifiedPhase1())
+                        {
+                            geoPointList[i + 1] = null;
+                        }
                         //Jeśli dotarliśmy do końca fragmentu granicy
                         if (geoEdgePart.Count == lpPartEdgeInnerCounter)
                         {
-
+                            geoEdgePart = null;
+                            startPoint = middlePoint;
                         }
                     }
                     //Jeśli fragment granicy jest nowy (nie został odnaleziony w tablicy), to będziemy go dalej budować
@@ -968,7 +1009,7 @@ namespace Migracja
                     {
                         //Punk środkowy nie ma prawa być uproszczony bo nie był jeszcze w żadnej granicy
                         Debug.Assert(!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplified(),
-                                     "Punkt ({0},{1}) został już uproszczony", middlePoint.pictX, middlePoint.pictY);
+                                     String.Format("Punkt ({0},{1}) został już uproszczony", middlePoint.pictX, middlePoint.pictY));
 
                         //fragmenty zawierają wszystkie punkty (także te usunięte), ale usunięte punkty będa odpowiednio oznaczone na tablicy parentMapFactory.pointAdvArr
                         geoEdgePart.Add(middlePoint);
@@ -989,9 +1030,9 @@ namespace Migracja
                         {
                             //uproszczenie punktu poprzez jego usunięcie
                             parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].DelSimplifyPhase1();
-                            aGeoEdgePointList[i + 1] = null;
+                            geoPointList[i + 1] = null;
                         }
-                        /*//Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
+                        //Jeśli punkty nie są w jednej lini to dla kolejnego sprawdzenia punktem startu będzie punkt z narożnika    
                         else
                         {
                             startPoint = middlePoint;
@@ -1001,30 +1042,33 @@ namespace Migracja
                             }
                             blGeoEdgePartFromArr = false;
                             lpPartEdgeInnerCounter = 0;
-                            2geoEdgePart = null;
-                        }*/
+                            geoEdgePart = null;
+                        }
                     }
                 }
-                aGeoEdgePointList.RemoveAll(x => x == null);
+                geoPointList.RemoveAll(x => x == null);
 
-                //Ostatni fragment granicy nie zostanie dodany w pętli, ale po jej zakończeniu możemy być pewni, że istnieje
+                //Ostatni fragment granicy może nie zostać dodany w pętli, ale po jej zakończeniu możemy być pewni, że istnieje
                 //następny fragment granicy zacznie się od punktu endPoint, którego nie dodano jeszcze do listy geoEdgePart
                 Debug.Assert(endPoint != null, "EndPoint jest null.");
-                geoEdgePart.Add(endPoint);
-                if (!blGeoEdgePartFromArr)
+                if (geoEdgePart != null)
                 {
-                    PlaceGeoEdgePartIntoArr(geoEdgePart);
+                    geoEdgePart.Add(endPoint);
+                    if (!blGeoEdgePartFromArr)
+                    {
+                        PlaceGeoEdgePartIntoArr(geoEdgePart);
+                    }
+                    blGeoEdgePartFromArr = false;
+                    lpPartEdgeInnerCounter = 0;
+                    geoEdgePart = null;
                 }
-                blGeoEdgePartFromArr = false;
-                lpPartEdgeInnerCounter = 0;
-                geoEdgePart = null;
 
                 return result;
             }
         
-            private void SimplifyPointAdvListPhase2(List<GeoEdgePoint> aGeoEdgePointList)
+            public void SimplifyPointAdvListPhase2()
             {
-                GeoEdgePoint startPoint = aGeoEdgePointList[0];
+                GeoEdgePoint startPoint = geoPointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
                 int endId;
@@ -1034,18 +1078,18 @@ namespace Migracja
                 lstIdStartEnd.Add(0);
                 float distance = (float)1;
 
-                for (int i = 0; i < aGeoEdgePointList.Count - 1; i++)
+                for (int i = 0; i < geoPointList.Count - 1; i++)
                 {
-                    middlePoint = aGeoEdgePointList[i + 1];
+                    middlePoint = geoPointList[i + 1];
                     lstPointsToCheck.Add(middlePoint);
-                    if (i < aGeoEdgePointList.Count - 2)
+                    if (i < geoPointList.Count - 2)
                     {
-                        endPoint = aGeoEdgePointList[i + 2];
+                        endPoint = geoPointList[i + 2];
                         endId = i + 2;
                     }
                     else
                     {
-                        endPoint = aGeoEdgePointList[0];
+                        endPoint = geoPointList[0];
                         endId = 0;
                     }
 
@@ -1086,7 +1130,7 @@ namespace Migracja
                         i++;
                     }
                 }
-                DeletePoints(lstPointsToDelete, aGeoEdgePointList);
+                DeletePoints(lstPointsToDelete, geoPointList);
             }
 
                 private float DistanceOfPoints(Point p1, Point p2)
@@ -1139,14 +1183,14 @@ namespace Migracja
             return GetScaledPointArrFromEdge(adpScale, aDisplaceX, aDisplaceY, pointAdvMapFromSimplifiedEdge);
         }
 
-        private PointAdv[] GetScaledPointArrFromEdge(float adpScale, float aDisplaceX, float aDisplaceY, PointAdv[] aPointArr)
+        private ScaledPointAdv[] GetScaledPointArrFromEdge(float adpScale, float aDisplaceX, float aDisplaceY, PointAdv[] aPointArr)
         {
-            PointAdv[] result = new PointAdv[aPointArr.Length];
+            ScaledPointAdv[] result = new ScaledPointAdv[aPointArr.Length];
             for(int i=0; i< aPointArr.Length; i++)
             {
-                result[i] = new PointAdv((int)Math.Round(aPointArr[i].X * adpScale / Cst.maxZoom + aDisplaceX), 
-                                            (int)Math.Round(aPointArr[i].Y * adpScale / Cst.maxZoom + aDisplaceY),
-                                            aPointArr[i].GetKdPointType());
+                result[i] = new ScaledPointAdv((int)Math.Round(aPointArr[i].X * adpScale /*/ Cst.maxZoom*/ + aDisplaceX), 
+                                               (int)Math.Round(aPointArr[i].Y * adpScale /*/ Cst.maxZoom*/ + aDisplaceY),
+                                               aPointArr[i].GetKdPointType());
             }
             return result;
         }

@@ -309,7 +309,7 @@ namespace Migracja
                 if ((int)Math.DivRem((long)i, (long)inMod, out dummy) == 0)
                     UpdateInfoAction("Tworzenie granicy dla grupy " + i.ToString() + "/" + (Count - 1).ToString());
                 i++;
-                vectGroup.MakeEdges(vectGroup.edgeVectRectList);
+                vectGroup.MakeOuterEdge(Cst.maxZoom, 0, 0);
             };            
         }
 
@@ -355,7 +355,7 @@ namespace Migracja
                         // vectGroupDown - grupa px będącego poniżej. Z niego zaczniemy budować  granicę wewnętrzną
                         vectGroupDown = this[colorPxDown.group];
                         // MakeEdges wybuduje granicę i wszystkie px powyżej punktów granicy ustawi used=true
-                        vectGroupDown.MakeEdges(list, true, colorPx.group);
+                        vectGroupDown.MakeEdges(list, true, colorPx.group, Cst.maxZoom, 0, 0);
                         vectGroup.innerEdgesList.Add(vectGroup.innerEdgesList.NextKey(), list);
                     }
                 }
@@ -373,13 +373,38 @@ namespace Migracja
 
         internal void MakePointArrFromSimplifiedEdgeForGroups()
         {
+            VectoredRectangleGroup vectoredRectangeGroup;
             foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
             {
-                pair.Value.MakePointArrFromSimplifiedEdge(Cst.maxZoom,
+                /*pair.Value.MakePointArrFromSimplifiedEdge(Cst.maxZoom,
                                                           0,
                                                           0,
                                                           settingsR2V.simplifyPhase2,
-                                                          settingsR2V.simplifyPhase3);
+                                                          settingsR2V.simplifyPhase3);*/                
+                vectoredRectangeGroup = pair.Value;
+                //  tworzymy listę geoPunktów z listy rectangli(będących granicą)
+                vectoredRectangeGroup.geoPointList = vectoredRectangeGroup.MakeVectorEdge(vectoredRectangeGroup.simplifiedEdgeVectRectList, colorArr, pointAdvArr, false, Cst.maxZoom, Cst.maxZoom, 0, 0);
+            }
+            //Dzielimy listę geopunktów na mniejsze listy tak, aby jeden fragment dotykał tylko 2 grup
+            //Lista obiektów List<GeoEdgePoint>, czyli fragmentów granic. Dzieli wejściową listę List<GeoEdgePoint> na pomniejsze listy. 
+            //Koniec jednej listy jest poczatkiem kolejnej (punkty powtarzają się)
+            //List<EdgeGeoPointList> simplifiedEdgeGeoPointListList = SplitGeoEdgePointList(geoPointList, GetEdgeGeoPointListArr());
+            if (settingsR2V.simplifyPhase2)
+                foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+                {             
+                    vectoredRectangeGroup = pair.Value;
+                    vectoredRectangeGroup.SimplifyPointAdvListPhase1();
+                }
+            if (settingsR2V.simplifyPhase3)
+                foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+                {             
+                    vectoredRectangeGroup = pair.Value;
+                    vectoredRectangeGroup.SimplifyPointAdvListPhase2();
+                }
+            foreach (KeyValuePair<int, VectoredRectangleGroup> pair in this)
+            {
+                vectoredRectangeGroup = pair.Value;
+                vectoredRectangeGroup.pointAdvMapFromSimplifiedEdge = vectoredRectangeGroup.PointList2PxArray(vectoredRectangeGroup.geoPointList);
             }
         }
 

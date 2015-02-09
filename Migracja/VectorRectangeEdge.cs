@@ -55,7 +55,7 @@ namespace Migracja
         }
     }
 
-    partial class VectoredRectangleGroup : Dictionary<int, Vector_Rectangle>
+    partial class VectoredRectangleGroup : VectorRectangeGroup
     {
         private int NextDirection(int aDirection)
         {
@@ -186,7 +186,7 @@ namespace Migracja
 
         //buduje krawędź
         //VectorRectangeGroup to mapa (kluczem jest int - kolejne wartości wyznaczają kolejność) obiektów Vector_Rectangle 
-        public void MakeEdges(VectorRectangeGroup aEdgePxList,  bool aBlInnerBorder = false, int aOuterGroup = 0)
+        public void MakeEdges(VectorRectangeGroup aEdgePxList, bool aBlInnerBorder = false, int aOuterGroup = 0, float aDpScale = 1, float aDisplaceX = 0, float aDisplaceY = 0)
         {
             //var
             //startEdgePoint, nextEdgePoint, prevEdgePoint: TVectRectangle;
@@ -245,10 +245,15 @@ namespace Migracja
                 aEdgePxList.Add(startEdgePoint);
                 // MakeUsed(startEdgePoint aBlInnerBorder);
             };
-            List<GeoEdgePoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), GetPointAdvArr(), true);
+            List<GeoEdgePoint> geoPointList = MakeVectorEdge(aEdgePxList, GetColorArr(), GetPointAdvArr(), true, aDpScale, aDpScale, aDisplaceX, aDisplaceY);
             MakeUsed(aEdgePxList, aBlInnerBorder);
             geoPointList.Clear();
             //PxListToGeoList;            
+        }
+
+        public void MakeOuterEdge(float aDpScale, float aDisplaceX, float aDisplaceY)
+        {
+            MakeEdges(edgeVectRectList, false, 0, aDpScale, aDisplaceX, aDisplaceY);
         }
 
         //VectorRectangeGroup to mapa (kluczem jest int - kolejne wartości wyznaczają kolejność) obiektów Vector_Rectangle 

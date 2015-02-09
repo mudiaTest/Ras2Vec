@@ -9,29 +9,34 @@ namespace Migracja
 {
     class PointAdv
     {
-        private Point fpoint;
-        private int fkdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxGroupBorder
+        private GeoEdgePoint fpoint;        
+        protected int fkdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxDontDelete
         private bool DelSimplifiedPhase1 = false; // usunięty w 1 fazie upraszczania
         private bool DelSimplifiedPhase2 = false; // usunięty w 2 fazie upraszczania
         internal List<GeoEdgePart> geoEdgePartList = new List<GeoEdgePart>();
-        public PointAdv(int X, int Y, int akdPointType)
-        {
-            fpoint = new Point(X, Y);
-            fkdPointType = akdPointType;
-        }
-        public PointAdv(Point point, int akdPointType)
+ 
+        public PointAdv(GeoEdgePoint point)
         {
             fpoint = point;
-            fkdPointType = akdPointType;
+            if (fpoint != null)
+            {
+                fkdPointType = fpoint.GetKdPointType();
+            }
         }
 
-        public Point GetPoint()
+        public GeoEdgePoint GetGeoEdgePoint()
         {
             return fpoint;
         }
 
-        public int GetKdPointType()
+        public virtual Point GetPoint()
         {
+            return fpoint.ToPoint();
+        }
+
+        public virtual int GetKdPointType()
+        {
+            Debug.Assert(fpoint!=null, "Podobiekt fpoint (GeoEdgePoint) nie został zainicjalizowany");
             return fkdPointType;
         }
 
@@ -79,8 +84,33 @@ namespace Migracja
             return GetKdPointType() == Cst.c_geoPxSimple;
         }
 
-        public int X{get{return fpoint.X;}}
+        public virtual int X{get{return fpoint.pictX;}}
 
-        public int Y{get{return fpoint.Y;}}
+        public virtual int Y { get { return fpoint.pictY; } }
+    }
+
+    class ScaledPointAdv: PointAdv
+    {
+        private Point fsimplePoint;
+        public ScaledPointAdv(int X, int Y, int akdPointType): base(null)
+        {
+            fsimplePoint = new Point(X, Y);
+            fkdPointType = akdPointType;
+        }
+
+        public override Point GetPoint()
+        {
+            return fsimplePoint;
+        }
+
+        public override int X { get { return fsimplePoint.X; } }
+
+        public override int Y { get { return fsimplePoint.Y; } }
+
+        public override int GetKdPointType()
+        {
+            Debug.Assert(fsimplePoint != null, "Podobiekt fpoint (GeoEdgePoint) nie został zainicjalizowany");
+            return fkdPointType;
+        }
     }
 }

@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Migracja.ExtDictionary" Collapsed="true">
+    <Position X="30.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\ClassHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Cst" Collapsed="true">
+    <Position X="27.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCAAAAMAAAABCEAAEAAAAAKAAQgAAEAAAAAgAhCMAAA=</HashCode>
+      <FileName>Migracja\cst.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Crooper">
+    <Position X="5.75" Y="0.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAACEQAAABAEAAAAAABgIAAAIwEAAAAAIQAAIQAA=</HashCode>
+      <FileName>Migracja\ImageCrooper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.RaserImageCrooper">
+    <Position X="1" Y="6.25" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\ImageCrooper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.VectorImageCrooper">
+    <Position X="7.25" Y="6.25" Width="8.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAACgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\ImageCrooper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.MainWindow" Collapsed="true">
+    <Position X="25.5" Y="1.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="Migracja.MainWindow.MovedPicture" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Migracja\MainWindowImages.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IF3TGi8CIi+KgRllYzHlj90yTxjeWihQh2oQAeIOAR0=</HashCode>
+      <FileName>Migracja\MainWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.MainWindowSettings" Collapsed="true">
+    <Position X="27.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkIAAAAAAAAAIEgIgGBoBAEAAgAABACAIAFAAAAA=</HashCode>
+      <FileName>Migracja\MainWindowSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.MakeEdges_Utils" Collapsed="true">
+    <Position X="29" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\MakeEdges_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.MapFactory" Collapsed="true">
+    <Position X="30.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IQgRaAAAMQYAAAAEEOAgAQAAIAAIACwACmQAgAAQAZA=</HashCode>
+      <FileName>Migracja\MapFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.PointAdv" Collapsed="true">
+    <Position X="32.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAEAAkAAAAAAAUAAABAAAAABAAAAAAAAAA4iA=</HashCode>
+      <FileName>Migracja\PointAdv.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Program" Collapsed="true">
+    <Position X="25.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Migracja\Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.R2VSettings" Collapsed="true">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wRAAGAAgAAAAACCAAAAAAEAAAAAKAABAEGAIIEAgAIA=</HashCode>
+      <FileName>Migracja\R2VSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.R2VRunner" Collapsed="true">
+    <Position X="27.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Migracja\RasterToVector_Main.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.RasterToVectorFactory">
+    <Position X="25.5" Y="3.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAAAAAAACAAAAAAAACgAAAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Main.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.RasterToVector_Utils" Collapsed="true">
+    <Position X="32.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.ColorGroupList" Collapsed="true">
+    <Position X="25.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAgAAAAAAAAABAAAEAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.RectGroupsByColorMap">
+    <Position X="27.25" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.GeoPoint">
+    <Position X="8.25" Y="9.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAACAAEAAAAAAACAAYAg=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.GeoEdgePoint">
+    <Position X="7.5" Y="13.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAABAQAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.ColorPx">
+    <Position X="22.25" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAQAAAAAAAAAAAAAAgAAAAQAAACAAQAgQAAAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="groupN" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Migracja.R2VUtils" Collapsed="true">
+    <Position X="30.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.SettingsRegister" Collapsed="true">
+    <Position X="32.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\SettingsRegister.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Vector_Gen">
+    <Position X="1.5" Y="9.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAIAIAAAABAAAAAAADAAEAAAAAEAAA=</HashCode>
+      <FileName>Migracja\Vector_Gen.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Vector_Rectangle">
+    <Position X="0.5" Y="13.5" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAgAAACAAAABA=</HashCode>
+      <FileName>Migracja\Vector_Rectangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Edge_Dict" Collapsed="true">
+    <Position X="29" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\VectorGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.GeoEdgePart_List" Collapsed="true">
+    <Position X="32.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAABAAAAACAAAAAAAAgA=</HashCode>
+      <FileName>Migracja\VectorGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.VROfBitmapGroup_Dict">
+    <Position X="25.5" Y="4.5" Width="19" />
+    <TypeIdentifier>
+      <HashCode>EgUhAoENDkIAgIErACIErAgCoECKgQoAAgBDAwUBOYg=</HashCode>
+      <FileName>Migracja\VectorGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.VectorRectangeGroup_Dict">
+    <Position X="27.25" Y="4.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAIQQAAAAAAAAAAAAAAAAQAAAAQAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\VectorRectangeEdge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Properties.Resources" Collapsed="true">
+    <Position X="29" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Migracja.Properties.Settings" Collapsed="true">
+    <Position X="30.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="System.Int32">
+    <Position X="15.5" Y="11.5" Width="5.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Struct>
+  <Delegate Name="Migracja.UpdateInfoBoxTimeDelegate">
+    <Position X="25.5" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgACAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Migracja\RasterToVector_Utils.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -41,7 +41,7 @@ namespace Migracja
             datePrv = aFunct("'UpdateColorArr'", false, datePrv);
 
             //budowanie granic wewnętrznych
-            singleThreadFactory.MakeInnerEdgesForGroups();
+            //singleThreadFactory.MakeInnerEdgesForGroups();
             aFunct("'MakeInnerEdgesForGroups'", false, datePrv);
 
             //budowanie list punktów dla rysowania polygonów - dla NIEUPROSZCZONEJ krawędzi. 

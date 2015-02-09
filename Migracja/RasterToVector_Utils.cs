@@ -58,7 +58,7 @@ namespace Migracja
         //współrzędne geograficzne punktu 
         internal float X; 
         internal float Y;
-        //współrzędne punktu na źródłowej bitmapie
+        //współrzędne punktu (lewy górny róg pixela) na źródłowej bitmapie
         internal int fPictX;
         internal int fPictY;
         public GeoPoint() { }
@@ -82,6 +82,7 @@ namespace Migracja
         public int pictY { get { return fPictY; } }
     }
 
+    //punkt 
     class GeoEdgePoint : GeoPoint
     {
         private int kdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxStartEnd
@@ -92,11 +93,15 @@ namespace Migracja
 
         public PointAdv PointToPointAdv()
         {
-            return new PointAdv(RasterToVector_Utils.Round(X), RasterToVector_Utils.Round(Y), kdPointType);
+            return new PointAdv(this);
         }
         public PointAdv PictPointToPointAdv()
         {
-            return new PointAdv(fPictX, fPictY, kdPointType);
+            return new PointAdv(this);
+        }
+        public int GetKdPointType()
+        {
+            return kdPointType;
         }
     }
 

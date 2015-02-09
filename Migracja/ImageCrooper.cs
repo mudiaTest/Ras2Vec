@@ -268,6 +268,8 @@ namespace Migracja
                             }
 
                             Point[] pointArr = GetPointArr(granica);
+                            if (pointArr.Count() < 2)
+                                continue;
                             graphics.FillPolygon(new SolidBrush(group.sourceColor), pointArr);
                             if (settings.Edges())
                             {
@@ -340,7 +342,10 @@ namespace Migracja
             int i=0;
             foreach (PointAdv pointAdv in aArr)
             {
-                result[i] = pointAdv.GetPoint();
+                if (pointAdv is ScaledPointAdv)
+                    result[i] = ((ScaledPointAdv)pointAdv).GetPoint();
+                else
+                    result[i] = pointAdv.GetPoint();
                 i++;
             }
             return result;

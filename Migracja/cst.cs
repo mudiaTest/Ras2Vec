@@ -27,7 +27,7 @@ namespace Migracja
                                                *zwykłe, które nie są rogami granicy
                                                */
         internal const int c_geoPxStartEnd = 2; //punkt będacy startem/końcem granicy
-        internal const int c_geoPxGroupBorder = 3; //punkt w najbliższej okolicy którego zachodzi zmiana grup
+        internal const int c_geoPxDontDelete = 3; //punkt w najbliższej okolicy którego zachodzi zmiana grup
 
         internal const int N = 1;
         internal const int S = 2;
