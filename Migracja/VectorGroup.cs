@@ -1071,8 +1071,13 @@ namespace Migracja
                 GeoEdgePoint startPoint = geoPointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
-                startPoint.SetCheckedPhase2();
-                parentMapFactory.pointAdvArr[startPoint.pictX][startPoint.pictY].SetCheckedPhase2();
+
+                if (!startPoint.IsCheckedPhase2())
+                {
+                    startPoint.SetCheckedPhase2();
+                    parentMapFactory.pointAdvArr[startPoint.pictX][startPoint.pictY].SetCheckedPhase2();
+                }
+
                 int endId;
                 List<GeoEdgePoint> lstPointsToDelete = new List<GeoEdgePoint>();
                 List<GeoEdgePoint> lstPointsToCheck = new List<GeoEdgePoint>();
@@ -1153,8 +1158,14 @@ namespace Migracja
                         i++;
                         //ustalamy, ze ten punkt przeszedł już upraszczanie fazy drugiej. i++ spowoduje, że endPoint 
                         //nigdy nie będzie w tej pętli uznany za middle, więc jego typ musimy ustalić tutaj
-                        endPoint.SetCheckedPhase2();
-                        parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].SetCheckedPhase2();
+
+                        if (!endPoint.IsCheckedPhase2())
+                        {
+                            endPoint.SetCheckedPhase2();
+                            parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].SetCheckedPhase2();
+                        }
+
+                        
                     }                    
                     //ustalamy, ze ten punkt przeszedł już upraszczanie fazy drugiej
                     if (!middlePoint.IsCheckedPhase2())
