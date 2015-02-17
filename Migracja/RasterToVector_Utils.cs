@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Migracja
 {
@@ -86,6 +87,7 @@ namespace Migracja
     class GeoEdgePoint : GeoPoint
     {
         private int kdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxStartEnd
+        private bool fcheckedPhase2 = false;
         public GeoEdgePoint(float x, float y, int aPictX, int aPictY, int akdPointType /*= Cst.c_geoPxSimple*/): base(x, y, aPictX, aPictY)
         {
             kdPointType = akdPointType;
@@ -102,6 +104,15 @@ namespace Migracja
         public int GetKdPointType()
         {
             return kdPointType;
+        }
+        public void SetCheckedPhase2()
+        {
+            Debug.Assert(fcheckedPhase2 == false, String.Format("Próba ponownego uproszczenia geopunktu ({0},{1})", fPictX, fPictY));
+            fcheckedPhase2 = true;
+        }
+        public Boolean IsCheckedPhase2()
+        {
+            return fcheckedPhase2; 
         }
     }
 

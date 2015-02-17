@@ -1071,6 +1071,8 @@ namespace Migracja
                 GeoEdgePoint startPoint = geoPointList[0];
                 GeoEdgePoint middlePoint;
                 GeoEdgePoint endPoint;
+                startPoint.SetCheckedPhase2();
+                parentMapFactory.pointAdvArr[startPoint.pictX][startPoint.pictY].SetCheckedPhase2();
                 int endId;
                 List<GeoEdgePoint> lstPointsToDelete = new List<GeoEdgePoint>();
                 List<GeoEdgePoint> lstPointsToCheck = new List<GeoEdgePoint>();
@@ -1093,14 +1095,35 @@ namespace Migracja
                         endId = 0;
                     }
 
-                    if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
+                    //Jeśli środkowy punkt został już sprawdzony procedurze upraszczania phase 2 i uznaliśmy, że nadaje się do 
+                    //usunięcia, to usuwamy go z granicy, ale nie musimy oznaczać jako do usunięcia, bo to już zostało zrobione
+                    if (middlePoint.IsCheckedPhase2())
                     {
-                        //właściwie nie powinniśmy nic robić, ale może się okazać, że middle
-                        if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+                        
+                        /*for (int j = 0; j < lstPointsToCheck.Count; j++)
                         {
-                            lstPointsToCheck.RemoveAll(x => true);
+                            lstPointsToDelete.Add(lstPointsToCheck[j]);
                         }
+                        lstPointsToCheck.RemoveAll(x => true);
+                        startPoint = endPoint;*/
+                        lstPointsToCheck.RemoveAll(x => true);
+                        if (parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].IsDelSimplified())
+                            lstPointsToDelete.Add(middlePoint);
+                        startPoint = middlePoint;
+
                     }
+                    else if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
+                    {
+                        //usuwamy z listy geopunktów te, które 
+                        /*if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
+                        {
+                            for (int j = 0; j < lstPointsToCheck.Count; j++)
+                            {
+                                lstPointsToDelete.Add(lstPointsToCheck[j]);
+                            }
+                            lstPointsToCheck.RemoveAll(x => true); 
+                        }*/
+                    }                    
                     //Jeśli ostatnio dodany punkt środkowy NIE MOŻE być usunięty - ta sytuacja może zajśc tylko gdy 
                     else if ((!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified() /*&& lstPointsToCheck.Count == 1*/) ||
                               //Funkcja sprawdzająca odległośc punktu middle od linii
@@ -1117,17 +1140,27 @@ namespace Migracja
                         }
                         lstPointsToCheck.RemoveAll(x => true);
                     }
-                    else if (!parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].CanBeDelSimplified() )
+                    else if (!parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].CanBeDelSimplified())
                     {
                         //ustawaimy na nowo startPoint na pozycję z endPoint
                         startPoint = endPoint;
                         //przepisujemy punkty z listy Check do Delete
-                        foreach(GeoEdgePoint checkPoint in lstPointsToCheck)
+                        foreach (GeoEdgePoint checkPoint in lstPointsToCheck)
                         {
                             lstPointsToDelete.Add(checkPoint);
                         }
                         lstPointsToCheck.RemoveAll(x => true);
                         i++;
+                        //ustalamy, ze ten punkt przeszedł już upraszczanie fazy drugiej. i++ spowoduje, że endPoint 
+                        //nigdy nie będzie w tej pętli uznany za middle, więc jego typ musimy ustalić tutaj
+                        endPoint.SetCheckedPhase2();
+                        parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].SetCheckedPhase2();
+                    }                    
+                    //ustalamy, ze ten punkt przeszedł już upraszczanie fazy drugiej
+                    if (!middlePoint.IsCheckedPhase2())
+                    {
+                        middlePoint.SetCheckedPhase2();
+                        parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].SetCheckedPhase2();
                     }
                 }
                 DeletePoints(lstPointsToDelete, geoPointList);
@@ -1142,6 +1175,7 @@ namespace Migracja
                 {
                     foreach (GeoEdgePoint point in alstPointsToDelete)
                     {
+
                         parentMapFactory.pointAdvArr[point.pictX][point.pictY].DelSimplifyPhase2();
                     }
                     aGeoEdgePointList.RemoveAll(x => alstPointsToDelete.Contains(x));

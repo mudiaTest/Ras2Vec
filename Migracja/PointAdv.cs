@@ -13,6 +13,7 @@ namespace Migracja
         protected int fkdPointType; //Cst.c_geoPxSimple/c_geoPxStartEnd/c_geoPxDontDelete
         private bool DelSimplifiedPhase1 = false; // usunięty w 1 fazie upraszczania
         private bool DelSimplifiedPhase2 = false; // usunięty w 2 fazie upraszczania
+        private bool fcheckedPhase2 = false;
         internal List<GeoEdgePart> geoEdgePartList = new List<GeoEdgePart>();
  
         public PointAdv(GeoEdgePoint point)
@@ -38,6 +39,17 @@ namespace Migracja
         {
             Debug.Assert(fpoint!=null, "Podobiekt fpoint (GeoEdgePoint) nie został zainicjalizowany");
             return fkdPointType;
+        }
+
+        public void SetCheckedPhase2()
+        {
+            Debug.Assert(fcheckedPhase2 == false, String.Format("Próba ponownego uproszczenia geopunktu ({0},{1})", fpoint.fPictX, fpoint.fPictY));
+            fcheckedPhase2 = true;
+        }
+
+        public Boolean IsCheckedPhase2()
+        {
+            return fcheckedPhase2;
         }
 
         public bool IsDelSimplifiedPhase1()
@@ -69,7 +81,7 @@ namespace Migracja
 
         public void DelSimplifyPhase2()
         {
-            if (CanBeDelSimplified())
+            if (GetKdPointType() == Cst.c_geoPxSimple || GetKdPointType() == Cst.c_geoPxDonePhase2) 
             {
                 DelSimplifiedPhase2 = true;
             }

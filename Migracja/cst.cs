@@ -28,6 +28,7 @@ namespace Migracja
                                                */
         internal const int c_geoPxStartEnd = 2; //punkt będacy startem/końcem granicy
         internal const int c_geoPxDontDelete = 3; //punkt w najbliższej okolicy którego zachodzi zmiana grup
+        internal const int c_geoPxDonePhase2 = 4; //punkt był już poddany próbie upraszczania podczas fazy 2
 
         internal const int N = 1;
         internal const int S = 2;
