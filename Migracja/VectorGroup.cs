@@ -420,7 +420,6 @@ namespace Migracja
                         else
                             kdPxType = GetPxType(GetColorPx(aColorArr, aPoint, pxToTypeCheck1),
                                                  GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
-                                                 GetColorPx(aColorArr, aPoint, pxToTypeCheck2),
                                                  GetColorPx(aColorArr, aPoint, pxToTypeCheck3),
                                                  aColorArr[aPoint.X][aPoint.Y].group);
                     }
@@ -540,6 +539,10 @@ namespace Migracja
                     return (apx1.group == apx2.group || apx1.group == aEdgeGroup || apx2.group == aEdgeGroup);
                 }               
             }
+            private bool IsThaSameGroup(ColorPx apx1, ColorPx apx2, ColorPx apx3)
+            {
+                return IsThaSameGroup(apx1, apx2, -1) && IsThaSameGroup(apx2, apx3, -1);
+            }
             private int GetPxType(ColorPx apx1, ColorPx apx2, int aEdgeGroup)
             {
                 if (IsThaSameGroup(apx1, apx2, aEdgeGroup))
@@ -551,9 +554,9 @@ namespace Migracja
                     return Cst.c_geoPxDontDelete;
                 }
             }
-            private int GetPxType(ColorPx apx1, ColorPx apx2, ColorPx apx3, ColorPx apx4, int aEdgeGroup)
+            private int GetPxType(ColorPx apx1, ColorPx apx2, ColorPx apx3, int aEdgeGroup)
             {
-                if (IsThaSameGroup(apx1, apx2, aEdgeGroup) && IsThaSameGroup(apx3, apx4, aEdgeGroup))
+                if (IsThaSameGroup(apx1, apx2, apx3))
                 {
                     return Cst.c_geoPxSimple;
                 }
