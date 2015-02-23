@@ -68,7 +68,13 @@ Migracja/obj/x86/Debug/Ras2Vec.MainWindow.resources
 Migracja/obj/x86/Debug/Ras2Vec.Ras2Vec.Ras2Vec.Properties.Resources.resources
 Migracja/obj/x86/Debug/WindowsApplication.pdb
 Migracja/Ras2Vec.v11.suo
-*.cache
-*.manifest
-*.Cache
+.*.cache
+.*.manifest
+.*.Cache
 Migracja/_ReSharper.Migracja/*
+.*.exe
+bin/Debug/*.exe
+obj/x86/Debug/*.cache
+*.config
+*.config
+*.pdb
