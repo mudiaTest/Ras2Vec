@@ -18,30 +18,30 @@ namespace Migracja
         private void StartMovingPictures()
         {
             blMouseInMoveMode = true;
-            mouseDownSourcePBLeft = sourcePB.Left;
-            mouseDownSourcePBTop = sourcePB.Top;
-            mouseDownDesinationPBLeft = destinationPB.Left;
-            mouseDownDesinationPBTop = destinationPB.Top;
+            mouseDownSourcePBLeft = sourceVectPB.Left;
+            mouseDownSourcePBTop = sourceVectPB.Top;
+            mouseDownDesinationPBLeft = destinationVectPB.Left;
+            mouseDownDesinationPBTop = destinationVectPB.Top;
         }
 
         private void StopMovingPictures(MovedPicture picture)
         {
-            float dpShift = float.Parse(ScaleTB.Text);
+            float dpShift = float.Parse(txtScaleLvlVect.Text);
             switch (picture)
             {
                 //centrum oglądanego obszaru przesówamy o przesunięcię myszą z uwzględnieniem sklai
                 case MovedPicture.source:
                     {
-                        sourceImageCropper.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourcePB.Left) / dpShift);
-                        sourceImageCropper.centerY += (int)Math.Round((mouseDownSourcePBTop - sourcePB.Top) / dpShift);
+                        sourceImageCropper.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourceVectPB.Left) / dpShift);
+                        sourceImageCropper.centerY += (int)Math.Round((mouseDownSourcePBTop - sourceVectPB.Top) / dpShift);
                         desinationImageCrooper.centerX = sourceImageCropper.centerX;
                         desinationImageCrooper.centerY = sourceImageCropper.centerY;
                         break;
                     }
                 case MovedPicture.desination:
                     {
-                        desinationImageCrooper.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationPB.Left) / dpShift);
-                        desinationImageCrooper.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationPB.Top) / dpShift);
+                        desinationImageCrooper.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationVectPB.Left) / dpShift);
+                        desinationImageCrooper.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationVectPB.Top) / dpShift);
                         sourceImageCropper.centerX = desinationImageCrooper.centerX;
                         sourceImageCropper.centerY = desinationImageCrooper.centerY;
                         break;
@@ -60,10 +60,10 @@ namespace Migracja
                 horChange = e.X - startingX;
                 verChange = e.Y - startingY;
 
-                sourcePB.Left = Math.Min(0, Math.Max(sourcePB.Left + horChange, sourcePanel.Width - sourcePB.Image.Width));
-                sourcePB.Top = Math.Min(0, Math.Max(sourcePB.Top + verChange, sourcePanel.Height - sourcePB.Image.Height));
-                destinationPB.Left = Math.Min(0, Math.Max(destinationPB.Left + horChange, destinationPanel.Width - destinationPB.Image.Width));
-                destinationPB.Top = Math.Min(0, Math.Max(destinationPB.Top + verChange, destinationPanel.Height - destinationPB.Image.Height));
+                sourceVectPB.Left = Math.Min(0, Math.Max(sourceVectPB.Left + horChange, sourceVectPanel.Width - sourceVectPB.Image.Width));
+                sourceVectPB.Top = Math.Min(0, Math.Max(sourceVectPB.Top + verChange, sourceVectPanel.Height - sourceVectPB.Image.Height));
+                destinationVectPB.Left = Math.Min(0, Math.Max(destinationVectPB.Left + horChange, destinationVectPanel.Width - destinationVectPB.Image.Width));
+                destinationVectPB.Top = Math.Min(0, Math.Max(destinationVectPB.Top + verChange, destinationVectPanel.Height - destinationVectPB.Image.Height));
                 UpdateInfoBox("startingX: " + startingX.ToString() + "\n" +
                               "startingY: " + startingY.ToString() + "\n" +
                               "horChange: " + horChange.ToString() + "\n" +
@@ -80,9 +80,9 @@ namespace Migracja
         }
 
         private void SetScaleControlEnable(bool aEnabled){
-            ZoomInBtn.Enabled = aEnabled;
-            ZoomOutBtn.Enabled = aEnabled;
-            ScaleTrB.Enabled = aEnabled;
+            btnZoomInVect.Enabled = aEnabled;
+            btnZoomOutVect.Enabled = aEnabled;
+            trScaleVect.Enabled = aEnabled;
         }
 
         //metoda po wczytaniu pliku save inicjalizuje obraz źródłowy i czyści docelowy. 
@@ -91,8 +91,8 @@ namespace Migracja
         {
             sourceBmp = new Bitmap(aPath);
             destinationBmp = null;
-            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
+            sourceImageCropper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(destinationVectPanel.Width, destinationVectPanel.Height), mapFactory,
                                                             sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings,
                                                             sourceBmp);
         }
@@ -102,7 +102,7 @@ namespace Migracja
             if (File.Exists(aPath))
             {
                 PrepareSourceImage(aPath);
-                DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
+                DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
                 SetScaleControlEnable(true);
                 return true;
             }
@@ -143,26 +143,26 @@ namespace Migracja
             int scaledShiftY = (int)Math.Round(sourceImageCropper.centerY * aDpScale);
 
             //UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
-            sourcePB.Height = croppedSrcBmp.Height;
-            sourcePB.Width = croppedSrcBmp.Width;
-            sourcePB.Image = croppedSrcBmp;
+            sourceVectPB.Height = croppedSrcBmp.Height;
+            sourceVectPB.Width = croppedSrcBmp.Width;
+            sourceVectPB.Image = croppedSrcBmp;
             //UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
             //              "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
             /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
             sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);*/
-            sourcePB.Left = -sourcePanel.Width;
-            sourcePB.Top = -sourcePanel.Height;
+            sourceVectPB.Left = -sourceVectPanel.Width;
+            sourceVectPB.Top = -sourceVectPanel.Height;
             //UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
 
             if (croppedDstBmp != null)
             {
-                destinationPB.Height = croppedDstBmp.Height;
-                destinationPB.Width = croppedDstBmp.Width;
-                destinationPB.Image = croppedDstBmp;
+                destinationVectPB.Height = croppedDstBmp.Height;
+                destinationVectPB.Width = croppedDstBmp.Width;
+                destinationVectPB.Image = croppedDstBmp;
                 /*destinationPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
                 destinationPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
-                destinationPB.Left = -destinationPanel.Width;
-                destinationPB.Top = -destinationPanel.Height;
+                destinationVectPB.Left = -destinationVectPanel.Width;
+                destinationVectPB.Top = -destinationVectPanel.Height;
             }
             aFunct("Pozostałe:", false, dtTimePrv);
             return true;

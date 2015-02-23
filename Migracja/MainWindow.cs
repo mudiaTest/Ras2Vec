@@ -70,17 +70,17 @@ namespace Migracja
 
         private void btnMenuHide_Click(object sender, EventArgs e)
         {
-            if (panel4.Visible)
+            if (panelInputVect.Visible)
             {
-                panel4.Visible = false;
-                panel2.Width = 34;
-                btnMenuHide.Text = ">>";
+                panelInputVect.Visible = false;
+                panelMenuVect.Width = 34;
+                btnMenuVectHide.Text = ">>";
             }
             else
             {
-                panel4.Visible = true;
-                panel2.Width = 333;
-                btnMenuHide.Text = "<<";
+                panelInputVect.Visible = true;
+                panelMenuVect.Width = 333;
+                btnMenuVectHide.Text = "<<";
             }
 
         }
@@ -194,8 +194,8 @@ namespace Migracja
         }
 
         private void ScaleRefresh(){
-            ScaleTB.Text = windowSettings.dpScale.ToString();
-            ScaleTrB.Value = (int)windowSettings.dpScale;
+            txtScaleLvlVect.Text = windowSettings.dpScale.ToString();
+            trScaleVect.Value = (int)windowSettings.dpScale;
         }
 
         private void ZoomInBtn_Click(object sender, EventArgs e)
@@ -221,14 +221,14 @@ namespace Migracja
 
         private void panel7_SizeChanged(object sender, EventArgs e)
         {
-            int panelSize = (int)Math.Round((panel7.Height - 8 - 10 - 8) / 2.0);
-            sourcePanel.Height = panelSize;
-            destinationPanel.Height = panelSize;
-            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
+            int panelSize = (int)Math.Round((panelPictVect.Height - 8 - 10 - 8) / 2.0);
+            sourceVectPanel.Height = panelSize;
+            destinationVectPanel.Height = panelSize;
+            sourceImageCropper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp);
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
                                                             sourceImageCropper.centerX, sourceImageCropper.centerY,
                                                             windowSettings, sourceBmp);
-            DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
+            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
@@ -272,17 +272,17 @@ namespace Migracja
 
         private void ScaleTb_MouseUp(object sender, MouseEventArgs e)
         {
-            if (ScaleTrB.Value != windowSettings.dpScale)
+            if (trScaleVect.Value != windowSettings.dpScale)
             {
-                if (DrawCroppedScaledImage(ScaleTrB.Value, UpdateInfoBoxTime, windowSettings.dpScale))
-                windowSettings.dpScale = ScaleTrB.Value;
+                if (DrawCroppedScaledImage(trScaleVect.Value, UpdateInfoBoxTime, windowSettings.dpScale))
+                windowSettings.dpScale = trScaleVect.Value;
                 ScaleRefresh();
             }
         }
 
         private void ScaleTb_MouseMove(object sender, MouseEventArgs e)
         {
-            ScaleTB.Text = ScaleTrB.Value.ToString();
+            txtScaleLvlVect.Text = trScaleVect.Value.ToString();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -363,11 +363,11 @@ namespace Migracja
             r2vSettings.simplifyPhase3 = windowSettings.SimplifyPhase3();
 
             mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), mapFactory,
+            desinationImageCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
                                                             sourceImageCropper.centerX, sourceImageCropper.centerY,
                                                             windowSettings, sourceBmp);
 
-            DrawCroppedScaledImage(float.Parse(ScaleTB.Text), UpdateInfoBoxTime);
+            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
@@ -462,6 +462,11 @@ namespace Migracja
             
             UpdateInfoBoxTime( info );
           //  UpdateInfoBoxTime( mapFactory.colorArr[x][y]..ToString );
+        }
+
+        private void btnMainThread_Click_1(object sender, EventArgs e)
+        {
+
         }
 
 

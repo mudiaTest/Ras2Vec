@@ -44,8 +44,23 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
+            this.saveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.mainTab = new System.Windows.Forms.TabControl();
+            this.tabColor = new System.Windows.Forms.TabPage();
+            this.tabVect = new System.Windows.Forms.TabPage();
+            this.panelMainVect = new System.Windows.Forms.Panel();
+            this.panelPictVect = new System.Windows.Forms.Panel();
+            this.destinationVectPanel = new System.Windows.Forms.Panel();
+            this.destinationVectPB = new System.Windows.Forms.PictureBox();
+            this.sourceVectPanel = new System.Windows.Forms.Panel();
+            this.sourceVectPB = new System.Windows.Forms.PictureBox();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.trScaleVect = new System.Windows.Forms.TrackBar();
+            this.btnZoomOutVect = new System.Windows.Forms.Button();
+            this.txtScaleLvlVect = new System.Windows.Forms.TextBox();
+            this.btnZoomInVect = new System.Windows.Forms.Button();
+            this.panelMenuVect = new System.Windows.Forms.Panel();
+            this.panelInputVect = new System.Windows.Forms.Panel();
             this.panel9 = new System.Windows.Forms.Panel();
             this.panel8 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
@@ -73,35 +88,51 @@
             this.btnStopR2V = new System.Windows.Forms.Button();
             this.btnStartR2V = new System.Windows.Forms.Button();
             this.btnSeparateThread = new System.Windows.Forms.Button();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.btnMenuHide = new System.Windows.Forms.Button();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.ScaleTrB = new System.Windows.Forms.TrackBar();
-            this.ZoomOutBtn = new System.Windows.Forms.Button();
-            this.ScaleTB = new System.Windows.Forms.TextBox();
-            this.ZoomInBtn = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel7 = new System.Windows.Forms.Panel();
-            this.destinationPanel = new System.Windows.Forms.Panel();
-            this.destinationPB = new System.Windows.Forms.PictureBox();
-            this.sourcePanel = new System.Windows.Forms.Panel();
-            this.sourcePB = new System.Windows.Forms.PictureBox();
-            this.saveDialog = new System.Windows.Forms.SaveFileDialog();
+            this.panelMenuVectHide = new System.Windows.Forms.Panel();
+            this.btnMenuVectHide = new System.Windows.Forms.Button();
+            this.panel10 = new System.Windows.Forms.Panel();
+            this.panelV = new System.Windows.Forms.Panel();
+            this.panelC2 = new System.Windows.Forms.Panel();
+            this.pictureBoxC2 = new System.Windows.Forms.PictureBox();
+            this.panelC1 = new System.Windows.Forms.Panel();
+            this.pictureBoxC1 = new System.Windows.Forms.PictureBox();
+            this.panel14 = new System.Windows.Forms.Panel();
+            this.trScaleCol = new System.Windows.Forms.TrackBar();
+            this.btnZoomOutCol = new System.Windows.Forms.Button();
+            this.txtScaleLvlCol = new System.Windows.Forms.TextBox();
+            this.btnZoomInCol = new System.Windows.Forms.Button();
+            this.panel15 = new System.Windows.Forms.Panel();
+            this.panel16 = new System.Windows.Forms.Panel();
+            this.panel20 = new System.Windows.Forms.Panel();
+            this.button10 = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel4.SuspendLayout();
+            this.mainTab.SuspendLayout();
+            this.tabColor.SuspendLayout();
+            this.tabVect.SuspendLayout();
+            this.panelMainVect.SuspendLayout();
+            this.panelPictVect.SuspendLayout();
+            this.destinationVectPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.destinationVectPB)).BeginInit();
+            this.sourceVectPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sourceVectPB)).BeginInit();
+            this.panel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).BeginInit();
+            this.panelMenuVect.SuspendLayout();
+            this.panelInputVect.SuspendLayout();
             this.panel8.SuspendLayout();
             this.panel5.SuspendLayout();
             this.gbThreadChoice.SuspendLayout();
-            this.panel3.SuspendLayout();
-            this.panel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ScaleTrB)).BeginInit();
-            this.panel1.SuspendLayout();
-            this.panel7.SuspendLayout();
-            this.destinationPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
-            this.sourcePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
+            this.panelMenuVectHide.SuspendLayout();
+            this.panel10.SuspendLayout();
+            this.panelV.SuspendLayout();
+            this.panelC2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC2)).BeginInit();
+            this.panelC1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC1)).BeginInit();
+            this.panel14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).BeginInit();
+            this.panel15.SuspendLayout();
+            this.panel20.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -114,7 +145,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuMain.Size = new System.Drawing.Size(880, 24);
+            this.menuMain.Size = new System.Drawing.Size(909, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.menuMain_MouseClick);
             // 
@@ -213,37 +244,200 @@
             // 
             this.loadDialog.FileName = "openFileDialog1";
             // 
-            // panel2
+            // mainTab
             // 
-            this.panel2.Controls.Add(this.panel4);
-            this.panel2.Controls.Add(this.panel3);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(349, 514);
-            this.panel2.TabIndex = 12;
+            this.mainTab.Controls.Add(this.tabColor);
+            this.mainTab.Controls.Add(this.tabVect);
+            this.mainTab.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainTab.Location = new System.Drawing.Point(0, 24);
+            this.mainTab.Name = "mainTab";
+            this.mainTab.SelectedIndex = 0;
+            this.mainTab.Size = new System.Drawing.Size(909, 527);
+            this.mainTab.TabIndex = 1;
+            this.mainTab.Tag = "";
             // 
-            // panel4
+            // tabColor
             // 
-            this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.panel9);
-            this.panel4.Controls.Add(this.panel8);
-            this.panel4.Controls.Add(this.reloadSrcMapBtn);
-            this.panel4.Controls.Add(this.infoBox);
-            this.panel4.Controls.Add(this.panel5);
-            this.panel4.Controls.Add(this.loadSrcMapBtn);
-            this.panel4.Controls.Add(this.chkBoxTestOptions);
-            this.panel4.Controls.Add(this.btnRefreshResultImg);
-            this.panel4.Controls.Add(this.btnMainThread);
-            this.panel4.Controls.Add(this.gbThreadChoice);
-            this.panel4.Controls.Add(this.btnSeparateThread);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(34, 0);
-            this.panel4.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(315, 514);
-            this.panel4.TabIndex = 26;
-            this.panel4.Click += new System.EventHandler(this.w);
+            this.tabColor.Controls.Add(this.panel10);
+            this.tabColor.Location = new System.Drawing.Point(4, 22);
+            this.tabColor.Name = "tabColor";
+            this.tabColor.Padding = new System.Windows.Forms.Padding(3);
+            this.tabColor.Size = new System.Drawing.Size(901, 501);
+            this.tabColor.TabIndex = 0;
+            this.tabColor.Text = "Kolor";
+            this.tabColor.UseVisualStyleBackColor = true;
+            // 
+            // tabVect
+            // 
+            this.tabVect.Controls.Add(this.panelMainVect);
+            this.tabVect.Location = new System.Drawing.Point(4, 22);
+            this.tabVect.Name = "tabVect";
+            this.tabVect.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVect.Size = new System.Drawing.Size(901, 501);
+            this.tabVect.TabIndex = 1;
+            this.tabVect.Text = "Wektoryzacja";
+            this.tabVect.UseVisualStyleBackColor = true;
+            // 
+            // panelMainVect
+            // 
+            this.panelMainVect.Controls.Add(this.panelPictVect);
+            this.panelMainVect.Controls.Add(this.panel6);
+            this.panelMainVect.Controls.Add(this.panelMenuVect);
+            this.panelMainVect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelMainVect.Location = new System.Drawing.Point(3, 3);
+            this.panelMainVect.Name = "panelMainVect";
+            this.panelMainVect.Size = new System.Drawing.Size(895, 495);
+            this.panelMainVect.TabIndex = 12;
+            // 
+            // panelPictVect
+            // 
+            this.panelPictVect.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelPictVect.Controls.Add(this.destinationVectPanel);
+            this.panelPictVect.Controls.Add(this.sourceVectPanel);
+            this.panelPictVect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelPictVect.Location = new System.Drawing.Point(349, 38);
+            this.panelPictVect.Name = "panelPictVect";
+            this.panelPictVect.Size = new System.Drawing.Size(546, 457);
+            this.panelPictVect.TabIndex = 14;
+            this.panelPictVect.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
+            // 
+            // destinationVectPanel
+            // 
+            this.destinationVectPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.destinationVectPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.destinationVectPanel.Controls.Add(this.destinationVectPB);
+            this.destinationVectPanel.Location = new System.Drawing.Point(6, 230);
+            this.destinationVectPanel.Name = "destinationVectPanel";
+            this.destinationVectPanel.Padding = new System.Windows.Forms.Padding(5);
+            this.destinationVectPanel.Size = new System.Drawing.Size(532, 210);
+            this.destinationVectPanel.TabIndex = 22;
+            // 
+            // destinationVectPB
+            // 
+            this.destinationVectPB.Location = new System.Drawing.Point(0, 0);
+            this.destinationVectPB.Name = "destinationVectPB";
+            this.destinationVectPB.Size = new System.Drawing.Size(152, 98);
+            this.destinationVectPB.TabIndex = 14;
+            this.destinationVectPB.TabStop = false;
+            this.destinationVectPB.Click += new System.EventHandler(this.destinationPB_Click);
+            this.destinationVectPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
+            this.destinationVectPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
+            this.destinationVectPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
+            // 
+            // sourceVectPanel
+            // 
+            this.sourceVectPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sourceVectPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.sourceVectPanel.Controls.Add(this.sourceVectPB);
+            this.sourceVectPanel.Location = new System.Drawing.Point(6, 8);
+            this.sourceVectPanel.Name = "sourceVectPanel";
+            this.sourceVectPanel.Size = new System.Drawing.Size(532, 210);
+            this.sourceVectPanel.TabIndex = 19;
+            // 
+            // sourceVectPB
+            // 
+            this.sourceVectPB.Location = new System.Drawing.Point(0, 0);
+            this.sourceVectPB.Name = "sourceVectPB";
+            this.sourceVectPB.Size = new System.Drawing.Size(152, 98);
+            this.sourceVectPB.TabIndex = 14;
+            this.sourceVectPB.TabStop = false;
+            this.sourceVectPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseDown);
+            this.sourceVectPB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
+            this.sourceVectPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
+            this.sourceVectPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
+            // 
+            // panel6
+            // 
+            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.trScaleVect);
+            this.panel6.Controls.Add(this.btnZoomOutVect);
+            this.panel6.Controls.Add(this.txtScaleLvlVect);
+            this.panel6.Controls.Add(this.btnZoomInVect);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel6.Location = new System.Drawing.Point(349, 0);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(546, 38);
+            this.panel6.TabIndex = 13;
+            // 
+            // trScaleVect
+            // 
+            this.trScaleVect.Enabled = false;
+            this.trScaleVect.Location = new System.Drawing.Point(120, 3);
+            this.trScaleVect.Minimum = 1;
+            this.trScaleVect.Name = "trScaleVect";
+            this.trScaleVect.Size = new System.Drawing.Size(175, 45);
+            this.trScaleVect.TabIndex = 26;
+            this.trScaleVect.Value = 1;
+            this.trScaleVect.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseMove);
+            this.trScaleVect.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseUp);
+            // 
+            // btnZoomOutVect
+            // 
+            this.btnZoomOutVect.Enabled = false;
+            this.btnZoomOutVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomOutVect.Location = new System.Drawing.Point(86, 4);
+            this.btnZoomOutVect.Name = "btnZoomOutVect";
+            this.btnZoomOutVect.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomOutVect.TabIndex = 23;
+            this.btnZoomOutVect.Text = "-";
+            this.btnZoomOutVect.UseVisualStyleBackColor = true;
+            this.btnZoomOutVect.Click += new System.EventHandler(this.ZoomOutBtn_Click);
+            // 
+            // txtScaleLvlVect
+            // 
+            this.txtScaleLvlVect.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.txtScaleLvlVect.Location = new System.Drawing.Point(301, 7);
+            this.txtScaleLvlVect.Name = "txtScaleLvlVect";
+            this.txtScaleLvlVect.ReadOnly = true;
+            this.txtScaleLvlVect.Size = new System.Drawing.Size(27, 20);
+            this.txtScaleLvlVect.TabIndex = 22;
+            this.txtScaleLvlVect.Text = "1";
+            this.txtScaleLvlVect.Leave += new System.EventHandler(this.textBox1_Leave);
+            // 
+            // btnZoomInVect
+            // 
+            this.btnZoomInVect.Enabled = false;
+            this.btnZoomInVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomInVect.Location = new System.Drawing.Point(52, 4);
+            this.btnZoomInVect.Name = "btnZoomInVect";
+            this.btnZoomInVect.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomInVect.TabIndex = 22;
+            this.btnZoomInVect.Text = "+";
+            this.btnZoomInVect.UseVisualStyleBackColor = true;
+            this.btnZoomInVect.Click += new System.EventHandler(this.ZoomInBtn_Click);
+            // 
+            // panelMenuVect
+            // 
+            this.panelMenuVect.Controls.Add(this.panelInputVect);
+            this.panelMenuVect.Controls.Add(this.panelMenuVectHide);
+            this.panelMenuVect.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelMenuVect.Location = new System.Drawing.Point(0, 0);
+            this.panelMenuVect.Name = "panelMenuVect";
+            this.panelMenuVect.Size = new System.Drawing.Size(349, 495);
+            this.panelMenuVect.TabIndex = 12;
+            // 
+            // panelInputVect
+            // 
+            this.panelInputVect.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelInputVect.Controls.Add(this.panel9);
+            this.panelInputVect.Controls.Add(this.panel8);
+            this.panelInputVect.Controls.Add(this.reloadSrcMapBtn);
+            this.panelInputVect.Controls.Add(this.infoBox);
+            this.panelInputVect.Controls.Add(this.panel5);
+            this.panelInputVect.Controls.Add(this.loadSrcMapBtn);
+            this.panelInputVect.Controls.Add(this.chkBoxTestOptions);
+            this.panelInputVect.Controls.Add(this.btnRefreshResultImg);
+            this.panelInputVect.Controls.Add(this.btnMainThread);
+            this.panelInputVect.Controls.Add(this.gbThreadChoice);
+            this.panelInputVect.Controls.Add(this.btnSeparateThread);
+            this.panelInputVect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelInputVect.Location = new System.Drawing.Point(34, 0);
+            this.panelInputVect.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.panelInputVect.Name = "panelInputVect";
+            this.panelInputVect.Size = new System.Drawing.Size(315, 495);
+            this.panelInputVect.TabIndex = 26;
+            this.panelInputVect.Click += new System.EventHandler(this.w);
             // 
             // panel9
             // 
@@ -324,7 +518,7 @@
             | System.Windows.Forms.AnchorStyles.Left)));
             this.infoBox.Location = new System.Drawing.Point(8, 366);
             this.infoBox.Name = "infoBox";
-            this.infoBox.Size = new System.Drawing.Size(295, 135);
+            this.infoBox.Size = new System.Drawing.Size(295, 116);
             this.infoBox.TabIndex = 25;
             this.infoBox.Text = "";
             // 
@@ -543,188 +737,230 @@
             this.btnSeparateThread.UseVisualStyleBackColor = true;
             this.btnSeparateThread.Click += new System.EventHandler(this.btnSeparateThread_Click);
             // 
-            // panel3
+            // panelMenuVectHide
             // 
-            this.panel3.Controls.Add(this.btnMenuHide);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
-            this.panel3.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(34, 514);
-            this.panel3.TabIndex = 25;
+            this.panelMenuVectHide.Controls.Add(this.btnMenuVectHide);
+            this.panelMenuVectHide.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelMenuVectHide.Location = new System.Drawing.Point(0, 0);
+            this.panelMenuVectHide.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.panelMenuVectHide.Name = "panelMenuVectHide";
+            this.panelMenuVectHide.Size = new System.Drawing.Size(34, 495);
+            this.panelMenuVectHide.TabIndex = 25;
             // 
-            // btnMenuHide
+            // btnMenuVectHide
             // 
-            this.btnMenuHide.Dock = System.Windows.Forms.DockStyle.Left;
-            this.btnMenuHide.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnMenuHide.Location = new System.Drawing.Point(0, 0);
-            this.btnMenuHide.Margin = new System.Windows.Forms.Padding(0);
-            this.btnMenuHide.Name = "btnMenuHide";
-            this.btnMenuHide.Size = new System.Drawing.Size(30, 514);
-            this.btnMenuHide.TabIndex = 0;
-            this.btnMenuHide.Text = "<<";
-            this.btnMenuHide.UseVisualStyleBackColor = true;
-            this.btnMenuHide.Click += new System.EventHandler(this.btnMenuHide_Click);
+            this.btnMenuVectHide.Dock = System.Windows.Forms.DockStyle.Left;
+            this.btnMenuVectHide.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnMenuVectHide.Location = new System.Drawing.Point(0, 0);
+            this.btnMenuVectHide.Margin = new System.Windows.Forms.Padding(0);
+            this.btnMenuVectHide.Name = "btnMenuVectHide";
+            this.btnMenuVectHide.Size = new System.Drawing.Size(30, 495);
+            this.btnMenuVectHide.TabIndex = 0;
+            this.btnMenuVectHide.Text = "<<";
+            this.btnMenuVectHide.UseVisualStyleBackColor = true;
+            this.btnMenuVectHide.Click += new System.EventHandler(this.btnMenuHide_Click);
             // 
-            // panel6
+            // panel10
             // 
-            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel6.Controls.Add(this.ScaleTrB);
-            this.panel6.Controls.Add(this.ZoomOutBtn);
-            this.panel6.Controls.Add(this.ScaleTB);
-            this.panel6.Controls.Add(this.ZoomInBtn);
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel6.Location = new System.Drawing.Point(349, 0);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(531, 38);
-            this.panel6.TabIndex = 13;
+            this.panel10.Controls.Add(this.panelV);
+            this.panel10.Controls.Add(this.panel14);
+            this.panel10.Controls.Add(this.panel15);
+            this.panel10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel10.Location = new System.Drawing.Point(3, 3);
+            this.panel10.Name = "panel10";
+            this.panel10.Size = new System.Drawing.Size(895, 495);
+            this.panel10.TabIndex = 13;
             // 
-            // ScaleTrB
+            // panelV
             // 
-            this.ScaleTrB.Enabled = false;
-            this.ScaleTrB.Location = new System.Drawing.Point(120, 3);
-            this.ScaleTrB.Minimum = 1;
-            this.ScaleTrB.Name = "ScaleTrB";
-            this.ScaleTrB.Size = new System.Drawing.Size(175, 45);
-            this.ScaleTrB.TabIndex = 26;
-            this.ScaleTrB.Value = 1;
-            this.ScaleTrB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseMove);
-            this.ScaleTrB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseUp);
+            this.panelV.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelV.Controls.Add(this.panelC2);
+            this.panelV.Controls.Add(this.panelC1);
+            this.panelV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelV.Location = new System.Drawing.Point(349, 38);
+            this.panelV.Name = "panelV";
+            this.panelV.Size = new System.Drawing.Size(546, 457);
+            this.panelV.TabIndex = 14;
             // 
-            // ZoomOutBtn
+            // panelC2
             // 
-            this.ZoomOutBtn.Enabled = false;
-            this.ZoomOutBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.ZoomOutBtn.Location = new System.Drawing.Point(86, 4);
-            this.ZoomOutBtn.Name = "ZoomOutBtn";
-            this.ZoomOutBtn.Size = new System.Drawing.Size(28, 26);
-            this.ZoomOutBtn.TabIndex = 23;
-            this.ZoomOutBtn.Text = "-";
-            this.ZoomOutBtn.UseVisualStyleBackColor = true;
-            this.ZoomOutBtn.Click += new System.EventHandler(this.ZoomOutBtn_Click);
+            this.panelC2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelC2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelC2.Controls.Add(this.pictureBoxC2);
+            this.panelC2.Location = new System.Drawing.Point(6, 230);
+            this.panelC2.Name = "panelC2";
+            this.panelC2.Padding = new System.Windows.Forms.Padding(5);
+            this.panelC2.Size = new System.Drawing.Size(532, 210);
+            this.panelC2.TabIndex = 22;
             // 
-            // ScaleTB
+            // pictureBoxC2
             // 
-            this.ScaleTB.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ScaleTB.Location = new System.Drawing.Point(301, 7);
-            this.ScaleTB.Name = "ScaleTB";
-            this.ScaleTB.ReadOnly = true;
-            this.ScaleTB.Size = new System.Drawing.Size(27, 20);
-            this.ScaleTB.TabIndex = 22;
-            this.ScaleTB.Text = "1";
-            this.ScaleTB.Leave += new System.EventHandler(this.textBox1_Leave);
+            this.pictureBoxC2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxC2.Name = "pictureBoxC2";
+            this.pictureBoxC2.Size = new System.Drawing.Size(152, 98);
+            this.pictureBoxC2.TabIndex = 14;
+            this.pictureBoxC2.TabStop = false;
             // 
-            // ZoomInBtn
+            // panelC1
             // 
-            this.ZoomInBtn.Enabled = false;
-            this.ZoomInBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.ZoomInBtn.Location = new System.Drawing.Point(52, 4);
-            this.ZoomInBtn.Name = "ZoomInBtn";
-            this.ZoomInBtn.Size = new System.Drawing.Size(28, 26);
-            this.ZoomInBtn.TabIndex = 22;
-            this.ZoomInBtn.Text = "+";
-            this.ZoomInBtn.UseVisualStyleBackColor = true;
-            this.ZoomInBtn.Click += new System.EventHandler(this.ZoomInBtn_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.panel7);
-            this.panel1.Controls.Add(this.panel6);
-            this.panel1.Controls.Add(this.panel2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 24);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(880, 514);
-            this.panel1.TabIndex = 11;
-            // 
-            // panel7
-            // 
-            this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel7.Controls.Add(this.destinationPanel);
-            this.panel7.Controls.Add(this.sourcePanel);
-            this.panel7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel7.Location = new System.Drawing.Point(349, 38);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(531, 476);
-            this.panel7.TabIndex = 14;
-            this.panel7.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
-            // 
-            // destinationPanel
-            // 
-            this.destinationPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Location = new System.Drawing.Point(6, 240);
-            this.destinationPanel.Name = "destinationPanel";
-            this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.destinationPanel.Size = new System.Drawing.Size(517, 210);
-            this.destinationPanel.TabIndex = 22;
-            // 
-            // destinationPB
-            // 
-            this.destinationPB.Location = new System.Drawing.Point(0, 0);
-            this.destinationPB.Name = "destinationPB";
-            this.destinationPB.Size = new System.Drawing.Size(152, 98);
-            this.destinationPB.TabIndex = 14;
-            this.destinationPB.TabStop = false;
-            this.destinationPB.Click += new System.EventHandler(this.destinationPB_Click);
-            this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
-            this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
-            this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
-            // 
-            // sourcePanel
-            // 
-            this.sourcePanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.panelC1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.sourcePanel.Controls.Add(this.sourcePB);
-            this.sourcePanel.Location = new System.Drawing.Point(6, 8);
-            this.sourcePanel.Name = "sourcePanel";
-            this.sourcePanel.Size = new System.Drawing.Size(517, 210);
-            this.sourcePanel.TabIndex = 19;
+            this.panelC1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelC1.Controls.Add(this.pictureBoxC1);
+            this.panelC1.Location = new System.Drawing.Point(6, 8);
+            this.panelC1.Name = "panelC1";
+            this.panelC1.Size = new System.Drawing.Size(532, 210);
+            this.panelC1.TabIndex = 19;
             // 
-            // sourcePB
+            // pictureBoxC1
             // 
-            this.sourcePB.Location = new System.Drawing.Point(0, 0);
-            this.sourcePB.Name = "sourcePB";
-            this.sourcePB.Size = new System.Drawing.Size(152, 98);
-            this.sourcePB.TabIndex = 14;
-            this.sourcePB.TabStop = false;
-            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseDown);
-            this.sourcePB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
-            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
-            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
+            this.pictureBoxC1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxC1.Name = "pictureBoxC1";
+            this.pictureBoxC1.Size = new System.Drawing.Size(152, 98);
+            this.pictureBoxC1.TabIndex = 14;
+            this.pictureBoxC1.TabStop = false;
+            // 
+            // panel14
+            // 
+            this.panel14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel14.Controls.Add(this.trScaleCol);
+            this.panel14.Controls.Add(this.btnZoomOutCol);
+            this.panel14.Controls.Add(this.txtScaleLvlCol);
+            this.panel14.Controls.Add(this.btnZoomInCol);
+            this.panel14.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel14.Location = new System.Drawing.Point(349, 0);
+            this.panel14.Name = "panel14";
+            this.panel14.Size = new System.Drawing.Size(546, 38);
+            this.panel14.TabIndex = 13;
+            // 
+            // trScaleCol
+            // 
+            this.trScaleCol.Enabled = false;
+            this.trScaleCol.Location = new System.Drawing.Point(120, 3);
+            this.trScaleCol.Minimum = 1;
+            this.trScaleCol.Name = "trScaleCol";
+            this.trScaleCol.Size = new System.Drawing.Size(175, 45);
+            this.trScaleCol.TabIndex = 26;
+            this.trScaleCol.Value = 1;
+            // 
+            // btnZoomOutCol
+            // 
+            this.btnZoomOutCol.Enabled = false;
+            this.btnZoomOutCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomOutCol.Location = new System.Drawing.Point(86, 4);
+            this.btnZoomOutCol.Name = "btnZoomOutCol";
+            this.btnZoomOutCol.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomOutCol.TabIndex = 23;
+            this.btnZoomOutCol.Text = "-";
+            this.btnZoomOutCol.UseVisualStyleBackColor = true;
+            // 
+            // txtScaleLvlCol
+            // 
+            this.txtScaleLvlCol.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.txtScaleLvlCol.Location = new System.Drawing.Point(301, 7);
+            this.txtScaleLvlCol.Name = "txtScaleLvlCol";
+            this.txtScaleLvlCol.ReadOnly = true;
+            this.txtScaleLvlCol.Size = new System.Drawing.Size(27, 20);
+            this.txtScaleLvlCol.TabIndex = 22;
+            this.txtScaleLvlCol.Text = "1";
+            // 
+            // btnZoomInCol
+            // 
+            this.btnZoomInCol.Enabled = false;
+            this.btnZoomInCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomInCol.Location = new System.Drawing.Point(52, 4);
+            this.btnZoomInCol.Name = "btnZoomInCol";
+            this.btnZoomInCol.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomInCol.TabIndex = 22;
+            this.btnZoomInCol.Text = "+";
+            this.btnZoomInCol.UseVisualStyleBackColor = true;
+            // 
+            // panel15
+            // 
+            this.panel15.Controls.Add(this.panel16);
+            this.panel15.Controls.Add(this.panel20);
+            this.panel15.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel15.Location = new System.Drawing.Point(0, 0);
+            this.panel15.Name = "panel15";
+            this.panel15.Size = new System.Drawing.Size(349, 495);
+            this.panel15.TabIndex = 12;
+            // 
+            // panel16
+            // 
+            this.panel16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel16.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel16.Location = new System.Drawing.Point(34, 0);
+            this.panel16.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.panel16.Name = "panel16";
+            this.panel16.Size = new System.Drawing.Size(315, 495);
+            this.panel16.TabIndex = 26;
+            // 
+            // panel20
+            // 
+            this.panel20.Controls.Add(this.button10);
+            this.panel20.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel20.Location = new System.Drawing.Point(0, 0);
+            this.panel20.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.panel20.Name = "panel20";
+            this.panel20.Size = new System.Drawing.Size(34, 495);
+            this.panel20.TabIndex = 25;
+            // 
+            // button10
+            // 
+            this.button10.Dock = System.Windows.Forms.DockStyle.Left;
+            this.button10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.button10.Location = new System.Drawing.Point(0, 0);
+            this.button10.Margin = new System.Windows.Forms.Padding(0);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(30, 495);
+            this.button10.TabIndex = 0;
+            this.button10.Text = "<<";
+            this.button10.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(880, 538);
-            this.Controls.Add(this.panel1);
+            this.ClientSize = new System.Drawing.Size(909, 551);
+            this.Controls.Add(this.mainTab);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;
             this.Name = "MainWindow";
             this.Text = "Form1";
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel4.ResumeLayout(false);
+            this.mainTab.ResumeLayout(false);
+            this.tabColor.ResumeLayout(false);
+            this.tabVect.ResumeLayout(false);
+            this.panelMainVect.ResumeLayout(false);
+            this.panelPictVect.ResumeLayout(false);
+            this.destinationVectPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.destinationVectPB)).EndInit();
+            this.sourceVectPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.sourceVectPB)).EndInit();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).EndInit();
+            this.panelMenuVect.ResumeLayout(false);
+            this.panelInputVect.ResumeLayout(false);
             this.panel8.ResumeLayout(false);
             this.panel8.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             this.gbThreadChoice.ResumeLayout(false);
             this.gbThreadChoice.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ScaleTrB)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel7.ResumeLayout(false);
-            this.destinationPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
-            this.sourcePanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
+            this.panelMenuVectHide.ResumeLayout(false);
+            this.panel10.ResumeLayout(false);
+            this.panelV.ResumeLayout(false);
+            this.panelC2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC2)).EndInit();
+            this.panelC1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC1)).EndInit();
+            this.panel14.ResumeLayout(false);
+            this.panel14.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).EndInit();
+            this.panel15.ResumeLayout(false);
+            this.panel20.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -746,8 +982,31 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.OpenFileDialog loadDialog;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.SaveFileDialog saveDialog;
+        private System.Windows.Forms.ToolStripMenuItem loadLastSaveToolStripMenuItem;
+        private System.Windows.Forms.TabControl mainTab;
+        private System.Windows.Forms.TabPage tabColor;
+        private System.Windows.Forms.TabPage tabVect;
+        private System.Windows.Forms.Panel panelMainVect;
+        private System.Windows.Forms.Panel panelPictVect;
+        private System.Windows.Forms.Panel destinationVectPanel;
+        private System.Windows.Forms.PictureBox destinationVectPB;
+        private System.Windows.Forms.Panel sourceVectPanel;
+        private System.Windows.Forms.PictureBox sourceVectPB;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.TrackBar trScaleVect;
+        private System.Windows.Forms.Button btnZoomOutVect;
+        private System.Windows.Forms.TextBox txtScaleLvlVect;
+        private System.Windows.Forms.Button btnZoomInVect;
+        private System.Windows.Forms.Panel panelMenuVect;
+        private System.Windows.Forms.Panel panelInputVect;
+        private System.Windows.Forms.Panel panel9;
+        private System.Windows.Forms.Panel panel8;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.MaskedTextBox edtSliceHeight;
+        private System.Windows.Forms.MaskedTextBox edtSliceWidth;
+        private System.Windows.Forms.Button reloadSrcMapBtn;
         private System.Windows.Forms.RichTextBox infoBox;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Label label1;
@@ -762,34 +1021,29 @@
         private System.Windows.Forms.CheckedListBox chkBoxTestOptions;
         private System.Windows.Forms.Button btnRefreshResultImg;
         private System.Windows.Forms.Button btnMainThread;
-        private System.Windows.Forms.Button btnStopR2V;
         private System.Windows.Forms.GroupBox gbThreadChoice;
         private System.Windows.Forms.RadioButton rbSeparateThread;
         private System.Windows.Forms.RadioButton rbMainThread;
+        private System.Windows.Forms.Button btnStopR2V;
         private System.Windows.Forms.Button btnStartR2V;
         private System.Windows.Forms.Button btnSeparateThread;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Button btnMenuHide;
-        private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.TrackBar ScaleTrB;
-        private System.Windows.Forms.Button ZoomOutBtn;
-        private System.Windows.Forms.TextBox ScaleTB;
-        private System.Windows.Forms.Button ZoomInBtn;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel7;
-        private System.Windows.Forms.Panel destinationPanel;
-        private System.Windows.Forms.PictureBox destinationPB;
-        private System.Windows.Forms.Panel sourcePanel;
-        private System.Windows.Forms.PictureBox sourcePB;
-        private System.Windows.Forms.SaveFileDialog saveDialog;
-        private System.Windows.Forms.Button reloadSrcMapBtn;
-        private System.Windows.Forms.ToolStripMenuItem loadLastSaveToolStripMenuItem;
-        private System.Windows.Forms.Panel panel8;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.MaskedTextBox edtSliceHeight;
-        private System.Windows.Forms.MaskedTextBox edtSliceWidth;
-        private System.Windows.Forms.Panel panel9;
+        private System.Windows.Forms.Panel panelMenuVectHide;
+        private System.Windows.Forms.Button btnMenuVectHide;
+        private System.Windows.Forms.Panel panel10;
+        private System.Windows.Forms.Panel panelV;
+        private System.Windows.Forms.Panel panelC2;
+        private System.Windows.Forms.PictureBox pictureBoxC2;
+        private System.Windows.Forms.Panel panelC1;
+        private System.Windows.Forms.PictureBox pictureBoxC1;
+        private System.Windows.Forms.Panel panel14;
+        private System.Windows.Forms.TrackBar trScaleCol;
+        private System.Windows.Forms.Button btnZoomOutCol;
+        private System.Windows.Forms.TextBox txtScaleLvlCol;
+        private System.Windows.Forms.Button btnZoomInCol;
+        private System.Windows.Forms.Panel panel15;
+        private System.Windows.Forms.Panel panel16;
+        private System.Windows.Forms.Panel panel20;
+        private System.Windows.Forms.Button button10;
     }
 }
 

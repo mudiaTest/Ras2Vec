@@ -411,7 +411,7 @@ namespace Migracja
                     //Może się zdażyć, że punkt graniczy krawędzią obrazka. W takim przypadku bedzie on uznany za punkt nie do usunięcia
                     else
                     {
-                        if ((pxToTypeCheck1 == Cst.W && pxToTypeCheck2 == Cst.NW && pxToTypeCheck3 == Cst.N && (aPoint.X ==0                   || aPoint.Y==0)                      ) ||
+                        if ((pxToTypeCheck1 == Cst.W && pxToTypeCheck2 == Cst.NW && pxToTypeCheck3 == Cst.N && (aPoint.X ==0                   || aPoint.Y == 0)                    ) ||
                             (pxToTypeCheck1 == Cst.N && pxToTypeCheck2 == Cst.NE && pxToTypeCheck3 == Cst.E && (aPoint.X == aColorArr.Length-1 || aPoint.Y == 0)                    ) ||
                             (pxToTypeCheck1 == Cst.E && pxToTypeCheck2 == Cst.SE && pxToTypeCheck3 == Cst.S && (aPoint.X == aColorArr.Length-1 || aPoint.Y == aColorArr[0].Length-1)) ||
                             (pxToTypeCheck1 == Cst.S && pxToTypeCheck2 == Cst.SW && pxToTypeCheck3 == Cst.W && (aPoint.X == 0                  || aPoint.Y == aColorArr[0].Length-1))
