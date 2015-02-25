@@ -47,6 +47,21 @@
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
             this.mainTab = new System.Windows.Forms.TabControl();
             this.tabColor = new System.Windows.Forms.TabPage();
+            this.panel10 = new System.Windows.Forms.Panel();
+            this.panelV = new System.Windows.Forms.Panel();
+            this.destinationColPanel = new System.Windows.Forms.Panel();
+            this.destinationColPB = new System.Windows.Forms.PictureBox();
+            this.sourceColPanel = new System.Windows.Forms.Panel();
+            this.sourceColPB = new System.Windows.Forms.PictureBox();
+            this.panel14 = new System.Windows.Forms.Panel();
+            this.trScaleCol = new System.Windows.Forms.TrackBar();
+            this.btnZoomOutCol = new System.Windows.Forms.Button();
+            this.txtScaleLvlCol = new System.Windows.Forms.TextBox();
+            this.btnZoomInCol = new System.Windows.Forms.Button();
+            this.panel15 = new System.Windows.Forms.Panel();
+            this.panel16 = new System.Windows.Forms.Panel();
+            this.panel20 = new System.Windows.Forms.Panel();
+            this.button10 = new System.Windows.Forms.Button();
             this.tabVect = new System.Windows.Forms.TabPage();
             this.panelMainVect = new System.Windows.Forms.Panel();
             this.panelPictVect = new System.Windows.Forms.Panel();
@@ -90,24 +105,23 @@
             this.btnSeparateThread = new System.Windows.Forms.Button();
             this.panelMenuVectHide = new System.Windows.Forms.Panel();
             this.btnMenuVectHide = new System.Windows.Forms.Button();
-            this.panel10 = new System.Windows.Forms.Panel();
-            this.panelV = new System.Windows.Forms.Panel();
-            this.panelC2 = new System.Windows.Forms.Panel();
-            this.pictureBoxC2 = new System.Windows.Forms.PictureBox();
-            this.panelC1 = new System.Windows.Forms.Panel();
-            this.pictureBoxC1 = new System.Windows.Forms.PictureBox();
-            this.panel14 = new System.Windows.Forms.Panel();
-            this.trScaleCol = new System.Windows.Forms.TrackBar();
-            this.btnZoomOutCol = new System.Windows.Forms.Button();
-            this.txtScaleLvlCol = new System.Windows.Forms.TextBox();
-            this.btnZoomInCol = new System.Windows.Forms.Button();
-            this.panel15 = new System.Windows.Forms.Panel();
-            this.panel16 = new System.Windows.Forms.Panel();
-            this.panel20 = new System.Windows.Forms.Panel();
-            this.button10 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             this.mainTab.SuspendLayout();
             this.tabColor.SuspendLayout();
+            this.panel10.SuspendLayout();
+            this.panelV.SuspendLayout();
+            this.destinationColPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.destinationColPB)).BeginInit();
+            this.sourceColPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sourceColPB)).BeginInit();
+            this.panel14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).BeginInit();
+            this.panel15.SuspendLayout();
+            this.panel16.SuspendLayout();
+            this.panel20.SuspendLayout();
             this.tabVect.SuspendLayout();
             this.panelMainVect.SuspendLayout();
             this.panelPictVect.SuspendLayout();
@@ -123,16 +137,6 @@
             this.panel5.SuspendLayout();
             this.gbThreadChoice.SuspendLayout();
             this.panelMenuVectHide.SuspendLayout();
-            this.panel10.SuspendLayout();
-            this.panelV.SuspendLayout();
-            this.panelC2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC2)).BeginInit();
-            this.panelC1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC1)).BeginInit();
-            this.panel14.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).BeginInit();
-            this.panel15.SuspendLayout();
-            this.panel20.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -266,6 +270,168 @@
             this.tabColor.TabIndex = 0;
             this.tabColor.Text = "Kolor";
             this.tabColor.UseVisualStyleBackColor = true;
+            // 
+            // panel10
+            // 
+            this.panel10.Controls.Add(this.panelV);
+            this.panel10.Controls.Add(this.panel14);
+            this.panel10.Controls.Add(this.panel15);
+            this.panel10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel10.Location = new System.Drawing.Point(3, 3);
+            this.panel10.Name = "panel10";
+            this.panel10.Size = new System.Drawing.Size(895, 495);
+            this.panel10.TabIndex = 13;
+            // 
+            // panelV
+            // 
+            this.panelV.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelV.Controls.Add(this.destinationColPanel);
+            this.panelV.Controls.Add(this.sourceColPanel);
+            this.panelV.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelV.Location = new System.Drawing.Point(349, 38);
+            this.panelV.Name = "panelV";
+            this.panelV.Size = new System.Drawing.Size(546, 457);
+            this.panelV.TabIndex = 14;
+            // 
+            // destinationColPanel
+            // 
+            this.destinationColPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.destinationColPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.destinationColPanel.Controls.Add(this.destinationColPB);
+            this.destinationColPanel.Location = new System.Drawing.Point(6, 230);
+            this.destinationColPanel.Name = "destinationColPanel";
+            this.destinationColPanel.Padding = new System.Windows.Forms.Padding(5);
+            this.destinationColPanel.Size = new System.Drawing.Size(532, 210);
+            this.destinationColPanel.TabIndex = 22;
+            this.destinationColPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.panelC2_Paint);
+            // 
+            // destinationColPB
+            // 
+            this.destinationColPB.Location = new System.Drawing.Point(0, 0);
+            this.destinationColPB.Name = "destinationColPB";
+            this.destinationColPB.Size = new System.Drawing.Size(152, 98);
+            this.destinationColPB.TabIndex = 14;
+            this.destinationColPB.TabStop = false;
+            // 
+            // sourceColPanel
+            // 
+            this.sourceColPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sourceColPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.sourceColPanel.Controls.Add(this.sourceColPB);
+            this.sourceColPanel.Location = new System.Drawing.Point(6, 8);
+            this.sourceColPanel.Name = "sourceColPanel";
+            this.sourceColPanel.Size = new System.Drawing.Size(532, 210);
+            this.sourceColPanel.TabIndex = 19;
+            // 
+            // sourceColPB
+            // 
+            this.sourceColPB.Location = new System.Drawing.Point(0, 0);
+            this.sourceColPB.Name = "sourceColPB";
+            this.sourceColPB.Size = new System.Drawing.Size(152, 98);
+            this.sourceColPB.TabIndex = 14;
+            this.sourceColPB.TabStop = false;
+            // 
+            // panel14
+            // 
+            this.panel14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel14.Controls.Add(this.trScaleCol);
+            this.panel14.Controls.Add(this.btnZoomOutCol);
+            this.panel14.Controls.Add(this.txtScaleLvlCol);
+            this.panel14.Controls.Add(this.btnZoomInCol);
+            this.panel14.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel14.Location = new System.Drawing.Point(349, 0);
+            this.panel14.Name = "panel14";
+            this.panel14.Size = new System.Drawing.Size(546, 38);
+            this.panel14.TabIndex = 13;
+            // 
+            // trScaleCol
+            // 
+            this.trScaleCol.Enabled = false;
+            this.trScaleCol.Location = new System.Drawing.Point(120, 3);
+            this.trScaleCol.Minimum = 1;
+            this.trScaleCol.Name = "trScaleCol";
+            this.trScaleCol.Size = new System.Drawing.Size(175, 45);
+            this.trScaleCol.TabIndex = 26;
+            this.trScaleCol.Value = 1;
+            // 
+            // btnZoomOutCol
+            // 
+            this.btnZoomOutCol.Enabled = false;
+            this.btnZoomOutCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomOutCol.Location = new System.Drawing.Point(86, 4);
+            this.btnZoomOutCol.Name = "btnZoomOutCol";
+            this.btnZoomOutCol.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomOutCol.TabIndex = 23;
+            this.btnZoomOutCol.Text = "-";
+            this.btnZoomOutCol.UseVisualStyleBackColor = true;
+            // 
+            // txtScaleLvlCol
+            // 
+            this.txtScaleLvlCol.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.txtScaleLvlCol.Location = new System.Drawing.Point(301, 7);
+            this.txtScaleLvlCol.Name = "txtScaleLvlCol";
+            this.txtScaleLvlCol.ReadOnly = true;
+            this.txtScaleLvlCol.Size = new System.Drawing.Size(27, 20);
+            this.txtScaleLvlCol.TabIndex = 22;
+            this.txtScaleLvlCol.Text = "1";
+            // 
+            // btnZoomInCol
+            // 
+            this.btnZoomInCol.Enabled = false;
+            this.btnZoomInCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomInCol.Location = new System.Drawing.Point(52, 4);
+            this.btnZoomInCol.Name = "btnZoomInCol";
+            this.btnZoomInCol.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomInCol.TabIndex = 22;
+            this.btnZoomInCol.Text = "+";
+            this.btnZoomInCol.UseVisualStyleBackColor = true;
+            // 
+            // panel15
+            // 
+            this.panel15.Controls.Add(this.panel16);
+            this.panel15.Controls.Add(this.panel20);
+            this.panel15.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel15.Location = new System.Drawing.Point(0, 0);
+            this.panel15.Name = "panel15";
+            this.panel15.Size = new System.Drawing.Size(349, 495);
+            this.panel15.TabIndex = 12;
+            // 
+            // panel16
+            // 
+            this.panel16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel16.Controls.Add(this.button1);
+            this.panel16.Controls.Add(this.button2);
+            this.panel16.Controls.Add(this.button3);
+            this.panel16.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel16.Location = new System.Drawing.Point(34, 0);
+            this.panel16.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.panel16.Name = "panel16";
+            this.panel16.Size = new System.Drawing.Size(315, 495);
+            this.panel16.TabIndex = 26;
+            this.panel16.Paint += new System.Windows.Forms.PaintEventHandler(this.panel16_Paint);
+            // 
+            // panel20
+            // 
+            this.panel20.Controls.Add(this.button10);
+            this.panel20.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel20.Location = new System.Drawing.Point(0, 0);
+            this.panel20.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.panel20.Name = "panel20";
+            this.panel20.Size = new System.Drawing.Size(34, 495);
+            this.panel20.TabIndex = 25;
+            // 
+            // button10
+            // 
+            this.button10.Dock = System.Windows.Forms.DockStyle.Left;
+            this.button10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.button10.Location = new System.Drawing.Point(0, 0);
+            this.button10.Margin = new System.Windows.Forms.Padding(0);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(30, 495);
+            this.button10.TabIndex = 0;
+            this.button10.Text = "<<";
+            this.button10.UseVisualStyleBackColor = true;
             // 
             // tabVect
             // 
@@ -504,6 +670,7 @@
             // 
             // reloadSrcMapBtn
             // 
+            this.reloadSrcMapBtn.Enabled = false;
             this.reloadSrcMapBtn.Location = new System.Drawing.Point(193, 318);
             this.reloadSrcMapBtn.Name = "reloadSrcMapBtn";
             this.reloadSrcMapBtn.Size = new System.Drawing.Size(112, 23);
@@ -624,6 +791,7 @@
             // 
             // loadSrcMapBtn
             // 
+            this.loadSrcMapBtn.Enabled = false;
             this.loadSrcMapBtn.Location = new System.Drawing.Point(89, 318);
             this.loadSrcMapBtn.Name = "loadSrcMapBtn";
             this.loadSrcMapBtn.Size = new System.Drawing.Size(98, 23);
@@ -760,162 +928,35 @@
             this.btnMenuVectHide.UseVisualStyleBackColor = true;
             this.btnMenuVectHide.Click += new System.EventHandler(this.btnMenuHide_Click);
             // 
-            // panel10
+            // button1
             // 
-            this.panel10.Controls.Add(this.panelV);
-            this.panel10.Controls.Add(this.panel14);
-            this.panel10.Controls.Add(this.panel15);
-            this.panel10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel10.Location = new System.Drawing.Point(3, 3);
-            this.panel10.Name = "panel10";
-            this.panel10.Size = new System.Drawing.Size(895, 495);
-            this.panel10.TabIndex = 13;
+            this.button1.Location = new System.Drawing.Point(193, 235);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(112, 23);
+            this.button1.TabIndex = 29;
+            this.button1.Text = "Reload source map";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
-            // panelV
+            // button2
             // 
-            this.panelV.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelV.Controls.Add(this.panelC2);
-            this.panelV.Controls.Add(this.panelC1);
-            this.panelV.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelV.Location = new System.Drawing.Point(349, 38);
-            this.panelV.Name = "panelV";
-            this.panelV.Size = new System.Drawing.Size(546, 457);
-            this.panelV.TabIndex = 14;
+            this.button2.Location = new System.Drawing.Point(89, 235);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(98, 23);
+            this.button2.TabIndex = 27;
+            this.button2.Text = "Load source map";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
-            // panelC2
+            // button3
             // 
-            this.panelC2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelC2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelC2.Controls.Add(this.pictureBoxC2);
-            this.panelC2.Location = new System.Drawing.Point(6, 230);
-            this.panelC2.Name = "panelC2";
-            this.panelC2.Padding = new System.Windows.Forms.Padding(5);
-            this.panelC2.Size = new System.Drawing.Size(532, 210);
-            this.panelC2.TabIndex = 22;
-            // 
-            // pictureBoxC2
-            // 
-            this.pictureBoxC2.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxC2.Name = "pictureBoxC2";
-            this.pictureBoxC2.Size = new System.Drawing.Size(152, 98);
-            this.pictureBoxC2.TabIndex = 14;
-            this.pictureBoxC2.TabStop = false;
-            // 
-            // panelC1
-            // 
-            this.panelC1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelC1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelC1.Controls.Add(this.pictureBoxC1);
-            this.panelC1.Location = new System.Drawing.Point(6, 8);
-            this.panelC1.Name = "panelC1";
-            this.panelC1.Size = new System.Drawing.Size(532, 210);
-            this.panelC1.TabIndex = 19;
-            // 
-            // pictureBoxC1
-            // 
-            this.pictureBoxC1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxC1.Name = "pictureBoxC1";
-            this.pictureBoxC1.Size = new System.Drawing.Size(152, 98);
-            this.pictureBoxC1.TabIndex = 14;
-            this.pictureBoxC1.TabStop = false;
-            // 
-            // panel14
-            // 
-            this.panel14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel14.Controls.Add(this.trScaleCol);
-            this.panel14.Controls.Add(this.btnZoomOutCol);
-            this.panel14.Controls.Add(this.txtScaleLvlCol);
-            this.panel14.Controls.Add(this.btnZoomInCol);
-            this.panel14.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel14.Location = new System.Drawing.Point(349, 0);
-            this.panel14.Name = "panel14";
-            this.panel14.Size = new System.Drawing.Size(546, 38);
-            this.panel14.TabIndex = 13;
-            // 
-            // trScaleCol
-            // 
-            this.trScaleCol.Enabled = false;
-            this.trScaleCol.Location = new System.Drawing.Point(120, 3);
-            this.trScaleCol.Minimum = 1;
-            this.trScaleCol.Name = "trScaleCol";
-            this.trScaleCol.Size = new System.Drawing.Size(175, 45);
-            this.trScaleCol.TabIndex = 26;
-            this.trScaleCol.Value = 1;
-            // 
-            // btnZoomOutCol
-            // 
-            this.btnZoomOutCol.Enabled = false;
-            this.btnZoomOutCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnZoomOutCol.Location = new System.Drawing.Point(86, 4);
-            this.btnZoomOutCol.Name = "btnZoomOutCol";
-            this.btnZoomOutCol.Size = new System.Drawing.Size(28, 26);
-            this.btnZoomOutCol.TabIndex = 23;
-            this.btnZoomOutCol.Text = "-";
-            this.btnZoomOutCol.UseVisualStyleBackColor = true;
-            // 
-            // txtScaleLvlCol
-            // 
-            this.txtScaleLvlCol.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.txtScaleLvlCol.Location = new System.Drawing.Point(301, 7);
-            this.txtScaleLvlCol.Name = "txtScaleLvlCol";
-            this.txtScaleLvlCol.ReadOnly = true;
-            this.txtScaleLvlCol.Size = new System.Drawing.Size(27, 20);
-            this.txtScaleLvlCol.TabIndex = 22;
-            this.txtScaleLvlCol.Text = "1";
-            // 
-            // btnZoomInCol
-            // 
-            this.btnZoomInCol.Enabled = false;
-            this.btnZoomInCol.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnZoomInCol.Location = new System.Drawing.Point(52, 4);
-            this.btnZoomInCol.Name = "btnZoomInCol";
-            this.btnZoomInCol.Size = new System.Drawing.Size(28, 26);
-            this.btnZoomInCol.TabIndex = 22;
-            this.btnZoomInCol.Text = "+";
-            this.btnZoomInCol.UseVisualStyleBackColor = true;
-            // 
-            // panel15
-            // 
-            this.panel15.Controls.Add(this.panel16);
-            this.panel15.Controls.Add(this.panel20);
-            this.panel15.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel15.Location = new System.Drawing.Point(0, 0);
-            this.panel15.Name = "panel15";
-            this.panel15.Size = new System.Drawing.Size(349, 495);
-            this.panel15.TabIndex = 12;
-            // 
-            // panel16
-            // 
-            this.panel16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel16.Location = new System.Drawing.Point(34, 0);
-            this.panel16.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.panel16.Name = "panel16";
-            this.panel16.Size = new System.Drawing.Size(315, 495);
-            this.panel16.TabIndex = 26;
-            // 
-            // panel20
-            // 
-            this.panel20.Controls.Add(this.button10);
-            this.panel20.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel20.Location = new System.Drawing.Point(0, 0);
-            this.panel20.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.panel20.Name = "panel20";
-            this.panel20.Size = new System.Drawing.Size(34, 495);
-            this.panel20.TabIndex = 25;
-            // 
-            // button10
-            // 
-            this.button10.Dock = System.Windows.Forms.DockStyle.Left;
-            this.button10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button10.Location = new System.Drawing.Point(0, 0);
-            this.button10.Margin = new System.Windows.Forms.Padding(0);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(30, 495);
-            this.button10.TabIndex = 0;
-            this.button10.Text = "<<";
-            this.button10.UseVisualStyleBackColor = true;
+            this.button3.Location = new System.Drawing.Point(8, 235);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 28;
+            this.button3.Text = "Refresh result";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // MainWindow
             // 
@@ -931,6 +972,18 @@
             this.menuMain.PerformLayout();
             this.mainTab.ResumeLayout(false);
             this.tabColor.ResumeLayout(false);
+            this.panel10.ResumeLayout(false);
+            this.panelV.ResumeLayout(false);
+            this.destinationColPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.destinationColPB)).EndInit();
+            this.sourceColPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.sourceColPB)).EndInit();
+            this.panel14.ResumeLayout(false);
+            this.panel14.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).EndInit();
+            this.panel15.ResumeLayout(false);
+            this.panel16.ResumeLayout(false);
+            this.panel20.ResumeLayout(false);
             this.tabVect.ResumeLayout(false);
             this.panelMainVect.ResumeLayout(false);
             this.panelPictVect.ResumeLayout(false);
@@ -950,17 +1003,6 @@
             this.gbThreadChoice.ResumeLayout(false);
             this.gbThreadChoice.PerformLayout();
             this.panelMenuVectHide.ResumeLayout(false);
-            this.panel10.ResumeLayout(false);
-            this.panelV.ResumeLayout(false);
-            this.panelC2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC2)).EndInit();
-            this.panelC1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxC1)).EndInit();
-            this.panel14.ResumeLayout(false);
-            this.panel14.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trScaleCol)).EndInit();
-            this.panel15.ResumeLayout(false);
-            this.panel20.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1031,10 +1073,10 @@
         private System.Windows.Forms.Button btnMenuVectHide;
         private System.Windows.Forms.Panel panel10;
         private System.Windows.Forms.Panel panelV;
-        private System.Windows.Forms.Panel panelC2;
-        private System.Windows.Forms.PictureBox pictureBoxC2;
-        private System.Windows.Forms.Panel panelC1;
-        private System.Windows.Forms.PictureBox pictureBoxC1;
+        private System.Windows.Forms.Panel destinationColPanel;
+        private System.Windows.Forms.PictureBox destinationColPB;
+        private System.Windows.Forms.Panel sourceColPanel;
+        private System.Windows.Forms.PictureBox sourceColPB;
         private System.Windows.Forms.Panel panel14;
         private System.Windows.Forms.TrackBar trScaleCol;
         private System.Windows.Forms.Button btnZoomOutCol;
@@ -1044,6 +1086,9 @@
         private System.Windows.Forms.Panel panel16;
         private System.Windows.Forms.Panel panel20;
         private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
     }
 }
 

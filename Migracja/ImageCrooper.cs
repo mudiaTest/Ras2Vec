@@ -147,6 +147,37 @@ namespace Migracja
         }
     }
 
+    /*class RaserImageCrooper : Crooper
+    {
+        public RaserImageCrooper(Size aPanelSize, Bitmap aSrcBmp)
+            : base(aPanelSize, aSrcBmp.Height, aSrcBmp.Width)
+        {
+            srcBmp = aSrcBmp;
+        }
+
+        public override Bitmap GetCroppedImage(float aScale, UpdateInfoBoxTimeDelegate aFunct = null)
+        {
+            Rectangle rect = GetSourceRectangle(aScale);
+            Bitmap result;
+            Rectangle resultRect = GetDestinationRectangle(aScale, rect);
+
+            //finalna bitmapa o odpowiednim rozmiarze
+            result = new Bitmap(3 * panelSize.Width, 3 * panelSize.Height);
+            //ustawia, że result będzie płótnem graphics
+            Graphics graphics = Graphics.FromImage(result);
+            //ustawia sposób zmiękczania przy powiększaniu - NN da brak zmiękczania
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            //przepisze źródło na cel odpowiednio skalująć. W tym przypadku źódło i cel to result
+            //nowy obszar jest większy od startego więc nastąpi rozciągnięcie pixeli zgodnie z InterpolationMode
+            graphics.DrawImage(srcBmp,
+                                resultRect, //nowy obszar
+                                rect, //originalny obszar
+                                System.Drawing.GraphicsUnit.Pixel);
+
+            return result;
+        }
+    }*/
+
     class VectorImageCrooper : Crooper
     {
         MainWindowSettings settings;

@@ -7,13 +7,15 @@ namespace Migracja
 {
     public partial class MainWindow : Form
     {
-        Bitmap sourceBmp;
+        Bitmap sourceBmp4Col;
         Bitmap destinationBmp;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
-        RaserImageCrooper sourceImageCropper;
-        VectorImageCrooper desinationImageCrooper;
+        RaserImageCrooper sourceImage4ColCropper;
+        RaserImageCrooper sourceImage4VectCrooper;
+        RaserImageCrooper destinationImage4ColCrooper;
+        VectorImageCrooper desinationImage4VectCrooper;
         int horChange;
         int verChange;
         int mouseDownSourcePBLeft;
@@ -165,11 +167,11 @@ namespace Migracja
             edtSliceHeight.Text = aSettings.sliceHeight.ToString();
             edtSliceWidth.Text = aSettings.sliceWidth.ToString();
             ScaleRefresh();
-            if (sourceImageCropper != null)
+            if (sourceImage4VectCrooper != null)
             {
-                sourceImageCropper.centerX = aSettings.centerX;
-                sourceImageCropper.centerY = aSettings.centerY;
-                DrawCroppedScaledImage(windowSettings.dpScale, UpdateInfoBoxTime);
+                sourceImage4VectCrooper.centerX = aSettings.centerX;
+                sourceImage4VectCrooper.centerY = aSettings.centerY;
+                DrawCroppedScaledImage4Vect(windowSettings.dpScale, UpdateInfoBoxTime);
                 //Dodać kod, który odczytaną mapę odpoweirdnio ustawi i wyświetli przy pomocy destinationImageCropper 
             }
             SetScaleControlEnable(true);
@@ -203,7 +205,7 @@ namespace Migracja
             if (windowSettings.dpScale < Cst.maxZoom)
             {
 
-                if (DrawCroppedScaledImage(windowSettings.dpScale + 1, UpdateInfoBoxTime, windowSettings.dpScale))
+                if (DrawCroppedScaledImage4Vect(windowSettings.dpScale + 1, UpdateInfoBoxTime, windowSettings.dpScale))
                     windowSettings.dpScale += 1;
                     ScaleRefresh();
             }
@@ -213,7 +215,7 @@ namespace Migracja
         {
             if (windowSettings.dpScale > 1)
             {
-                if (DrawCroppedScaledImage(windowSettings.dpScale - 1, UpdateInfoBoxTime, windowSettings.dpScale))
+                if (DrawCroppedScaledImage4Vect(windowSettings.dpScale - 1, UpdateInfoBoxTime, windowSettings.dpScale))
                 windowSettings.dpScale -= 1;
                 ScaleRefresh();
             }
@@ -224,11 +226,11 @@ namespace Migracja
             int panelSize = (int)Math.Round((panelPictVect.Height - 8 - 10 - 8) / 2.0);
             sourceVectPanel.Height = panelSize;
             destinationVectPanel.Height = panelSize;
-            sourceImageCropper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY,
-                                                            windowSettings, sourceBmp);
-            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+            sourceImage4VectCrooper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp4Col);
+            desinationImage4VectCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
+                                                            sourceImage4VectCrooper.centerX, sourceImage4VectCrooper.centerY,
+                                                            windowSettings, sourceBmp4Col);
+            DrawCroppedScaledImage4Vect(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
@@ -274,7 +276,7 @@ namespace Migracja
         {
             if (trScaleVect.Value != windowSettings.dpScale)
             {
-                if (DrawCroppedScaledImage(trScaleVect.Value, UpdateInfoBoxTime, windowSettings.dpScale))
+                if (DrawCroppedScaledImage4Vect(trScaleVect.Value, UpdateInfoBoxTime, windowSettings.dpScale))
                 windowSettings.dpScale = trScaleVect.Value;
                 ScaleRefresh();
             }
@@ -329,8 +331,8 @@ namespace Migracja
 
         private void btnStartR2V_Click_1(object sender, EventArgs e)
         {
-            Debug.Assert(sourceBmp != null, "Nie wgrano obrazu źródłowego.");
-            R2VSettings r2vSettings = new R2VSettings{ sourceBmp = sourceBmp };
+            Debug.Assert(sourceBmp4Col != null, "Nie wgrano obrazu źródłowego.");
+            R2VSettings r2vSettings = new R2VSettings{ sourceBmp = sourceBmp4Col };
             r2vSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
             if (rbMainThread.Checked)
             {
@@ -354,7 +356,7 @@ namespace Migracja
                                        windowSettings.leftYCoord, 
                                        windowSettings.rightXCoord, 
                                        windowSettings.rightYCoord);
-            r2vSettings.sourceBmp = sourceBmp;
+            r2vSettings.sourceBmp = sourceBmp4Col;
             r2vSettings.CalculateGeoPx();
             r2vSettings.sliceWidth = windowSettings.sliceWidth;
             r2vSettings.sliceHeight = windowSettings.sliceHeight;
@@ -363,11 +365,11 @@ namespace Migracja
             r2vSettings.simplifyPhase3 = windowSettings.SimplifyPhase3();
 
             mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
-            desinationImageCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY,
-                                                            windowSettings, sourceBmp);
+            desinationImage4VectCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
+                                                            sourceImage4VectCrooper.centerX, sourceImage4VectCrooper.centerY,
+                                                            windowSettings, sourceBmp4Col);
 
-            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+            DrawCroppedScaledImage4Vect(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
@@ -382,7 +384,7 @@ namespace Migracja
 
         private void btnRefreshResultImg_Click(object sender, EventArgs e)
         {
-            DrawCroppedScaledImage(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
+            DrawCroppedScaledImage4Vect(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
         }
 
         private void edtSliceWidth_Leave(object sender, EventArgs e)
@@ -467,6 +469,31 @@ namespace Migracja
         private void btnMainThread_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void panelC2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void panel16_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            LoadImage();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            ReloadImage();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            DrawCroppedScaledImage4Col(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
         }
 
 

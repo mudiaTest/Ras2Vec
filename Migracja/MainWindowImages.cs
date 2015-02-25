@@ -32,24 +32,24 @@ namespace Migracja
                 //centrum oglądanego obszaru przesówamy o przesunięcię myszą z uwzględnieniem sklai
                 case MovedPicture.source:
                     {
-                        sourceImageCropper.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourceVectPB.Left) / dpShift);
-                        sourceImageCropper.centerY += (int)Math.Round((mouseDownSourcePBTop - sourceVectPB.Top) / dpShift);
-                        desinationImageCrooper.centerX = sourceImageCropper.centerX;
-                        desinationImageCrooper.centerY = sourceImageCropper.centerY;
+                        sourceImage4VectCrooper.centerX += (int)Math.Round((mouseDownSourcePBLeft - sourceVectPB.Left) / dpShift);
+                        sourceImage4VectCrooper.centerY += (int)Math.Round((mouseDownSourcePBTop - sourceVectPB.Top) / dpShift);
+                        desinationImage4VectCrooper.centerX = sourceImage4VectCrooper.centerX;
+                        desinationImage4VectCrooper.centerY = sourceImage4VectCrooper.centerY;
                         break;
                     }
                 case MovedPicture.desination:
                     {
-                        desinationImageCrooper.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationVectPB.Left) / dpShift);
-                        desinationImageCrooper.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationVectPB.Top) / dpShift);
-                        sourceImageCropper.centerX = desinationImageCrooper.centerX;
-                        sourceImageCropper.centerY = desinationImageCrooper.centerY;
+                        desinationImage4VectCrooper.centerX += (int)Math.Round((mouseDownDesinationPBLeft - destinationVectPB.Left) / dpShift);
+                        desinationImage4VectCrooper.centerY += (int)Math.Round((mouseDownDesinationPBTop - destinationVectPB.Top) / dpShift);
+                        sourceImage4VectCrooper.centerX = desinationImage4VectCrooper.centerX;
+                        sourceImage4VectCrooper.centerY = desinationImage4VectCrooper.centerY;
                         break;
                     }
             }
-            windowSettings.centerX = sourceImageCropper.centerX;
-            windowSettings.centerY = sourceImageCropper.centerY;
-            DrawCroppedScaledImage(dpShift, UpdateInfoBoxTime);
+            windowSettings.centerX = sourceImage4VectCrooper.centerX;
+            windowSettings.centerY = sourceImage4VectCrooper.centerY;
+            DrawCroppedScaledImage4Vect(dpShift, UpdateInfoBoxTime);
             blMouseInMoveMode = false;
         }
 
@@ -89,12 +89,14 @@ namespace Migracja
         //Buduje na nowo też obiekty sourceImageCropper i destinationImageCropper
         private void PrepareSourceImage(String aPath)
         {
-            sourceBmp = new Bitmap(aPath);
+            sourceBmp4Col = new Bitmap(aPath);
             destinationBmp = null;
-            sourceImageCropper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp);
-            desinationImageCrooper = new VectorImageCrooper(new Size(destinationVectPanel.Width, destinationVectPanel.Height), mapFactory,
-                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, windowSettings,
-                                                            sourceBmp);
+            sourceImage4ColCropper = new RaserImageCrooper(new Size(sourceColPanel.Width, sourceColPanel.Height), sourceBmp4Col);
+            destinationImage4ColCrooper = new RaserImageCrooper(new Size(destinationColPanel.Width, destinationColPanel.Height), sourceBmp4Col);
+            /*sourceImage4VectCropper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp);*/
+           /* desinationImage4VectCrooper = new VectorImageCrooper(new Size(destinationVectPanel.Width, destinationVectPanel.Height), mapFactory,
+                                                            sourceImage4VectCrooper.centerX, sourceImage4VectCrooper.centerY, windowSettings,
+                                                            sourceBmp4Col);*/
         }
 
         private bool LoadImage(String aPath)
@@ -102,21 +104,22 @@ namespace Migracja
             if (File.Exists(aPath))
             {
                 PrepareSourceImage(aPath);
-                DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+                DrawCroppedScaledImage4Col(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+                /*DrawCroppedScaledImage4Vect(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);*/
                 SetScaleControlEnable(true);
                 return true;
             }
             return false;
         }
 
-        private bool DrawCroppedScaledImage(float aDpScale,  UpdateInfoBoxTimeDelegate aFunct = null, float? aDpScalePrev = null)
+        private bool DrawCroppedScaledImage4Col(float aDpScale, UpdateInfoBoxTimeDelegate aFunct = null, float? aDpScalePrev = null)
         {
             DateTime dtTimePrv = DateTime.Now;
-            Bitmap croppedSrcBmp = sourceImageCropper.GetCroppedImage(aDpScale);
+            Bitmap croppedSrcBmp4Col = sourceImage4ColCropper.GetCroppedImage(aDpScale);
 
             //pozyskiwanie danych potrzebnych do odczytania, na który px kliknęliśmy
-            Rectangle srcRect = sourceImageCropper.GetSourceRectangle(aDpScale);
-            Rectangle resultRect = sourceImageCropper.GetDestinationRectangle(aDpScale, srcRect);
+            Rectangle srcRect = sourceImage4ColCropper.GetSourceRectangle(aDpScale);
+            Rectangle resultRect = sourceImage4ColCropper.GetDestinationRectangle(aDpScale, srcRect);
             srcLeftX = srcRect.X;
             srcLeftY = srcRect.Y;
             resultLeftX = resultRect.X;
@@ -126,26 +129,85 @@ namespace Migracja
             //tymczasowo przypisuję ten sam obraz
             //Bitmap croppedDstBmp = croppedSrcBmp;
             Bitmap croppedDstBmp;
-            if (desinationImageCrooper.mapFactory == null)
+            if (destinationImage4ColCrooper.mapFactory == null)
             {
                 croppedDstBmp = null;
                 dtTimePrv = aFunct("GetCroppedImage 2 NULL:", false, dtTimePrv);
             }
             else
             {
-                croppedDstBmp = desinationImageCrooper.GetCroppedImage(aDpScale, aFunct);
+                croppedDstBmp = destinationImage4ColCrooper.GetCroppedImage(aDpScale, aFunct);
+                dtTimePrv = aFunct("GetCroppedImage 2:", false, dtTimePrv);
+            }
+
+            /*int scaledShiftX = sourcePanel.Width;
+            int scaledShiftY = sourcePanel.Height;*/
+            int scaledShiftX = (int)Math.Round(sourceImage4ColCropper.centerX * aDpScale);
+            int scaledShiftY = (int)Math.Round(sourceImage4ColCropper.centerY * aDpScale);
+
+            //UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
+            sourceColPB.Height = croppedSrcBmp4Col.Height;
+            sourceColPB.Width = croppedSrcBmp4Col.Width;
+            sourceColPB.Image = croppedSrcBmp4Col;
+            //UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
+            //              "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
+            /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
+            sourcePB.Top = -Math.Min(scaledShiftY, sourcePanel.Height);*/
+            sourceColPB.Left = -sourceVectPanel.Width;
+            sourceColPB.Top = -sourceVectPanel.Height;
+            //UpdateInfoBox("L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString(), false);
+
+            if (croppedDstBmp != null)
+            {
+                destinationColPB.Height = croppedDstBmp.Height;
+                destinationColPB.Width = croppedDstBmp.Width;
+                destinationColPB.Image = croppedDstBmp;
+                /*destinationColPB.Left = -Math.Min(scaledShiftX, destinationPanel.Width);
+                destinationColPB.Top = -Math.Min(scaledShiftY, destinationPanel.Height);*/
+                destinationColPB.Left = -destinationVectPanel.Width;
+                destinationColPB.Top = -destinationVectPanel.Height;
+            }
+            aFunct("Pozostałe:", false, dtTimePrv);
+            return true;
+        }
+
+        private bool DrawCroppedScaledImage4Vect(float aDpScale,  UpdateInfoBoxTimeDelegate aFunct = null, float? aDpScalePrev = null)
+        {
+            DateTime dtTimePrv = DateTime.Now;
+            Bitmap croppedSrcBmp4Vect = sourceImage4VectCrooper.GetCroppedImage(aDpScale);
+
+            //pozyskiwanie danych potrzebnych do odczytania, na który px kliknęliśmy
+            Rectangle srcRect = sourceImage4VectCrooper.GetSourceRectangle(aDpScale);
+            Rectangle resultRect = sourceImage4VectCrooper.GetDestinationRectangle(aDpScale, srcRect);
+            srcLeftX = srcRect.X;
+            srcLeftY = srcRect.Y;
+            resultLeftX = resultRect.X;
+            resultLeftY = resultRect.Y;
+
+            dtTimePrv = aFunct("GetCroppedImage 1:", true, dtTimePrv);
+            //tymczasowo przypisuję ten sam obraz
+            //Bitmap croppedDstBmp = croppedSrcBmp;
+            Bitmap croppedDstBmp;
+            if (desinationImage4VectCrooper.mapFactory == null)
+            {
+                croppedDstBmp = null;
+                dtTimePrv = aFunct("GetCroppedImage 2 NULL:", false, dtTimePrv);
+            }
+            else
+            {
+                croppedDstBmp = desinationImage4VectCrooper.GetCroppedImage(aDpScale, aFunct);
                 dtTimePrv = aFunct("GetCroppedImage 2:", false, dtTimePrv);
             }
             
             /*int scaledShiftX = sourcePanel.Width;
             int scaledShiftY = sourcePanel.Height;*/
-            int scaledShiftX = (int)Math.Round(sourceImageCropper.centerX * aDpScale);
-            int scaledShiftY = (int)Math.Round(sourceImageCropper.centerY * aDpScale);
+            int scaledShiftX = (int)Math.Round(sourceImage4VectCrooper.centerX * aDpScale);
+            int scaledShiftY = (int)Math.Round(sourceImage4VectCrooper.centerY * aDpScale);
 
             //UpdateInfoBox("bmp: " + croppedSrcBmp.Width.ToString() + " x " + croppedSrcBmp.Height.ToString());
-            sourceVectPB.Height = croppedSrcBmp.Height;
-            sourceVectPB.Width = croppedSrcBmp.Width;
-            sourceVectPB.Image = croppedSrcBmp;
+            sourceVectPB.Height = croppedSrcBmp4Vect.Height;
+            sourceVectPB.Width = croppedSrcBmp4Vect.Width;
+            sourceVectPB.Image = croppedSrcBmp4Vect;
             //UpdateInfoBox("pb: " + sourcePB.Width.ToString() + " x " + sourcePB.Height.ToString() +
             //              "L/T: " + sourcePB.Left.ToString() + " x " + sourcePB.Top.ToString());
             /*sourcePB.Left = -Math.Min(scaledShiftX, sourcePanel.Width);
@@ -184,7 +246,7 @@ namespace Migracja
                     LoadImage(windowSettings.stSourceImagePath);
                 else
                 {
-                    Debug.Assert(false, "Nie powiadła się próba wgrania pliku źrógłowego mapy: '" + windowSettings.stSourceImagePath + "'");
+                    Debug.Assert(false, "Nie powiadła się próba wgrania pliku źródłowego mapy: '" + windowSettings.stSourceImagePath + "'");
                 }
             }
             else
