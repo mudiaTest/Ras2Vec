@@ -7,19 +7,20 @@ namespace Migracja
 {
     public partial class MainWindow : Form
     {
-        Bitmap sourceBmp4Col;
-        Bitmap destinationBmp;
+        Bitmap sourceBmp;
+        Bitmap posterizedBmp;
         private bool blMouseInMoveMode;
         int startingX;
         int startingY;
-        RaserImageCrooper sourceImage4ColCropper;
-        RaserImageCrooper sourceImage4VectCrooper;
-        RaserImageCrooper destinationImage4ColCrooper;
-        VectorImageCrooper desinationImage4VectCrooper;
+        RaserImageCrooper sourceImageCropper;
+        RaserImageCrooper posterizedImageCropper;
+        VectorImageCrooper desinationImageCropper;
         int horChange;
         int verChange;
         int mouseDownSourcePBLeft;
         int mouseDownSourcePBTop;
+        int mouseDownPosterizedPBLeft;
+        int mouseDownPosterizedPBTop;
         int mouseDownDesinationPBLeft;
         int mouseDownDesinationPBTop;
         MainWindowSettings windowSettings;
@@ -39,7 +40,7 @@ namespace Migracja
             RefreshLastSaveButton();
 
             windowSettings = new MainWindowSettings();
-            windowSettings.dpScale = 1;
+            windowSettings.dpScaleVect = 1;
             ScaleRefresh();
             //tymczasowo
             LoadLastSave();
@@ -133,9 +134,30 @@ namespace Migracja
             blMouseInMoveMode = false;
         }
 
-        private void destinationPB_MouseDown(object sender, MouseEventArgs e)
+        private void posterizedPB_MouseDown(object sender, MouseEventArgs e)
         {
             StartMovingPictures();
+        }
+
+        private void posterizedPB_MouseUp(object sender, MouseEventArgs e)
+        {
+            StopMovingPictures(MovedPicture.posterized);
+        }
+
+        private void posterizedPB_MouseMove(object sender, MouseEventArgs e)
+        {
+            MovePictures(e);
+        }
+
+        private void posterizedPB_MouseLeave(object sender, EventArgs e)
+        {
+            blMouseInMoveMode = false;
+        }
+
+        private void destinationPB_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (destinationPB.Image != null) 
+                StartMovingPictures();
         }
 
         private void destinationPB_MouseLeave(object sender, EventArgs e)
@@ -145,12 +167,14 @@ namespace Migracja
 
         private void destinationPB_MouseMove(object sender, MouseEventArgs e)
         {
-            MovePictures(e);
+            if (destinationPB.Image != null)
+                MovePictures(e);
         }
 
         private void destinationPB_MouseUp(object sender, MouseEventArgs e)
         {
-            StopMovingPictures(MovedPicture.desination);
+            if (destinationPB.Image != null)
+                StopMovingPictures(MovedPicture.desination);
         }
 
         private void w(object sender, EventArgs e)
@@ -164,16 +188,23 @@ namespace Migracja
             maskedTextBox2.Text = aSettings.leftYCoord;
             maskedTextBox3.Text = aSettings.rightXCoord;
             maskedTextBox4.Text = aSettings.rightYCoord;
-            edtSliceHeight.Text = aSettings.sliceHeight.ToString();
-            edtSliceWidth.Text = aSettings.sliceWidth.ToString();
+            edtSliceHeight.Text = aSettings.sliceHeightVect.ToString();
+            edtSliceWidth.Text = aSettings.sliceWidthVect.ToString();
             ScaleRefresh();
-            if (sourceImage4VectCrooper != null)
+            if (posterizedImageCropper != null)
             {
-                sourceImage4VectCrooper.centerX = aSettings.centerX;
-                sourceImage4VectCrooper.centerY = aSettings.centerY;
-                DrawCroppedScaledImage4Vect(windowSettings.dpScale, UpdateInfoBoxTime);
+                posterizedImageCropper.centerX = aSettings.centerXVect;
+                posterizedImageCropper.centerY = aSettings.centerYVect;
+                DrawCroppedScaledImage(windowSettings.dpScaleVect, UpdateInfoBoxTime);
                 //Dodać kod, który odczytaną mapę odpoweirdnio ustawi i wyświetli przy pomocy destinationImageCropper 
             }
+            /*if (sourceImage4ColCropper != null)
+            {
+                sourceImage4ColCropper.centerX = aSettings.centerXVect;
+                sourceImage4ColCropper.centerY = aSettings.centerYVect;
+                DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime);
+                //Dodać kod, który odczytaną mapę odpoweirdnio ustawi i wyświetli przy pomocy destinationImageCropper 
+            }*/
             SetScaleControlEnable(true);
 
             chkBoxTestOptions.ClearSelected();
@@ -196,27 +227,27 @@ namespace Migracja
         }
 
         private void ScaleRefresh(){
-            txtScaleLvlVect.Text = windowSettings.dpScale.ToString();
-            trScaleVect.Value = (int)windowSettings.dpScale;
+            txtScaleLvlVect.Text = windowSettings.dpScaleVect.ToString();
+            trScaleVect.Value = (int)windowSettings.dpScaleVect;
         }
 
         private void ZoomInBtn_Click(object sender, EventArgs e)
         {
-            if (windowSettings.dpScale < Cst.maxZoom)
+            if (windowSettings.dpScaleVect < Cst.maxZoom)
             {
 
-                if (DrawCroppedScaledImage4Vect(windowSettings.dpScale + 1, UpdateInfoBoxTime, windowSettings.dpScale))
-                    windowSettings.dpScale += 1;
+                if (DrawCroppedScaledImage(windowSettings.dpScaleVect + 1, UpdateInfoBoxTime, windowSettings.dpScaleVect))
+                    windowSettings.dpScaleVect += 1;
                     ScaleRefresh();
             }
         }
 
         private void ZoomOutBtn_Click(object sender, EventArgs e)
         {
-            if (windowSettings.dpScale > 1)
+            if (windowSettings.dpScaleVect > 1)
             {
-                if (DrawCroppedScaledImage4Vect(windowSettings.dpScale - 1, UpdateInfoBoxTime, windowSettings.dpScale))
-                windowSettings.dpScale -= 1;
+                if (DrawCroppedScaledImage(windowSettings.dpScaleVect - 1, UpdateInfoBoxTime, windowSettings.dpScaleVect))
+                windowSettings.dpScaleVect -= 1;
                 ScaleRefresh();
             }
         }
@@ -224,13 +255,13 @@ namespace Migracja
         private void panel7_SizeChanged(object sender, EventArgs e)
         {
             int panelSize = (int)Math.Round((panelPictVect.Height - 8 - 10 - 8) / 2.0);
-            sourceVectPanel.Height = panelSize;
-            destinationVectPanel.Height = panelSize;
-            sourceImage4VectCrooper = new RaserImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), sourceBmp4Col);
-            desinationImage4VectCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
-                                                            sourceImage4VectCrooper.centerX, sourceImage4VectCrooper.centerY,
-                                                            windowSettings, sourceBmp4Col);
-            DrawCroppedScaledImage4Vect(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+            posterizedPanel.Height = panelSize;
+            destinationPanel.Height = panelSize;
+            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), posterizedBmp);
+            desinationImageCropper = new VectorImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), mapFactory,
+                                                            posterizedImageCropper.centerX, posterizedImageCropper.centerY,
+                                                            windowSettings, posterizedBmp);
+            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
@@ -265,7 +296,7 @@ namespace Migracja
 
         private void textBox1_Leave(object sender, EventArgs e)
         {
-            windowSettings.dpScale = float.Parse(((TextBox)sender).Text);
+            windowSettings.dpScaleVect = float.Parse(((TextBox)sender).Text);
         }
 
         private void ScaleTb_MouseDown(object sender, MouseEventArgs e)
@@ -274,10 +305,10 @@ namespace Migracja
 
         private void ScaleTb_MouseUp(object sender, MouseEventArgs e)
         {
-            if (trScaleVect.Value != windowSettings.dpScale)
+            if (trScaleVect.Value != windowSettings.dpScaleVect)
             {
-                if (DrawCroppedScaledImage4Vect(trScaleVect.Value, UpdateInfoBoxTime, windowSettings.dpScale))
-                windowSettings.dpScale = trScaleVect.Value;
+                if (DrawCroppedScaledImage(trScaleVect.Value, UpdateInfoBoxTime, windowSettings.dpScaleVect))
+                windowSettings.dpScaleVect = trScaleVect.Value;
                 ScaleRefresh();
             }
         }
@@ -331,8 +362,8 @@ namespace Migracja
 
         private void btnStartR2V_Click_1(object sender, EventArgs e)
         {
-            Debug.Assert(sourceBmp4Col != null, "Nie wgrano obrazu źródłowego.");
-            R2VSettings r2vSettings = new R2VSettings{ sourceBmp = sourceBmp4Col };
+            Debug.Assert(posterizedBmp != null, "Nie wgrano obrazu źródłowego.");
+            R2VSettings r2vSettings = new R2VSettings { sourceBmp = posterizedBmp };
             r2vSettings.ReadGeoCorners(windowSettings.leftXCoord, windowSettings.leftYCoord, windowSettings.rightXCoord, windowSettings.rightYCoord);
             if (rbMainThread.Checked)
             {
@@ -356,20 +387,20 @@ namespace Migracja
                                        windowSettings.leftYCoord, 
                                        windowSettings.rightXCoord, 
                                        windowSettings.rightYCoord);
-            r2vSettings.sourceBmp = sourceBmp4Col;
+            r2vSettings.sourceBmp = posterizedBmp;
             r2vSettings.CalculateGeoPx();
-            r2vSettings.sliceWidth = windowSettings.sliceWidth;
-            r2vSettings.sliceHeight = windowSettings.sliceHeight;
+            r2vSettings.sliceWidth = windowSettings.sliceWidthVect;
+            r2vSettings.sliceHeight = windowSettings.sliceHeightVect;
             r2vSettings.simplifyPhase1 = windowSettings.SimplifyPhase1();
             r2vSettings.simplifyPhase2 = windowSettings.SimplifyPhase2();
             r2vSettings.simplifyPhase3 = windowSettings.SimplifyPhase3();
 
             mapFactory = R2VRunner.RunR2VMainThread(r2vSettings, new UpdateInfoBoxTimeDelegate(UpdateInfoBoxTime));
-            desinationImage4VectCrooper = new VectorImageCrooper(new Size(sourceVectPanel.Width, sourceVectPanel.Height), mapFactory,
-                                                            sourceImage4VectCrooper.centerX, sourceImage4VectCrooper.centerY,
-                                                            windowSettings, sourceBmp4Col);
+            desinationImageCropper = new VectorImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), mapFactory,
+                                                            posterizedImageCropper.centerX, posterizedImageCropper.centerY,
+                                                            windowSettings, posterizedBmp);
 
-            DrawCroppedScaledImage4Vect(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
         }
 
         private void btnSeparateThread_Click(object sender, EventArgs e)
@@ -384,24 +415,24 @@ namespace Migracja
 
         private void btnRefreshResultImg_Click(object sender, EventArgs e)
         {
-            DrawCroppedScaledImage4Vect(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
+            DrawCroppedScaledImage(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);
         }
 
         private void edtSliceWidth_Leave(object sender, EventArgs e)
         {
             if (((MaskedTextBox)sender).Text == "")
-                windowSettings.sliceWidth = 0;
+                windowSettings.sliceWidthVect = 0;
             else
-                windowSettings.sliceWidth = Int32.Parse(((MaskedTextBox)sender).Text);
+                windowSettings.sliceWidthVect = Int32.Parse(((MaskedTextBox)sender).Text);
         }
 
 
         private void edtSliceHeight_Leave(object sender, EventArgs e)
         {
             if (((MaskedTextBox)sender).Text == "")
-                windowSettings.sliceHeight = 0;
+                windowSettings.sliceHeightVect = 0;
             else
-                windowSettings.sliceHeight = Int32.Parse(((MaskedTextBox)sender).Text);
+                windowSettings.sliceHeightVect = Int32.Parse(((MaskedTextBox)sender).Text);
         }
 
         private void edtSliceHeight_Validated(object sender, EventArgs e)
@@ -424,8 +455,8 @@ namespace Migracja
             srcLeftY = srcRect.Y;
             resultLeftX = resultRect.X;
             resultLeftY = resultRect.Y;*/
-            int x = (int)Math.Floor((((MouseEventArgs)e).X - resultLeftX) / windowSettings.dpScale) + srcLeftX;
-            int y = (int)Math.Floor((((MouseEventArgs)e).Y - resultLeftY) / windowSettings.dpScale) + srcLeftY;
+            int x = (int)Math.Floor((((MouseEventArgs)e).X - resultLeftX) / windowSettings.dpScaleVect) + srcLeftX;
+            int y = (int)Math.Floor((((MouseEventArgs)e).Y - resultLeftY) / windowSettings.dpScaleVect) + srcLeftY;
 
             string info = "";
             info += string.Format("Point({0},{1}):", x, y);
@@ -493,10 +524,17 @@ namespace Migracja
 
         private void button3_Click(object sender, EventArgs e)
         {
-            DrawCroppedScaledImage4Col(windowSettings.dpScale, UpdateInfoBoxTime, windowSettings.dpScale);
+            /*DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);*/
         }
 
-
-
+        private void posterizeSrcImageBtn_Click(object sender, EventArgs e)
+        {
+            ColorChanger cc = new ColorChanger();
+            cc.PosterizeBitmap(sourceBmp, ref posterizedBmp);
+            posterizedImageCropper.srcBmp = posterizedBmp;
+            /*DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);*/
+            DrawCroppedScaledImage(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);
+        }
+        
     }
 }

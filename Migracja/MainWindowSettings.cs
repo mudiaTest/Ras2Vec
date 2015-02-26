@@ -83,11 +83,16 @@ namespace Migracja
         public String rightXCoord;
         public String rightYCoord;
         public String testOptions;
-        public float dpScale;
-        public int centerX;
-        public int centerY;
-        public int sliceWidth;
-        public int sliceHeight;
+        public float dpScaleVect;
+        public int centerXVect;
+        public int centerYVect;
+        public int sliceWidthVect;
+        public int sliceHeightVect;
+        public float dpScaleCol;
+        public int centerXCol;
+        public int centerYCol;
+        public int sliceWidthCol;
+        public int sliceHeightCol;
 
         //[NonSerialized]
         public string thisSettingsPath;
@@ -99,9 +104,12 @@ namespace Migracja
             rightXCoord = "";
             rightYCoord = "";
             stSourceImagePath = "";
-            dpScale = 0;
-            centerX = 0;
-            centerY = 0;
+            dpScaleVect = 1;
+            centerXVect = 0;
+            centerYVect = 0;
+            dpScaleCol = 1;
+            centerXCol = 0;
+            centerYCol = 0;
             thisSettingsPath = "";
             testOptions = "";
         }
@@ -135,13 +143,18 @@ namespace Migracja
             this.rightXCoord = tmp.rightXCoord;
             this.rightYCoord = tmp.rightYCoord;
             this.stSourceImagePath = tmp.stSourceImagePath;
-            this.dpScale = tmp.dpScale;
-            this.centerX = tmp.centerX;
-            this.centerY = tmp.centerY;
+            this.dpScaleVect = tmp.dpScaleVect;
+            this.centerXVect = tmp.centerXVect;
+            this.centerYVect = tmp.centerYVect;
+            this.dpScaleCol = tmp.dpScaleCol;
+            this.centerXCol = tmp.centerXCol;
+            this.centerYCol = tmp.centerYCol;
             this.thisSettingsPath = aPath;
             this.testOptions = tmp.testOptions;
-            this.sliceWidth = tmp.sliceWidth;
-            this.sliceHeight = tmp.sliceHeight;
+            this.sliceWidthVect = tmp.sliceWidthVect;
+            this.sliceHeightVect = tmp.sliceHeightVect;
+            this.sliceWidthCol = tmp.sliceWidthCol;
+            this.sliceHeightCol = tmp.sliceHeightCol;
         }
 
         public string[] GetCheckegTestOptionsList()

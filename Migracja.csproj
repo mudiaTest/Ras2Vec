@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migracja\ClassHelpers.cs" />
+    <Compile Include="Migracja\ColorChanger.cs" />
     <Compile Include="Migracja\cst.cs" />
     <Compile Include="Migracja\ImageCrooper.cs" />
     <Compile Include="Migracja\MainWindow.cs">
