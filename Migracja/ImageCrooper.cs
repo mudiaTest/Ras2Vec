@@ -118,10 +118,12 @@ namespace Migracja
 
     class RaserImageCrooper: Crooper
     {
-        public RaserImageCrooper(Size aPanelSize, Bitmap aSrcBmp)
+        public RaserImageCrooper(Size aPanelSize, int aCenterX, int aCenterY, Bitmap aSrcBmp)
             : base(aPanelSize, aSrcBmp.Height, aSrcBmp.Width)
         { 
-            srcBmp = aSrcBmp; 
+            srcBmp = aSrcBmp;
+            centerX = aCenterX;
+            centerY = aCenterY;
         }
 
         public override Bitmap GetCroppedImage(float aScale, UpdateInfoBoxTimeDelegate aFunct = null)

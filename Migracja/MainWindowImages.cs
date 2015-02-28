@@ -116,8 +116,8 @@ namespace Migracja
         {
             sourceBmp = new Bitmap(aPath);
             posterizedBmp = new Bitmap(aPath);
-            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), sourceBmp);
-            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), posterizedBmp);
+            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height), 0, 0, sourceBmp);
+            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), 0, 0, posterizedBmp);
             desinationImageCropper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
                                                             posterizedImageCropper.centerX, posterizedImageCropper.centerY, windowSettings,
                                                             posterizedBmp);

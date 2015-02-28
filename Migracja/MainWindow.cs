@@ -44,6 +44,7 @@ namespace Migracja
             ScaleRefresh();
             //tymczasowo
             LoadLastSave();
+            ResizePanelPict();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -254,11 +255,24 @@ namespace Migracja
 
         private void panel7_SizeChanged(object sender, EventArgs e)
         {
-            int panelSize = (int)Math.Round((panelPictVect.Height - 8 - 10 - 8) / 2.0);
-            posterizedPanel.Height = panelSize;
-            destinationPanel.Height = panelSize;
-            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), posterizedBmp);
-            desinationImageCropper = new VectorImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height), mapFactory,
+            ResizePanelPict();
+        }
+
+        private void ResizePanelPict()
+        {
+            int imagePanelHeight = (int)Math.Round((flpPictures.Height - 3 - 3 - 3 - 3) / 3.0);
+            int imagePanelWidth = flpPictures.Width - 3 - 3;
+            sourcePanel.Height = imagePanelHeight;
+            posterizedPanel.Height = imagePanelHeight;
+            destinationPanel.Height = imagePanelHeight;
+            sourcePanel.Width = imagePanelWidth;
+            posterizedPanel.Width = imagePanelWidth;
+            destinationPanel.Width = imagePanelWidth;
+            //posterizedPanel.Top = 5 + imagePanelHeight + 5;
+            //destinationPanel.Top = 5 + imagePanelHeight + 5 + imagePanelHeight + 5;
+            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height),
+                                                           sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
+            desinationImageCropper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
                                                             posterizedImageCropper.centerX, posterizedImageCropper.centerY,
                                                             windowSettings, posterizedBmp);
             DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
