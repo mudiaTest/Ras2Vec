@@ -270,6 +270,8 @@ namespace Migracja
             destinationPanel.Width = imagePanelWidth;
             //posterizedPanel.Top = 5 + imagePanelHeight + 5;
             //destinationPanel.Top = 5 + imagePanelHeight + 5 + imagePanelHeight + 5;
+            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height),
+                                                           sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
             posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height),
                                                            sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
             desinationImageCropper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
