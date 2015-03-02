@@ -6,15 +6,15 @@ using System.Drawing;
 
 namespace Migracja
 {
-    class PosterizedColorData
+    public class PosterizedColorData
     {
-        int lpRedMin = -1;
-        int lpRedMax = -1;
-        int lpGreenMin = -1;
-        int lpGreenMax = -1;
-        int lpBlueMin = -1;
-        int lpBlueMax = -1;
-        Color garminColor;
+        public int lpRedMin = -1;
+        public int lpRedMax = -1;
+        public int lpGreenMin = -1;
+        public int lpGreenMax = -1;
+        public int lpBlueMin = -1;
+        public int lpBlueMax = -1;
+        public Color garminColor;
 
         public PosterizedColorData()
         {

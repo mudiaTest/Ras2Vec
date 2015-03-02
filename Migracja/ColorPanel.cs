@@ -22,12 +22,12 @@ namespace Migracja
 
         public void Scr2Obj()
         {
-            postColorObj.lpRedMin.Text = Int32.Parse(txtRedMin.Text);
-            postColorObj.lpRedMax.Text = Int32.Parse(txtRedMax.Text);
-            postColorObj.lpGreenMin.Text = Int32.Parse(txtGreenMin.Text);
-            postColorObj.lpGreenMax.Text = Int32.Parse(txtGreenMax.Text);
-            postColorObj.lpBlueMin.Text = Int32.Parse(txtBlueMin.Text);
-            postColorObj.lpBlueMax.Text = Int32.Parse(txtBlueMax.Text);
+            postColorObj.lpRedMin = Int32.Parse(txtRedMin.Text);
+            postColorObj.lpRedMax = Int32.Parse(txtRedMax.Text);
+            postColorObj.lpGreenMin = Int32.Parse(txtGreenMin.Text);
+            postColorObj.lpGreenMax = Int32.Parse(txtGreenMax.Text);
+            postColorObj.lpBlueMin = Int32.Parse(txtBlueMin.Text);
+            postColorObj.lpBlueMax = Int32.Parse(txtBlueMax.Text);
         }
 
         public void Obj2Scr()

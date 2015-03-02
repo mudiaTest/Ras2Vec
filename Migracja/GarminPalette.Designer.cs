@@ -1,4 +1,4 @@
-﻿namespace Migracja.Migracja
+﻿namespace Migracja
 {
     partial class GarminPalette
     {

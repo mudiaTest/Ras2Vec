@@ -27,7 +27,10 @@ namespace Migracja
 
         public Color Ok(int aLpRed, int aLpGreen, int aLpBlue)
         {
-            return new Color(255, aLpRed, aLpGreen, aLpBlue);
+            Color result = new Color();
+            result.R = aLpRed;
+            result.R = aLpGreen;
+            result.R = aLpBlue;
         }
 
     }

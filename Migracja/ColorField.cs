@@ -22,7 +22,10 @@ namespace Migracja
             lpRed = aLpRed;
             lpGreen = aLpGreen;
             lpBlue = aLpBlue;
-            pnlColor.BackColor = new Color(255, lpRed, lpGreen, lpBlue);
+            pnlColor.BackColor = new Color();
+            pnlColor.BackColor.R = lpRed;
+            pnlColor.BackColor.G = lpGreen;
+            pnlColor.BackColor.B = lpBlue;
             ReturnFunct = aReturnFunct(aLpRed, aLpGreen, aLpBlue);
         }
 
