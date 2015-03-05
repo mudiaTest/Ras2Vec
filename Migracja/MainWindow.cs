@@ -31,6 +31,7 @@ namespace Migracja
         int resultLeftX;
         float resultLeftY;
 
+
         public MainWindow()
         {
             InitializeComponent();
@@ -270,14 +271,18 @@ namespace Migracja
             destinationPanel.Width = imagePanelWidth;
             //posterizedPanel.Top = 5 + imagePanelHeight + 5;
             //destinationPanel.Top = 5 + imagePanelHeight + 5 + imagePanelHeight + 5;
-            sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height),
-                                                           sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
-            posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height),
-                                                           sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
-            desinationImageCropper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
-                                                            posterizedImageCropper.centerX, posterizedImageCropper.centerY,
-                                                            windowSettings, posterizedBmp);
-            DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+
+            if (posterizedBmp != null)
+            { 
+                sourceImageCropper = new RaserImageCrooper(new Size(sourcePanel.Width, sourcePanel.Height),
+                                                               sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
+                posterizedImageCropper = new RaserImageCrooper(new Size(posterizedPanel.Width, posterizedPanel.Height),
+                                                               sourceImageCropper.centerX, sourceImageCropper.centerY, posterizedBmp);
+                desinationImageCropper = new VectorImageCrooper(new Size(destinationPanel.Width, destinationPanel.Height), mapFactory,
+                                                                posterizedImageCropper.centerX, posterizedImageCropper.centerY,
+                                                                windowSettings, posterizedBmp);
+                DrawCroppedScaledImage(float.Parse(txtScaleLvlVect.Text), UpdateInfoBoxTime);
+            }
         }
 
         private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
@@ -550,6 +555,14 @@ namespace Migracja
             posterizedImageCropper.srcBmp = posterizedBmp;
             /*DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);*/
             DrawCroppedScaledImage(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);
+        }
+
+        private void btnAddColorPanel_Click(object sender, EventArgs e)
+        {
+            PosterizedColorData postColData = new PosterizedColorData();
+            ColorPanel cp = new ColorPanel(postColData);
+            flpColors.Controls.Add(cp);
+            windowSettings.dictColorData.Add(ExtDictionary.NextKey(windowSettings.dictColorData), postColData);
         }
         
     }

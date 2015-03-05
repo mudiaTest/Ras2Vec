@@ -41,11 +41,12 @@
             this.pnlColor.Name = "pnlColor";
             this.pnlColor.Size = new System.Drawing.Size(16, 38);
             this.pnlColor.TabIndex = 0;
+            this.pnlColor.Click += new System.EventHandler(this.pnlColor_Click);
             // 
             // lblRed
             // 
             this.lblRed.AutoSize = true;
-            this.lblRed.Location = new System.Drawing.Point(16, 0);
+            this.lblRed.Location = new System.Drawing.Point(14, 0);
             this.lblRed.Name = "lblRed";
             this.lblRed.Size = new System.Drawing.Size(25, 13);
             this.lblRed.TabIndex = 1;
@@ -54,7 +55,7 @@
             // lblGreen
             // 
             this.lblGreen.AutoSize = true;
-            this.lblGreen.Location = new System.Drawing.Point(16, 13);
+            this.lblGreen.Location = new System.Drawing.Point(14, 13);
             this.lblGreen.Name = "lblGreen";
             this.lblGreen.Size = new System.Drawing.Size(25, 13);
             this.lblGreen.TabIndex = 2;
@@ -63,7 +64,7 @@
             // lblBlue
             // 
             this.lblBlue.AutoSize = true;
-            this.lblBlue.Location = new System.Drawing.Point(16, 25);
+            this.lblBlue.Location = new System.Drawing.Point(14, 25);
             this.lblBlue.Name = "lblBlue";
             this.lblBlue.Size = new System.Drawing.Size(25, 13);
             this.lblBlue.TabIndex = 3;

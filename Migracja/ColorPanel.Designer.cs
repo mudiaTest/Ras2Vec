@@ -51,7 +51,8 @@
             this.pnlColor.Padding = new System.Windows.Forms.Padding(2);
             this.pnlColor.Size = new System.Drawing.Size(35, 68);
             this.pnlColor.TabIndex = 0;
-            this.pnlColor.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.pnlColor.Click += new System.EventHandler(this.pnlColor_Click);
+            this.pnlColor.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlColor_Paint);
             // 
             // txtRedMin
             // 
@@ -79,7 +80,6 @@
             this.label1.Size = new System.Drawing.Size(48, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "R          -";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
             // 
@@ -89,7 +89,6 @@
             this.label2.Size = new System.Drawing.Size(48, 13);
             this.label2.TabIndex = 6;
             this.label2.Text = "G          -";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // txtGreenMax
             // 
@@ -117,7 +116,6 @@
             this.label3.Size = new System.Drawing.Size(47, 13);
             this.label3.TabIndex = 9;
             this.label3.Text = "B          -";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // txtBlueMax
             // 

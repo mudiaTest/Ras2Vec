@@ -149,6 +149,12 @@
     <Compile Include="Migracja\Vector_Rectangle.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migracja\ColorField.resx">
+      <DependentUpon>ColorField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migracja\ColorPanel.resx">
+      <DependentUpon>ColorPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migracja\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>

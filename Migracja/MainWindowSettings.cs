@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.Linq;
 using System.IO;
 using Microsoft.Win32;
 using System.Windows.Forms;
@@ -74,6 +76,8 @@ namespace Migracja
         }
     }
 
+
+
     [Serializable]
     public class MainWindowSettings
     {
@@ -94,8 +98,12 @@ namespace Migracja
         public int sliceWidthCol;
         public int sliceHeightCol;
 
+       
+
         //[NonSerialized]
         public string thisSettingsPath;
+        [NonSerialized]
+        internal Dictionary<int, PosterizedColorData> dictColorData;
 
         public MainWindowSettings()
         {
@@ -112,11 +120,64 @@ namespace Migracja
             centerYCol = 0;
             thisSettingsPath = "";
             testOptions = "";
+            dictColorData = new Dictionary<int, PosterizedColorData>();
         }
 
         public void Save(String aPath = "")
         {
-            XmlSerializer xmlEngine = new XmlSerializer(typeof(MainWindowSettings));
+
+
+
+            XElement mainElement = new XElement("MainWindowSettings",
+                new XElement("leftXCoord", leftXCoord),
+                new XElement("leftYCoord", leftYCoord),
+                new XElement("rightXCoord", rightXCoord),
+                new XElement("rightYCoord", rightYCoord),
+                new XElement("stSourceImagePath", stSourceImagePath),
+                new XElement("dpScaleVect", dpScaleVect.ToString()),
+                new XElement("centerXVect", centerXVect.ToString()),
+                new XElement("centerYVect", centerYVect.ToString()),
+                new XElement("dpScaleCol", dpScaleCol.ToString()),
+                new XElement("centerXCol", centerXCol.ToString()),
+                new XElement("centerYCol", centerYCol.ToString()),
+                new XElement("testOptions", testOptions),
+                new XElement("sliceWidthVect", sliceWidthVect.ToString()),
+                new XElement("sliceHeightVect", sliceHeightVect.ToString()),
+                new XElement("sliceWidthCol", sliceWidthCol.ToString()),
+                new XElement("sliceHeightCol", sliceHeightCol.ToString())
+                /*new XElement("posterization","")*/
+            );
+
+            PosterizedColorData pcd;
+            foreach (KeyValuePair<int, PosterizedColorData> pair in dictColorData)
+            {
+                pcd = pair.Value;
+                XElement postElement = new XElement("posterization",
+                    new XElement("redMin", pcd.lpRedMin.ToString()),
+                    new XElement("redMax", pcd.lpRedMax.ToString()),
+                    new XElement("greenMin", pcd.lpGreenMin.ToString()),
+                    new XElement("greenMax", pcd.lpGreenMax.ToString()),
+                    new XElement("blueMin", pcd.lpBlueMin.ToString()),
+                    new XElement("blueMax", pcd.lpBlueMax.ToString()),
+                    new XElement("garminColorR", pcd.garminColor.R.ToString()),
+                    new XElement("garminColorG", pcd.garminColor.G.ToString()),
+                    new XElement("garminColorB", pcd.garminColor.B.ToString())
+                );
+                mainElement.Add(postElement);
+            }
+
+            XDocument xDoc = new XDocument( new XDeclaration("1.0", "UTF-16", null), mainElement);
+            FileStream file;
+            if (aPath != "") 
+            {
+                file = new FileStream(aPath, FileMode.OpenOrCreate);
+                thisSettingsPath = aPath;
+            }
+            else
+                file = new FileStream(thisSettingsPath, FileMode.Truncate);
+            xDoc.Save(file);
+
+           /* XmlSerializer xmlEngine = new XmlSerializer(typeof(MainWindowSettings));
             FileStream file;
             if (aPath != "") 
             {
@@ -129,32 +190,95 @@ namespace Migracja
             file.Close();
             //zapamiętanie ostatniego save'u w rejestrze
             SettingsRegister reg = new SettingsRegister();
-            reg.SetLastSaveInfo(this);
+            reg.SetLastSaveInfo(this);*/
         }
 
         public void Load(String aPath)
         {
-            XmlSerializer xmlEngine = new XmlSerializer(typeof(MainWindowSettings));
+           /* XmlSerializer xmlMainEngine = new XmlSerializer(typeof(MainWindowSettings));
             FileStream file = new FileStream(aPath, FileMode.Open);
-            MainWindowSettings tmp = (MainWindowSettings)xmlEngine.Deserialize(file);
-            file.Close();
-            this.leftXCoord = tmp.leftXCoord;
-            this.leftYCoord = tmp.leftYCoord;
-            this.rightXCoord = tmp.rightXCoord;
-            this.rightYCoord = tmp.rightYCoord;
-            this.stSourceImagePath = tmp.stSourceImagePath;
-            this.dpScaleVect = tmp.dpScaleVect;
-            this.centerXVect = tmp.centerXVect;
-            this.centerYVect = tmp.centerYVect;
-            this.dpScaleCol = tmp.dpScaleCol;
-            this.centerXCol = tmp.centerXCol;
-            this.centerYCol = tmp.centerYCol;
+            MainWindowSettings tmp = (MainWindowSettings)xmlMainEngine.Deserialize(file);
+            file.Close();*/
+
+            XElement settings = XElement.Load(aPath);
+
+            // ... XNames.
+            XName XleftXCoord = XName.Get("leftXCoord", "");
+            XName XleftYCoord = XName.Get("leftYCoord", "");
+            XName XrightXCoord = XName.Get("rightXCoord", "");
+            XName XrightYCoord = XName.Get("rightYCoord", "");
+            XName XstSourceImagePath = XName.Get("stSourceImagePath", "");
+            XName XdpScaleVect = XName.Get("dpScaleVect", "");
+            XName XcenterXVect = XName.Get("centerXVect", "");
+            XName XcenterYVect = XName.Get("centerYVect", "");
+            XName XdpScaleCol = XName.Get("dpScaleCol", "");
+            XName XcenterXCol = XName.Get("centerXCol", "");
+            XName XcenterYCol = XName.Get("centerYCol", "");
+            XName XtestOptions = XName.Get("testOptions", "");
+            XName XsliceWidthVect = XName.Get("sliceWidthVect", "");
+            XName XsliceHeightVect = XName.Get("sliceHeightVect", "");
+            XName XsliceWidthCol = XName.Get("sliceWidthCol", "");
+            XName XsliceHeightCol = XName.Get("sliceHeightCol", "");
+
+            XName XPosterization = XName.Get("posterization");
+                XName XColor = XName.Get("color");
+                    XName XredMin = XName.Get("redMin");
+                    XName XredMax = XName.Get("redMax");
+                    XName XgreenMin = XName.Get("greenMin");
+                    XName XgreenMax = XName.Get("greenMax");
+                    XName XblueMin = XName.Get("blueMin");
+                    XName XblueMax = XName.Get("blueMax");
+                    XName XgarminColorR = XName.Get("garminColorR");
+                    XName XgarminColorG = XName.Get("garminColorG");
+                    XName XgarminColorB = XName.Get("garminColorB");
+
+
+            // ... Loop over url elements.
+            // ... Then access each loc element.
+            //foreach (var urlElement in settings.Elements(url))
+            //{
+                //var locElement = urlElement.Element(loc);
+                //Console.WriteLine(locElement.Value);
+                //Console.WriteLine(urlElement.Value);
+
+            this.leftXCoord = settings.Elements(XleftXCoord).First().Value;
+            this.leftYCoord = settings.Elements(XleftYCoord).First().Value;
+            this.rightXCoord = settings.Elements(XrightXCoord).First().Value;
+            this.rightYCoord = settings.Elements(XrightYCoord).First().Value;
+            this.stSourceImagePath = settings.Elements(XstSourceImagePath).First().Value;
+            this.dpScaleVect = float.Parse(settings.Elements(XdpScaleVect).First().Value);
+            this.centerXVect = int.Parse(settings.Elements(XcenterXVect).First().Value);
+            this.centerYVect = int.Parse(settings.Elements(XcenterYVect).First().Value);
+            this.dpScaleCol = float.Parse(settings.Elements(XdpScaleCol).First().Value);
+            this.centerXCol = int.Parse(settings.Elements(XcenterXCol).First().Value);
+            this.centerYCol = int.Parse(settings.Elements(XcenterYCol).First().Value);
             this.thisSettingsPath = aPath;
-            this.testOptions = tmp.testOptions;
-            this.sliceWidthVect = tmp.sliceWidthVect;
-            this.sliceHeightVect = tmp.sliceHeightVect;
-            this.sliceWidthCol = tmp.sliceWidthCol;
-            this.sliceHeightCol = tmp.sliceHeightCol;
+            this.testOptions = settings.Elements(XtestOptions).First().Value;
+            this.sliceWidthVect = int.Parse(settings.Elements(XsliceWidthVect).First().Value);
+            this.sliceHeightVect = int.Parse(settings.Elements(XsliceHeightVect).First().Value);
+            this.sliceWidthCol = int.Parse(settings.Elements(XsliceWidthCol).First().Value);
+            this.sliceHeightCol = int.Parse(settings.Elements(XsliceHeightCol).First().Value);
+
+            var postElement = settings.Elements(XPosterization);             
+            foreach (var colorElement in postElement.Elements(XColor))
+            {
+                if (colorElement.Element(XredMin) != null)
+                { 
+                    PosterizedColorData pcd = new PosterizedColorData();
+                    pcd.lpRedMin = int.Parse(colorElement.Element(XredMin).Value);
+                    pcd.lpRedMax = int.Parse(colorElement.Element(XredMax).Value);
+                    pcd.lpGreenMin = int.Parse(colorElement.Element(XgreenMin).Value);
+                    pcd.lpGreenMax = int.Parse(colorElement.Element(XgreenMax).Value);
+                    pcd.lpBlueMin = int.Parse(colorElement.Element(XblueMin).Value);
+                    pcd.lpBlueMax = int.Parse(colorElement.Element(XblueMax).Value);
+                    pcd.garminColor = Color.FromArgb(255,
+                                                        int.Parse(colorElement.Element(XgarminColorR).Value),
+                                                        int.Parse(colorElement.Element(XgarminColorG).Value), 
+                                                        int.Parse(colorElement.Element(XgarminColorB).Value)
+                                                        );
+                    this.dictColorData.Add(ExtDictionary.NextKey(this.dictColorData), pcd);
+                }
+            }
         }
 
         public string[] GetCheckegTestOptionsList()

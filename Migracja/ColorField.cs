@@ -14,24 +14,21 @@ namespace Migracja
         int lpRed;
         int lpGreen;
         int lpBlue;
-        Func<string, int> ReturnFunct;
+        Func<int, int, int, Color> ReturnFunct;
 
-        public ColorField(int aLpRed = -1, int aLpGreen = -1, int aLpBlue = -1, Func<string, int> aReturnFunct = null)
+        public ColorField(int aLpRed = -1, int aLpGreen = -1, int aLpBlue = -1, Func<int, int, int, Color> aReturnFunct = null)
         {
             InitializeComponent();
             lpRed = aLpRed;
             lpGreen = aLpGreen;
             lpBlue = aLpBlue;
-            pnlColor.BackColor = new Color();
-            pnlColor.BackColor.R = lpRed;
-            pnlColor.BackColor.G = lpGreen;
-            pnlColor.BackColor.B = lpBlue;
-            ReturnFunct = aReturnFunct(aLpRed, aLpGreen, aLpBlue);
+            pnlColor.BackColor = Color.FromArgb(lpRed, lpGreen, lpBlue);             
+            ReturnFunct = aReturnFunct/*(aLpRed, aLpGreen, aLpBlue)*/;
         }
 
         private void ColorField_Click(object sender, EventArgs e)
         {
-            ReturnFunct(aLpRed, aLpGreen, aLpBlue);
+            ReturnFunct(lpRed, lpGreen, lpBlue);
         }
 
         public void ShowDetails()
@@ -48,6 +45,11 @@ namespace Migracja
             lblGreen.Visible = false;
             lblBlue.Visible = false;
             pnlColor.Width = 16;
+        }
+
+        private void pnlColor_Click(object sender, EventArgs e)
+        {
+            ReturnFunct(lpRed, lpGreen, lpBlue);
         }
     }
 }

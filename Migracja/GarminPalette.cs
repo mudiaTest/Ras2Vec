@@ -11,13 +11,12 @@ namespace Migracja
 {
     public partial class GarminPalette : Form
     {
-        public GarminPalette()
+        PosterizedColorData postColorData;
+        public GarminPalette(PosterizedColorData aPostColorData)
         {
             InitializeComponent();
-        }
+            postColorData = aPostColorData;
 
-        private void tpTest_Click(object sender, EventArgs e)
-        {
             flpTest.Controls.Add(new ColorField(0, 0, 0, Ok));
             flpTest.Controls.Add(new ColorField(255, 0, 0, Ok));
             flpTest.Controls.Add(new ColorField(0, 255, 0, Ok));
@@ -27,11 +26,19 @@ namespace Migracja
 
         public Color Ok(int aLpRed, int aLpGreen, int aLpBlue)
         {
-            Color result = new Color();
-            result.R = aLpRed;
-            result.R = aLpGreen;
-            result.R = aLpBlue;
+            Color result = Color.FromArgb(aLpRed, aLpGreen, aLpBlue);
+            postColorData.garminColor = result;
+            Close();
+            return result;
         }
 
+        private void tpTest_Click(object sender, EventArgs e)
+        {
+            /*flpTest.Controls.Add(new ColorField(0, 0, 0, Ok));
+            flpTest.Controls.Add(new ColorField(255, 0, 0, Ok));
+            flpTest.Controls.Add(new ColorField(0, 255, 0, Ok));
+            flpTest.Controls.Add(new ColorField(0, 0, 255, Ok));
+            flpTest.Controls.Add(new ColorField(255, 255, 255, Ok));*/
+        }
     }
 }

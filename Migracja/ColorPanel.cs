@@ -28,6 +28,7 @@ namespace Migracja
             postColorObj.lpGreenMax = Int32.Parse(txtGreenMax.Text);
             postColorObj.lpBlueMin = Int32.Parse(txtBlueMin.Text);
             postColorObj.lpBlueMax = Int32.Parse(txtBlueMax.Text);
+            postColorObj.garminColor = pnlColor.BackColor;
         }
 
         public void Obj2Scr()
@@ -38,14 +39,10 @@ namespace Migracja
             txtGreenMax.Text = postColorObj.lpGreenMax.ToString();
             txtBlueMin.Text = postColorObj.lpBlueMin.ToString();
             txtBlueMax.Text = postColorObj.lpBlueMax.ToString();
+            pnlColor.BackColor = postColorObj.garminColor;
         }
 
         private void ColorPanel_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
@@ -80,17 +77,14 @@ namespace Migracja
 
         }
 
-        private void label3_Click(object sender, EventArgs e)
+        private void pnlColor_Click(object sender, EventArgs e)
         {
-
+            GarminPalette palette = new GarminPalette(postColorObj);
+            palette.ShowDialog(this);
+            Obj2Scr();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
+        private void pnlColor_Paint(object sender, PaintEventArgs e)
         {
 
         }

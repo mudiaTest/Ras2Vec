@@ -48,18 +48,6 @@
             this.mainTab = new System.Windows.Forms.TabControl();
             this.tabVect = new System.Windows.Forms.TabPage();
             this.panelMainVect = new System.Windows.Forms.Panel();
-            this.panelPict = new System.Windows.Forms.Panel();
-            this.sourcePanel = new System.Windows.Forms.Panel();
-            this.sourcePB = new System.Windows.Forms.PictureBox();
-            this.destinationPanel = new System.Windows.Forms.Panel();
-            this.destinationPB = new System.Windows.Forms.PictureBox();
-            this.posterizedPanel = new System.Windows.Forms.Panel();
-            this.posterizedPB = new System.Windows.Forms.PictureBox();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.trScaleVect = new System.Windows.Forms.TrackBar();
-            this.btnZoomOutVect = new System.Windows.Forms.Button();
-            this.txtScaleLvlVect = new System.Windows.Forms.TextBox();
-            this.btnZoomInVect = new System.Windows.Forms.Button();
             this.panelMenuVect = new System.Windows.Forms.Panel();
             this.panelInputVect = new System.Windows.Forms.Panel();
             this.posterizeSrcImageBtn = new System.Windows.Forms.Button();
@@ -92,29 +80,47 @@
             this.btnSeparateThread = new System.Windows.Forms.Button();
             this.panelMenuVectHide = new System.Windows.Forms.Panel();
             this.btnMenuVectHide = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.panelPict = new System.Windows.Forms.Panel();
             this.flpPictures = new System.Windows.Forms.FlowLayoutPanel();
+            this.sourcePanel = new System.Windows.Forms.Panel();
+            this.sourcePB = new System.Windows.Forms.PictureBox();
+            this.posterizedPanel = new System.Windows.Forms.Panel();
+            this.posterizedPB = new System.Windows.Forms.PictureBox();
+            this.destinationPanel = new System.Windows.Forms.Panel();
+            this.destinationPB = new System.Windows.Forms.PictureBox();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnZoomInVect = new System.Windows.Forms.Button();
+            this.btnZoomOutVect = new System.Windows.Forms.Button();
+            this.txtScaleLvlVect = new System.Windows.Forms.TextBox();
+            this.trScaleVect = new System.Windows.Forms.TrackBar();
+            this.tabColor = new System.Windows.Forms.TabPage();
+            this.flpColors = new System.Windows.Forms.FlowLayoutPanel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnAddColorPanel = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             this.mainTab.SuspendLayout();
             this.tabVect.SuspendLayout();
             this.panelMainVect.SuspendLayout();
-            this.panelPict.SuspendLayout();
-            this.sourcePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
-            this.destinationPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
-            this.posterizedPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.posterizedPB)).BeginInit();
-            this.panel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).BeginInit();
             this.panelMenuVect.SuspendLayout();
             this.panelInputVect.SuspendLayout();
             this.panel8.SuspendLayout();
             this.panel5.SuspendLayout();
             this.gbThreadChoice.SuspendLayout();
             this.panelMenuVectHide.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.panelPict.SuspendLayout();
             this.flpPictures.SuspendLayout();
+            this.sourcePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).BeginInit();
+            this.posterizedPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.posterizedPB)).BeginInit();
+            this.destinationPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).BeginInit();
+            this.panel6.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).BeginInit();
+            this.tabColor.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -228,6 +234,7 @@
             // 
             // mainTab
             // 
+            this.mainTab.Controls.Add(this.tabColor);
             this.mainTab.Controls.Add(this.tabVect);
             this.mainTab.Dock = System.Windows.Forms.DockStyle.Left;
             this.mainTab.Location = new System.Drawing.Point(0, 24);
@@ -256,149 +263,6 @@
             this.panelMainVect.Name = "panelMainVect";
             this.panelMainVect.Size = new System.Drawing.Size(351, 481);
             this.panelMainVect.TabIndex = 12;
-            // 
-            // panelPict
-            // 
-            this.panelPict.AutoSize = true;
-            this.panelPict.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelPict.Controls.Add(this.flpPictures);
-            this.panelPict.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelPict.Location = new System.Drawing.Point(0, 40);
-            this.panelPict.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.panelPict.Name = "panelPict";
-            this.panelPict.Size = new System.Drawing.Size(489, 471);
-            this.panelPict.TabIndex = 14;
-            this.panelPict.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
-            // 
-            // sourcePanel
-            // 
-            this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.sourcePanel.Controls.Add(this.sourcePB);
-            this.sourcePanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.sourcePanel.Location = new System.Drawing.Point(3, 3);
-            this.sourcePanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.sourcePanel.Name = "sourcePanel";
-            this.sourcePanel.Size = new System.Drawing.Size(480, 108);
-            this.sourcePanel.TabIndex = 24;
-            // 
-            // sourcePB
-            // 
-            this.sourcePB.Location = new System.Drawing.Point(0, 0);
-            this.sourcePB.Name = "sourcePB";
-            this.sourcePB.Size = new System.Drawing.Size(152, 98);
-            this.sourcePB.TabIndex = 14;
-            this.sourcePB.TabStop = false;
-            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseDown);
-            this.sourcePB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
-            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
-            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
-            // 
-            // destinationPanel
-            // 
-            this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.destinationPanel.Controls.Add(this.destinationPB);
-            this.destinationPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.destinationPanel.Location = new System.Drawing.Point(3, 236);
-            this.destinationPanel.Name = "destinationPanel";
-            this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.destinationPanel.Size = new System.Drawing.Size(480, 105);
-            this.destinationPanel.TabIndex = 22;
-            // 
-            // destinationPB
-            // 
-            this.destinationPB.Location = new System.Drawing.Point(0, 0);
-            this.destinationPB.Name = "destinationPB";
-            this.destinationPB.Size = new System.Drawing.Size(152, 98);
-            this.destinationPB.TabIndex = 14;
-            this.destinationPB.TabStop = false;
-            this.destinationPB.Click += new System.EventHandler(this.destinationPB_Click);
-            this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
-            this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
-            this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
-            // 
-            // posterizedPanel
-            // 
-            this.posterizedPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.posterizedPanel.Controls.Add(this.posterizedPB);
-            this.posterizedPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.posterizedPanel.Location = new System.Drawing.Point(3, 114);
-            this.posterizedPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.posterizedPanel.Name = "posterizedPanel";
-            this.posterizedPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.posterizedPanel.Size = new System.Drawing.Size(480, 119);
-            this.posterizedPanel.TabIndex = 19;
-            // 
-            // posterizedPB
-            // 
-            this.posterizedPB.Location = new System.Drawing.Point(0, 0);
-            this.posterizedPB.Name = "posterizedPB";
-            this.posterizedPB.Size = new System.Drawing.Size(152, 98);
-            this.posterizedPB.TabIndex = 14;
-            this.posterizedPB.TabStop = false;
-            this.posterizedPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseDown);
-            this.posterizedPB.MouseLeave += new System.EventHandler(this.posterizedPB_MouseLeave);
-            this.posterizedPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseMove);
-            this.posterizedPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseUp);
-            // 
-            // panel6
-            // 
-            this.panel6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel6.Controls.Add(this.panelPict);
-            this.panel6.Controls.Add(this.panel1);
-            this.panel6.Location = new System.Drawing.Point(362, 24);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(491, 513);
-            this.panel6.TabIndex = 13;
-            // 
-            // trScaleVect
-            // 
-            this.trScaleVect.Enabled = false;
-            this.trScaleVect.Location = new System.Drawing.Point(81, 3);
-            this.trScaleVect.Minimum = 1;
-            this.trScaleVect.Name = "trScaleVect";
-            this.trScaleVect.Size = new System.Drawing.Size(175, 45);
-            this.trScaleVect.TabIndex = 26;
-            this.trScaleVect.Value = 1;
-            this.trScaleVect.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseMove);
-            this.trScaleVect.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseUp);
-            // 
-            // btnZoomOutVect
-            // 
-            this.btnZoomOutVect.Enabled = false;
-            this.btnZoomOutVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnZoomOutVect.Location = new System.Drawing.Point(47, 8);
-            this.btnZoomOutVect.Name = "btnZoomOutVect";
-            this.btnZoomOutVect.Size = new System.Drawing.Size(28, 26);
-            this.btnZoomOutVect.TabIndex = 23;
-            this.btnZoomOutVect.Text = "-";
-            this.btnZoomOutVect.UseVisualStyleBackColor = true;
-            this.btnZoomOutVect.Click += new System.EventHandler(this.ZoomOutBtn_Click);
-            // 
-            // txtScaleLvlVect
-            // 
-            this.txtScaleLvlVect.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.txtScaleLvlVect.Location = new System.Drawing.Point(262, 13);
-            this.txtScaleLvlVect.Name = "txtScaleLvlVect";
-            this.txtScaleLvlVect.ReadOnly = true;
-            this.txtScaleLvlVect.Size = new System.Drawing.Size(27, 20);
-            this.txtScaleLvlVect.TabIndex = 22;
-            this.txtScaleLvlVect.Text = "1";
-            this.txtScaleLvlVect.Leave += new System.EventHandler(this.textBox1_Leave);
-            // 
-            // btnZoomInVect
-            // 
-            this.btnZoomInVect.Enabled = false;
-            this.btnZoomInVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnZoomInVect.Location = new System.Drawing.Point(13, 8);
-            this.btnZoomInVect.Name = "btnZoomInVect";
-            this.btnZoomInVect.Size = new System.Drawing.Size(28, 26);
-            this.btnZoomInVect.TabIndex = 22;
-            this.btnZoomInVect.Text = "+";
-            this.btnZoomInVect.UseVisualStyleBackColor = true;
-            this.btnZoomInVect.Click += new System.EventHandler(this.ZoomInBtn_Click);
             // 
             // panelMenuVect
             // 
@@ -766,6 +630,113 @@
             this.btnMenuVectHide.UseVisualStyleBackColor = true;
             this.btnMenuVectHide.Click += new System.EventHandler(this.btnMenuHide_Click);
             // 
+            // panelPict
+            // 
+            this.panelPict.AutoSize = true;
+            this.panelPict.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelPict.Controls.Add(this.flpPictures);
+            this.panelPict.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelPict.Location = new System.Drawing.Point(0, 40);
+            this.panelPict.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.panelPict.Name = "panelPict";
+            this.panelPict.Size = new System.Drawing.Size(489, 471);
+            this.panelPict.TabIndex = 14;
+            this.panelPict.SizeChanged += new System.EventHandler(this.panel7_SizeChanged);
+            // 
+            // flpPictures
+            // 
+            this.flpPictures.Controls.Add(this.sourcePanel);
+            this.flpPictures.Controls.Add(this.posterizedPanel);
+            this.flpPictures.Controls.Add(this.destinationPanel);
+            this.flpPictures.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpPictures.Location = new System.Drawing.Point(0, 0);
+            this.flpPictures.Name = "flpPictures";
+            this.flpPictures.Size = new System.Drawing.Size(487, 469);
+            this.flpPictures.TabIndex = 25;
+            // 
+            // sourcePanel
+            // 
+            this.sourcePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.sourcePanel.Controls.Add(this.sourcePB);
+            this.sourcePanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.sourcePanel.Location = new System.Drawing.Point(3, 3);
+            this.sourcePanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.sourcePanel.Name = "sourcePanel";
+            this.sourcePanel.Size = new System.Drawing.Size(480, 108);
+            this.sourcePanel.TabIndex = 24;
+            // 
+            // sourcePB
+            // 
+            this.sourcePB.Location = new System.Drawing.Point(0, 0);
+            this.sourcePB.Name = "sourcePB";
+            this.sourcePB.Size = new System.Drawing.Size(152, 98);
+            this.sourcePB.TabIndex = 14;
+            this.sourcePB.TabStop = false;
+            this.sourcePB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseDown);
+            this.sourcePB.MouseLeave += new System.EventHandler(this.sourcePB_MouseLeave);
+            this.sourcePB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseMove);
+            this.sourcePB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sourcePB_MouseUp);
+            // 
+            // posterizedPanel
+            // 
+            this.posterizedPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.posterizedPanel.Controls.Add(this.posterizedPB);
+            this.posterizedPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.posterizedPanel.Location = new System.Drawing.Point(3, 114);
+            this.posterizedPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.posterizedPanel.Name = "posterizedPanel";
+            this.posterizedPanel.Padding = new System.Windows.Forms.Padding(5);
+            this.posterizedPanel.Size = new System.Drawing.Size(480, 119);
+            this.posterizedPanel.TabIndex = 19;
+            // 
+            // posterizedPB
+            // 
+            this.posterizedPB.Location = new System.Drawing.Point(0, 0);
+            this.posterizedPB.Name = "posterizedPB";
+            this.posterizedPB.Size = new System.Drawing.Size(152, 98);
+            this.posterizedPB.TabIndex = 14;
+            this.posterizedPB.TabStop = false;
+            this.posterizedPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseDown);
+            this.posterizedPB.MouseLeave += new System.EventHandler(this.posterizedPB_MouseLeave);
+            this.posterizedPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseMove);
+            this.posterizedPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.posterizedPB_MouseUp);
+            // 
+            // destinationPanel
+            // 
+            this.destinationPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.destinationPanel.Controls.Add(this.destinationPB);
+            this.destinationPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.destinationPanel.Location = new System.Drawing.Point(3, 236);
+            this.destinationPanel.Name = "destinationPanel";
+            this.destinationPanel.Padding = new System.Windows.Forms.Padding(5);
+            this.destinationPanel.Size = new System.Drawing.Size(480, 105);
+            this.destinationPanel.TabIndex = 22;
+            // 
+            // destinationPB
+            // 
+            this.destinationPB.Location = new System.Drawing.Point(0, 0);
+            this.destinationPB.Name = "destinationPB";
+            this.destinationPB.Size = new System.Drawing.Size(152, 98);
+            this.destinationPB.TabIndex = 14;
+            this.destinationPB.TabStop = false;
+            this.destinationPB.Click += new System.EventHandler(this.destinationPB_Click);
+            this.destinationPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseDown);
+            this.destinationPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseMove);
+            this.destinationPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.destinationPB_MouseUp);
+            // 
+            // panel6
+            // 
+            this.panel6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel6.Controls.Add(this.panelPict);
+            this.panel6.Controls.Add(this.panel1);
+            this.panel6.Location = new System.Drawing.Point(362, 24);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(491, 513);
+            this.panel6.TabIndex = 13;
+            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.btnZoomInVect);
@@ -778,16 +749,93 @@
             this.panel1.Size = new System.Drawing.Size(489, 40);
             this.panel1.TabIndex = 27;
             // 
-            // flpPictures
+            // btnZoomInVect
             // 
-            this.flpPictures.Controls.Add(this.sourcePanel);
-            this.flpPictures.Controls.Add(this.posterizedPanel);
-            this.flpPictures.Controls.Add(this.destinationPanel);
-            this.flpPictures.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flpPictures.Location = new System.Drawing.Point(0, 0);
-            this.flpPictures.Name = "flpPictures";
-            this.flpPictures.Size = new System.Drawing.Size(487, 469);
-            this.flpPictures.TabIndex = 25;
+            this.btnZoomInVect.Enabled = false;
+            this.btnZoomInVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomInVect.Location = new System.Drawing.Point(13, 8);
+            this.btnZoomInVect.Name = "btnZoomInVect";
+            this.btnZoomInVect.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomInVect.TabIndex = 22;
+            this.btnZoomInVect.Text = "+";
+            this.btnZoomInVect.UseVisualStyleBackColor = true;
+            this.btnZoomInVect.Click += new System.EventHandler(this.ZoomInBtn_Click);
+            // 
+            // btnZoomOutVect
+            // 
+            this.btnZoomOutVect.Enabled = false;
+            this.btnZoomOutVect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnZoomOutVect.Location = new System.Drawing.Point(47, 8);
+            this.btnZoomOutVect.Name = "btnZoomOutVect";
+            this.btnZoomOutVect.Size = new System.Drawing.Size(28, 26);
+            this.btnZoomOutVect.TabIndex = 23;
+            this.btnZoomOutVect.Text = "-";
+            this.btnZoomOutVect.UseVisualStyleBackColor = true;
+            this.btnZoomOutVect.Click += new System.EventHandler(this.ZoomOutBtn_Click);
+            // 
+            // txtScaleLvlVect
+            // 
+            this.txtScaleLvlVect.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.txtScaleLvlVect.Location = new System.Drawing.Point(262, 13);
+            this.txtScaleLvlVect.Name = "txtScaleLvlVect";
+            this.txtScaleLvlVect.ReadOnly = true;
+            this.txtScaleLvlVect.Size = new System.Drawing.Size(27, 20);
+            this.txtScaleLvlVect.TabIndex = 22;
+            this.txtScaleLvlVect.Text = "1";
+            this.txtScaleLvlVect.Leave += new System.EventHandler(this.textBox1_Leave);
+            // 
+            // trScaleVect
+            // 
+            this.trScaleVect.Enabled = false;
+            this.trScaleVect.Location = new System.Drawing.Point(81, 3);
+            this.trScaleVect.Minimum = 1;
+            this.trScaleVect.Name = "trScaleVect";
+            this.trScaleVect.Size = new System.Drawing.Size(175, 45);
+            this.trScaleVect.TabIndex = 26;
+            this.trScaleVect.Value = 1;
+            this.trScaleVect.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseMove);
+            this.trScaleVect.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseUp);
+            // 
+            // tabColor
+            // 
+            this.tabColor.Controls.Add(this.flpColors);
+            this.tabColor.Controls.Add(this.panel2);
+            this.tabColor.Location = new System.Drawing.Point(4, 22);
+            this.tabColor.Name = "tabColor";
+            this.tabColor.Padding = new System.Windows.Forms.Padding(3);
+            this.tabColor.Size = new System.Drawing.Size(357, 487);
+            this.tabColor.TabIndex = 2;
+            this.tabColor.Text = "Kolor";
+            this.tabColor.UseVisualStyleBackColor = true;
+            // 
+            // flpColors
+            // 
+            this.flpColors.AutoScroll = true;
+            this.flpColors.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpColors.Location = new System.Drawing.Point(3, 3);
+            this.flpColors.Margin = new System.Windows.Forms.Padding(0);
+            this.flpColors.Name = "flpColors";
+            this.flpColors.Size = new System.Drawing.Size(351, 441);
+            this.flpColors.TabIndex = 0;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.btnAddColorPanel);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(3, 444);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(351, 40);
+            this.panel2.TabIndex = 1;
+            // 
+            // btnAddColorPanel
+            // 
+            this.btnAddColorPanel.Location = new System.Drawing.Point(7, 8);
+            this.btnAddColorPanel.Name = "btnAddColorPanel";
+            this.btnAddColorPanel.Size = new System.Drawing.Size(35, 24);
+            this.btnAddColorPanel.TabIndex = 0;
+            this.btnAddColorPanel.Text = "Add";
+            this.btnAddColorPanel.UseVisualStyleBackColor = true;
+            this.btnAddColorPanel.Click += new System.EventHandler(this.btnAddColorPanel_Click);
             // 
             // MainWindow
             // 
@@ -805,16 +853,6 @@
             this.mainTab.ResumeLayout(false);
             this.tabVect.ResumeLayout(false);
             this.panelMainVect.ResumeLayout(false);
-            this.panelPict.ResumeLayout(false);
-            this.sourcePanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
-            this.destinationPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
-            this.posterizedPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.posterizedPB)).EndInit();
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).EndInit();
             this.panelMenuVect.ResumeLayout(false);
             this.panelInputVect.ResumeLayout(false);
             this.panel8.ResumeLayout(false);
@@ -824,9 +862,21 @@
             this.gbThreadChoice.ResumeLayout(false);
             this.gbThreadChoice.PerformLayout();
             this.panelMenuVectHide.ResumeLayout(false);
+            this.panelPict.ResumeLayout(false);
+            this.flpPictures.ResumeLayout(false);
+            this.sourcePanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.sourcePB)).EndInit();
+            this.posterizedPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.posterizedPB)).EndInit();
+            this.destinationPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.destinationPB)).EndInit();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.flpPictures.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).EndInit();
+            this.tabColor.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -899,6 +949,10 @@
         private System.Windows.Forms.Button posterizeSrcImageBtn;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.FlowLayoutPanel flpPictures;
+        private System.Windows.Forms.TabPage tabColor;
+        private System.Windows.Forms.FlowLayoutPanel flpColors;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnAddColorPanel;
     }
 }
 
