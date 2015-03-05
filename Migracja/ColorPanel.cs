@@ -88,5 +88,35 @@ namespace Migracja
         {
 
         }
+
+        private void txtRedMin_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
+
+        private void txtRedMax_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
+
+        private void txtGreenMin_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
+
+        private void txtGreenMax_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
+
+        private void txtBlueMin_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
+
+        private void txtBlueMax_Leave(object sender, EventArgs e)
+        {
+            Scr2Obj();
+        }
     }
 }

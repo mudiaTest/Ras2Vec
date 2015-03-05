@@ -32,6 +32,7 @@ namespace Migracja
             if (File.Exists(lastSavePath))
             { 
                 windowSettings.Load(lastSavePath);
+                FillFlpColorsFromSettings(windowSettings);
                 if (File.Exists(windowSettings.stSourceImagePath))
                     PrepareSourceImage(windowSettings.stSourceImagePath);
                 SettingsToScr(windowSettings);
@@ -58,11 +59,23 @@ namespace Migracja
             if (result == DialogResult.OK)
             {
                 windowSettings.Load(loadDialog.FileName);
+
                 PrepareSourceImage(windowSettings.stSourceImagePath);
                 SettingsToScr(windowSettings);
             }
 
 
+        }
+
+        private void FillFlpColorsFromSettings(MainWindowSettings aSettings)
+        {
+            PosterizedColorData pcd;
+            foreach (KeyValuePair<int, PosterizedColorData> pair in aSettings.dictColorData)
+            {
+                pcd = pair.Value;
+                ColorPanel cp = new ColorPanel(pcd);
+                flpColors.Controls.Add(cp);
+            }
         }
 
         //przycisk SaveAs w menu
@@ -145,14 +158,14 @@ namespace Migracja
                 new XElement("sliceHeightVect", sliceHeightVect.ToString()),
                 new XElement("sliceWidthCol", sliceWidthCol.ToString()),
                 new XElement("sliceHeightCol", sliceHeightCol.ToString())
-                /*new XElement("posterization","")*/
             );
 
             PosterizedColorData pcd;
+            XElement postElement = new XElement("posterization","");
             foreach (KeyValuePair<int, PosterizedColorData> pair in dictColorData)
             {
                 pcd = pair.Value;
-                XElement postElement = new XElement("posterization",
+                XElement colorElement = new XElement("color",
                     new XElement("redMin", pcd.lpRedMin.ToString()),
                     new XElement("redMax", pcd.lpRedMax.ToString()),
                     new XElement("greenMin", pcd.lpGreenMin.ToString()),
@@ -163,9 +176,9 @@ namespace Migracja
                     new XElement("garminColorG", pcd.garminColor.G.ToString()),
                     new XElement("garminColorB", pcd.garminColor.B.ToString())
                 );
-                mainElement.Add(postElement);
+                postElement.Add(colorElement);
             }
-
+            mainElement.Add(postElement);
             XDocument xDoc = new XDocument( new XDeclaration("1.0", "UTF-16", null), mainElement);
             FileStream file;
             if (aPath != "") 
@@ -259,11 +272,11 @@ namespace Migracja
             this.sliceWidthCol = int.Parse(settings.Elements(XsliceWidthCol).First().Value);
             this.sliceHeightCol = int.Parse(settings.Elements(XsliceHeightCol).First().Value);
 
-            var postElement = settings.Elements(XPosterization);             
+            var postElement = settings.Element(XPosterization);             
             foreach (var colorElement in postElement.Elements(XColor))
             {
-                if (colorElement.Element(XredMin) != null)
-                { 
+                //if (colorElement.Element(XredMin) != null)
+                //{ 
                     PosterizedColorData pcd = new PosterizedColorData();
                     pcd.lpRedMin = int.Parse(colorElement.Element(XredMin).Value);
                     pcd.lpRedMax = int.Parse(colorElement.Element(XredMax).Value);
@@ -277,7 +290,7 @@ namespace Migracja
                                                         int.Parse(colorElement.Element(XgarminColorB).Value)
                                                         );
                     this.dictColorData.Add(ExtDictionary.NextKey(this.dictColorData), pcd);
-                }
+                //}
             }
         }
 

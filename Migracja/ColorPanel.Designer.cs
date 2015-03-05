@@ -62,6 +62,7 @@
             this.txtRedMin.Size = new System.Drawing.Size(25, 20);
             this.txtRedMin.TabIndex = 4;
             this.txtRedMin.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox1_MaskInputRejected);
+            this.txtRedMin.Leave += new System.EventHandler(this.txtRedMin_Leave);
             // 
             // txtRedMax
             // 
@@ -71,6 +72,7 @@
             this.txtRedMax.Size = new System.Drawing.Size(25, 20);
             this.txtRedMax.TabIndex = 5;
             this.txtRedMax.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox2_MaskInputRejected);
+            this.txtRedMax.Leave += new System.EventHandler(this.txtRedMax_Leave);
             // 
             // label1
             // 
@@ -98,6 +100,7 @@
             this.txtGreenMax.Size = new System.Drawing.Size(25, 20);
             this.txtGreenMax.TabIndex = 8;
             this.txtGreenMax.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox3_MaskInputRejected);
+            this.txtGreenMax.Leave += new System.EventHandler(this.txtGreenMax_Leave);
             // 
             // txtGreenMin
             // 
@@ -107,6 +110,7 @@
             this.txtGreenMin.Size = new System.Drawing.Size(25, 20);
             this.txtGreenMin.TabIndex = 7;
             this.txtGreenMin.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox4_MaskInputRejected);
+            this.txtGreenMin.Leave += new System.EventHandler(this.txtGreenMin_Leave);
             // 
             // label3
             // 
@@ -125,6 +129,7 @@
             this.txtBlueMax.Size = new System.Drawing.Size(25, 20);
             this.txtBlueMax.TabIndex = 11;
             this.txtBlueMax.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox5_MaskInputRejected);
+            this.txtBlueMax.Leave += new System.EventHandler(this.txtBlueMax_Leave);
             // 
             // txtBlueMin
             // 
@@ -134,6 +139,7 @@
             this.txtBlueMin.Size = new System.Drawing.Size(25, 20);
             this.txtBlueMin.TabIndex = 10;
             this.txtBlueMin.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox6_MaskInputRejected);
+            this.txtBlueMin.Leave += new System.EventHandler(this.txtBlueMin_Leave);
             // 
             // ColorPanel
             // 
