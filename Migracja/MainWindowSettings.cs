@@ -166,15 +166,13 @@ namespace Migracja
             {
                 pcd = pair.Value;
                 XElement colorElement = new XElement("color",
-                    new XElement("redMin", pcd.lpRedMin.ToString()),
-                    new XElement("redMax", pcd.lpRedMax.ToString()),
-                    new XElement("greenMin", pcd.lpGreenMin.ToString()),
-                    new XElement("greenMax", pcd.lpGreenMax.ToString()),
-                    new XElement("blueMin", pcd.lpBlueMin.ToString()),
-                    new XElement("blueMax", pcd.lpBlueMax.ToString()),
+                    new XElement("gravity", pcd.gravity.ToString()),
                     new XElement("garminColorR", pcd.garminColor.R.ToString()),
                     new XElement("garminColorG", pcd.garminColor.G.ToString()),
-                    new XElement("garminColorB", pcd.garminColor.B.ToString())
+                    new XElement("garminColorB", pcd.garminColor.B.ToString()),
+                    new XElement("rasterColorR", pcd.rasterColor.R.ToString()),
+                    new XElement("rasterColorG", pcd.rasterColor.G.ToString()),
+                    new XElement("rasterColorB", pcd.rasterColor.B.ToString())
                 );
                 postElement.Add(colorElement);
             }
@@ -235,16 +233,13 @@ namespace Migracja
 
             XName XPosterization = XName.Get("posterization");
                 XName XColor = XName.Get("color");
-                    XName XredMin = XName.Get("redMin");
-                    XName XredMax = XName.Get("redMax");
-                    XName XgreenMin = XName.Get("greenMin");
-                    XName XgreenMax = XName.Get("greenMax");
-                    XName XblueMin = XName.Get("blueMin");
-                    XName XblueMax = XName.Get("blueMax");
+                    XName Xgravity = XName.Get("gravity");                    
                     XName XgarminColorR = XName.Get("garminColorR");
                     XName XgarminColorG = XName.Get("garminColorG");
                     XName XgarminColorB = XName.Get("garminColorB");
-
+                    XName XrasterColorR = XName.Get("rasterColorR");
+                    XName XrasterColorG = XName.Get("rasterColorG");
+                    XName XrasterColorB = XName.Get("rasterColorB");
 
             // ... Loop over url elements.
             // ... Then access each loc element.
@@ -278,16 +273,16 @@ namespace Migracja
                 //if (colorElement.Element(XredMin) != null)
                 //{ 
                     PosterizedColorData pcd = new PosterizedColorData();
-                    pcd.lpRedMin = int.Parse(colorElement.Element(XredMin).Value);
-                    pcd.lpRedMax = int.Parse(colorElement.Element(XredMax).Value);
-                    pcd.lpGreenMin = int.Parse(colorElement.Element(XgreenMin).Value);
-                    pcd.lpGreenMax = int.Parse(colorElement.Element(XgreenMax).Value);
-                    pcd.lpBlueMin = int.Parse(colorElement.Element(XblueMin).Value);
-                    pcd.lpBlueMax = int.Parse(colorElement.Element(XblueMax).Value);
+                    pcd.gravity = int.Parse(colorElement.Element(Xgravity).Value);
                     pcd.garminColor = Color.FromArgb(255,
                                                         int.Parse(colorElement.Element(XgarminColorR).Value),
                                                         int.Parse(colorElement.Element(XgarminColorG).Value), 
                                                         int.Parse(colorElement.Element(XgarminColorB).Value)
+                                                        );
+                    pcd.rasterColor = Color.FromArgb(255,
+                                                        int.Parse(colorElement.Element(XrasterColorR).Value),
+                                                        int.Parse(colorElement.Element(XrasterColorG).Value),
+                                                        int.Parse(colorElement.Element(XrasterColorB).Value)
                                                         );
                     this.dictColorData.Add(ExtDictionary.NextKey(this.dictColorData), pcd);
                 //}

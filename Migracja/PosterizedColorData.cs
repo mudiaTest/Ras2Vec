@@ -8,17 +8,14 @@ namespace Migracja
 {
     public class PosterizedColorData
     {
-        public int lpRedMin = -1;
-        public int lpRedMax = -1;
-        public int lpGreenMin = -1;
-        public int lpGreenMax = -1;
-        public int lpBlueMin = -1;
-        public int lpBlueMax = -1;
+        public double gravity = 1;
         public Color garminColor;
+        public Color rasterColor;
 
         public PosterizedColorData()
         {
             garminColor = new Color();
+            rasterColor = new Color();
         }
     }
 }

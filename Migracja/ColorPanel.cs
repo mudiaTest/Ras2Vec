@@ -15,31 +15,23 @@ namespace Migracja
         public ColorPanel(PosterizedColorData aPostColorObj)
         {
             InitializeComponent();
-            pnlColor.BackColor = BackColor;
+            pnlGarminColor.BackColor = BackColor;
             postColorObj = aPostColorObj;
             Obj2Scr();
         }
 
         public void Scr2Obj()
         {
-            postColorObj.lpRedMin = Int32.Parse(txtRedMin.Text);
-            postColorObj.lpRedMax = Int32.Parse(txtRedMax.Text);
-            postColorObj.lpGreenMin = Int32.Parse(txtGreenMin.Text);
-            postColorObj.lpGreenMax = Int32.Parse(txtGreenMax.Text);
-            postColorObj.lpBlueMin = Int32.Parse(txtBlueMin.Text);
-            postColorObj.lpBlueMax = Int32.Parse(txtBlueMax.Text);
-            postColorObj.garminColor = pnlColor.BackColor;
+            postColorObj.gravity = Double.Parse(txtGravity.Text);
+            postColorObj.garminColor = pnlGarminColor.BackColor;
+            postColorObj.rasterColor = pnlRasterColor.BackColor;
         }
 
         public void Obj2Scr()
         {
-            txtRedMin.Text = postColorObj.lpRedMin.ToString();
-            txtRedMax.Text = postColorObj.lpRedMax.ToString();
-            txtGreenMin.Text = postColorObj.lpGreenMin.ToString();
-            txtGreenMax.Text = postColorObj.lpGreenMax.ToString();
-            txtBlueMin.Text = postColorObj.lpBlueMin.ToString();
-            txtBlueMax.Text = postColorObj.lpBlueMax.ToString();
-            pnlColor.BackColor = postColorObj.garminColor;
+            txtGravity.Text = String.Format("{0:0.000}", postColorObj.gravity);
+            pnlGarminColor.BackColor = postColorObj.garminColor;
+            pnlRasterColor.BackColor = postColorObj.rasterColor;
         }
 
         private void ColorPanel_Load(object sender, EventArgs e)
@@ -79,9 +71,11 @@ namespace Migracja
 
         private void pnlColor_Click(object sender, EventArgs e)
         {
-            GarminPalette palette = new GarminPalette(postColorObj);
+            GarminPalette palette = new GarminPalette(ref postColorObj.garminColor);
             palette.ShowDialog(this);
+            postColorObj.garminColor = palette.color;
             Obj2Scr();
+            palette.Dispose();
         }
 
         private void pnlColor_Paint(object sender, PaintEventArgs e)
@@ -117,6 +111,15 @@ namespace Migracja
         private void txtBlueMax_Leave(object sender, EventArgs e)
         {
             Scr2Obj();
+        }
+
+        private void pnlRasterColor_Click(object sender, EventArgs e)
+        {
+            GarminPalette palette = new GarminPalette(ref postColorObj.rasterColor);
+            palette.ShowDialog(this);
+            postColorObj.rasterColor = palette.color;
+            Obj2Scr();
+            palette.Dispose();
         }
     }
 }
