@@ -51,7 +51,7 @@ namespace Migracja
     //Grupa rectangli tworzacych jedną grupę. Pozwala obliczyć swoją granicę
     partial class VectoredRectangleGroup : VectorRectangeGroup
     {
-        //cztery punkty geograficzne określanące rogi obrazka
+        //cztery punkty geograficzne Określanące rogi obrazka
         //leftTopGeo, rightTopGeo, leftBottomGeo, rightBottomGeo: Double;
 
         //lista obiektów Vector_Rectangle tworzących krawędź (self, czyli grupy obiektów Vector_Rectangle). 
@@ -61,7 +61,7 @@ namespace Migracja
         public EdgeList innerEdgesList { get; set; }
         //lista krawędzi punktów Double
         public Dictionary<int, GeoEdgePoint> edgeGeoList { get; set; }
-        //lista krawędzi punktów-pixeli (kolejnych), które zostały poddane uproszczaniu - jest to okrojona edgePxList
+        //lista krawędzi punktów-pixeli (kolejnych), które zostały poddane uproszczaniu - jest to Okrojona edgePxList
         public VectorRectangeGroup simplifiedEdgeVectRectList{get;set;}
         //lista uroszczonych wewnętrznych krawędzi. Każda z nich ma konstrukcję jak edgePxList
         public Dictionary<int, VectorRectangeGroup> simplifiedInnerEdgesList{get;set;}
@@ -114,7 +114,7 @@ namespace Migracja
         }
 
         //tworzy krawędź z 3 kolejnych punktów
-        //  multi = mnożnik: dla grafiki bedzie to zoom, dla geo będzie to szerokośc
+        //  multi = mnożnik: dla grafiki bedzie to zoom, dla geo będzie to szerOkośc
         //          geograficzna jednego px
         private void MakePartEdge(  Point aPrvPoint, Point aActPoint, Point aNextPoint,
                                     ref int lpCounter, List<GeoEdgePoint> aGeoArr,
@@ -389,10 +389,10 @@ namespace Migracja
                                            PointAdv[][] aPointAdvArr, //mapa dla PointAdv
                                            ColorPx[][] aColorArr, //mapa dla ColorPx
                                            bool aIsFirstEdgeVectRect, //Czy jest pierwszym punktem krawędzi
-                                           //Sprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu pary punktów 1,2 i 2,3( o ile 3 != null) 
-                                           int? pxToTypeCheck1 = null, //1 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
-                                           int? pxToTypeCheck2 = null, //2 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
-                                           int? pxToTypeCheck3 = null)  //3 punkt zprawdzamy na możliwośc zmiany grupy w okolicy dodawanego punktu
+                                           //Sprawdzamy na możliwośc zmiany grupy w Okolicy dodawanego punktu pary punktów 1,2 i 2,3( o ile 3 != null) 
+                                           int? pxToTypeCheck1 = null, //1 punkt zprawdzamy na możliwośc zmiany grupy w Okolicy dodawanego punktu
+                                           int? pxToTypeCheck2 = null, //2 punkt zprawdzamy na możliwośc zmiany grupy w Okolicy dodawanego punktu
+                                           int? pxToTypeCheck3 = null)  //3 punkt zprawdzamy na możliwośc zmiany grupy w Okolicy dodawanego punktu
             {
                 int kdPxType = 0; 
                 if (pxToTypeCheck1 != null && pxToTypeCheck2 != null)
@@ -432,7 +432,7 @@ namespace Migracja
                 Debug.Assert(tmpGeoPoint != null, "newGeoPoint jest 'Point.Empty'");
                 Point newGeoPoint = (Point)tmpGeoPoint; //newGeoPoint ma jeszcze zmienne X,Y odpowiadające px. Przekształcenie ma prawdzowe zmienne geograficzne następuje poniżej
 
-                //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim kroku i jest to zgodne z algorytmem, ale nie logiką. 
+                //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim krOku i jest to zgodne z algorytmem, ale nie logiką. 
                 //Taka sytuacja może zajść np dla granicy ...(26,1),(27,1),(27,0),(27,1)... Sprawdzenie (26,1),(27,1),(27,0) doda (27,1), a kolejne 
                 //(27,1),(27,0),(27,1) doda (27,1),(27,0),(28,0), więc (27,1) byłby dodany 2 razy pod rząd
                 if (aGeoArr.Count ==0 ||
@@ -741,7 +741,7 @@ namespace Migracja
                 //Aby wyjaśnicz dlaczego najlepiej narysować podane granice przyjrzeć się jak przebiegają
                 if (result.Count > 0)
                 {
-                    //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim kroku i jest to zgodne z algorytmem, ale nie logiką. 
+                    //Możliwa jest sytuacja, gdy punkt, który włąśnie chcemy dodać został dodany w poprzednim krOku i jest to zgodne z algorytmem, ale nie logiką. 
                     //Taka sytuacja może zajść np dla granicy ...(26,1),(27,1),(27,0),(27,1)... Sprawdzenie (26,1),(27,1),(27,0) doda (27,1), a kolejne 
                     //(27,1),(27,0),(27,1) doda (27,1),(27,0),(28,0), więc (27,1) byłby dodany 2 razy pod rząd
                     //Jednak sprawdzenie wykonywane w powyższej pętli nie zadziała jeśli te punkty bedą na 2 końcach granicy. Można to wykryć
@@ -847,7 +847,7 @@ namespace Migracja
 
                     if (parentMapFactory.pointAdvArr[endPoint.pictX][endPoint.pictY].IsDelSimplified())
                     {
-                        //właściwie nie powinniśmy nic robić, ale może się okazać, że middle
+                        //właściwie nie powinniśmy nic robić, ale może się Okazać, że middle
                         if (!parentMapFactory.pointAdvArr[middlePoint.pictX][middlePoint.pictY].CanBeDelSimplified())
                         {
                             lstPointsToCheck.RemoveAll(x => true);
@@ -966,7 +966,7 @@ namespace Migracja
                             blGeoEdgePartFromArr = true;
                             lpPartEdgeInnerCounter = 1;
                             //Fragment granicy został odnalexiony, tzn, ze jeśli mamy trafienie i GetGeoEdgePart oddało fragment, to teraz będzie on czytany od końca.
-                            //Poniższe sprawdzenie testuje, czy przypadkiem znaleziony fragment nie ma dokładnie takiego samego kierunku, jak ten co chemy zbudować. 
+                            //Poniższe sprawdzenie testuje, czy przypadkiem znaleziony fragment nie ma dOkładnie takiego samego kierunku, jak ten co chemy zbudować. 
                             //Tak być nie powinno, bo jego zwrot powinien być odwrotny
                             if (geoEdgePart[0].pictX == startPoint.pictX && geoEdgePart[0].pictY == startPoint.pictY)
                             {
@@ -991,7 +991,7 @@ namespace Migracja
                         result.Add(geoEdgePart);
                     }
 
-                    //Jeśli fragment granicy już istnieje, to przechodzimy po nim od końca sprawdzając, czy punkty pokrywają się
+                    //Jeśli fragment granicy już istnieje, to przechodzimy po nim od końca sprawdzając, czy punkty pOkrywają się
                     if (blGeoEdgePartFromArr)
                     {
 

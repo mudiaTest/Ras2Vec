@@ -46,6 +46,11 @@
             this.loadDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveDialog = new System.Windows.Forms.SaveFileDialog();
             this.mainTab = new System.Windows.Forms.TabControl();
+            this.tabColor = new System.Windows.Forms.TabPage();
+            this.flpColors = new System.Windows.Forms.FlowLayoutPanel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnPosterize = new System.Windows.Forms.Button();
+            this.btnAddColorPanel = new System.Windows.Forms.Button();
             this.tabVect = new System.Windows.Forms.TabPage();
             this.panelMainVect = new System.Windows.Forms.Panel();
             this.panelMenuVect = new System.Windows.Forms.Panel();
@@ -94,12 +99,10 @@
             this.btnZoomOutVect = new System.Windows.Forms.Button();
             this.txtScaleLvlVect = new System.Windows.Forms.TextBox();
             this.trScaleVect = new System.Windows.Forms.TrackBar();
-            this.tabColor = new System.Windows.Forms.TabPage();
-            this.flpColors = new System.Windows.Forms.FlowLayoutPanel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.btnAddColorPanel = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             this.mainTab.SuspendLayout();
+            this.tabColor.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.tabVect.SuspendLayout();
             this.panelMainVect.SuspendLayout();
             this.panelMenuVect.SuspendLayout();
@@ -119,8 +122,6 @@
             this.panel6.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).BeginInit();
-            this.tabColor.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -243,6 +244,58 @@
             this.mainTab.Size = new System.Drawing.Size(365, 513);
             this.mainTab.TabIndex = 1;
             this.mainTab.Tag = "";
+            // 
+            // tabColor
+            // 
+            this.tabColor.Controls.Add(this.flpColors);
+            this.tabColor.Controls.Add(this.panel2);
+            this.tabColor.Location = new System.Drawing.Point(4, 22);
+            this.tabColor.Name = "tabColor";
+            this.tabColor.Padding = new System.Windows.Forms.Padding(3);
+            this.tabColor.Size = new System.Drawing.Size(357, 487);
+            this.tabColor.TabIndex = 2;
+            this.tabColor.Text = "Kolor";
+            this.tabColor.UseVisualStyleBackColor = true;
+            // 
+            // flpColors
+            // 
+            this.flpColors.AutoScroll = true;
+            this.flpColors.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpColors.Location = new System.Drawing.Point(3, 3);
+            this.flpColors.Margin = new System.Windows.Forms.Padding(0);
+            this.flpColors.Name = "flpColors";
+            this.flpColors.Size = new System.Drawing.Size(351, 441);
+            this.flpColors.TabIndex = 0;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.btnPosterize);
+            this.panel2.Controls.Add(this.btnAddColorPanel);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(3, 444);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(351, 40);
+            this.panel2.TabIndex = 1;
+            // 
+            // btnPosterize
+            // 
+            this.btnPosterize.Location = new System.Drawing.Point(48, 8);
+            this.btnPosterize.Name = "btnPosterize";
+            this.btnPosterize.Size = new System.Drawing.Size(63, 24);
+            this.btnPosterize.TabIndex = 1;
+            this.btnPosterize.Text = "Posterize";
+            this.btnPosterize.UseVisualStyleBackColor = true;
+            this.btnPosterize.Click += new System.EventHandler(this.btnPosterize_Click);
+            // 
+            // btnAddColorPanel
+            // 
+            this.btnAddColorPanel.Location = new System.Drawing.Point(7, 8);
+            this.btnAddColorPanel.Name = "btnAddColorPanel";
+            this.btnAddColorPanel.Size = new System.Drawing.Size(35, 24);
+            this.btnAddColorPanel.TabIndex = 0;
+            this.btnAddColorPanel.Text = "Add";
+            this.btnAddColorPanel.UseVisualStyleBackColor = true;
+            this.btnAddColorPanel.Click += new System.EventHandler(this.btnAddColorPanel_Click);
             // 
             // tabVect
             // 
@@ -493,7 +546,6 @@
             // 
             // loadSrcMapVectBtn
             // 
-            this.loadSrcMapVectBtn.Enabled = false;
             this.loadSrcMapVectBtn.Location = new System.Drawing.Point(89, 335);
             this.loadSrcMapVectBtn.Name = "loadSrcMapVectBtn";
             this.loadSrcMapVectBtn.Size = new System.Drawing.Size(98, 23);
@@ -796,47 +848,6 @@
             this.trScaleVect.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseMove);
             this.trScaleVect.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ScaleTb_MouseUp);
             // 
-            // tabColor
-            // 
-            this.tabColor.Controls.Add(this.flpColors);
-            this.tabColor.Controls.Add(this.panel2);
-            this.tabColor.Location = new System.Drawing.Point(4, 22);
-            this.tabColor.Name = "tabColor";
-            this.tabColor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabColor.Size = new System.Drawing.Size(357, 487);
-            this.tabColor.TabIndex = 2;
-            this.tabColor.Text = "Kolor";
-            this.tabColor.UseVisualStyleBackColor = true;
-            // 
-            // flpColors
-            // 
-            this.flpColors.AutoScroll = true;
-            this.flpColors.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flpColors.Location = new System.Drawing.Point(3, 3);
-            this.flpColors.Margin = new System.Windows.Forms.Padding(0);
-            this.flpColors.Name = "flpColors";
-            this.flpColors.Size = new System.Drawing.Size(351, 441);
-            this.flpColors.TabIndex = 0;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.btnAddColorPanel);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(3, 444);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(351, 40);
-            this.panel2.TabIndex = 1;
-            // 
-            // btnAddColorPanel
-            // 
-            this.btnAddColorPanel.Location = new System.Drawing.Point(7, 8);
-            this.btnAddColorPanel.Name = "btnAddColorPanel";
-            this.btnAddColorPanel.Size = new System.Drawing.Size(35, 24);
-            this.btnAddColorPanel.TabIndex = 0;
-            this.btnAddColorPanel.Text = "Add";
-            this.btnAddColorPanel.UseVisualStyleBackColor = true;
-            this.btnAddColorPanel.Click += new System.EventHandler(this.btnAddColorPanel_Click);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -851,6 +862,8 @@
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.mainTab.ResumeLayout(false);
+            this.tabColor.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
             this.tabVect.ResumeLayout(false);
             this.panelMainVect.ResumeLayout(false);
             this.panelMenuVect.ResumeLayout(false);
@@ -875,8 +888,6 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trScaleVect)).EndInit();
-            this.tabColor.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -953,6 +964,7 @@
         private System.Windows.Forms.FlowLayoutPanel flpColors;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnAddColorPanel;
+        private System.Windows.Forms.Button btnPosterize;
     }
 }
 

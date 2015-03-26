@@ -273,7 +273,7 @@ namespace Migracja
                 //if (colorElement.Element(XredMin) != null)
                 //{ 
                     PosterizedColorData pcd = new PosterizedColorData();
-                    pcd.gravity = int.Parse(colorElement.Element(Xgravity).Value);
+                    pcd.gravity = float.Parse(colorElement.Element(Xgravity).Value);
                     pcd.garminColor = Color.FromArgb(255,
                                                         int.Parse(colorElement.Element(XgarminColorR).Value),
                                                         int.Parse(colorElement.Element(XgarminColorG).Value), 

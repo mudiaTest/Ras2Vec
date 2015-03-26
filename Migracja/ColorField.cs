@@ -22,8 +22,16 @@ namespace Migracja
             lpRed = aLpRed;
             lpGreen = aLpGreen;
             lpBlue = aLpBlue;
-            pnlColor.BackColor = Color.FromArgb(lpRed, lpGreen, lpBlue);             
+            ObjToScreen();     
             ReturnFunct = aReturnFunct/*(aLpRed, aLpGreen, aLpBlue)*/;
+        }
+
+        private void ObjToScreen()
+        {
+            lblRed.Text = lpRed.ToString();
+            lblGreen.Text = lpGreen.ToString();
+            lblBlue.Text = lpBlue.ToString();
+            pnlColor.BackColor = Color.FromArgb(lpRed, lpGreen, lpBlue);
         }
 
         private void ColorField_Click(object sender, EventArgs e)

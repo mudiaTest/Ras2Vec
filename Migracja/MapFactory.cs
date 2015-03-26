@@ -11,8 +11,8 @@ namespace Migracja
     class MapFactory : Dictionary<int, VectoredRectangleGroup>
     {
         public Vector_Rectangle[][] vectArr;// { get; set; } //2 wymiarowa tablica odzwiercieglająca rastra przy pomocy obiektów Vector_Rectangle
-        public int srcWidth { get; set; } //szerokość wczytanego (ReadFromImgIntoRectArray) obrazka
-        public int srcHeight { get; set; } //wysokość wczytanego (ReadFromImgIntoRectArray) obrazka
+        public int srcWidth { get; set; } //szerOkość wczytanego (ReadFromImgIntoRectArray) obrazka
+        public int srcHeight { get; set; } //wysOkość wczytanego (ReadFromImgIntoRectArray) obrazka
         //wsp. geo. lewego górnego rogu
         public float geoLeftUpX { get; set; }
         public float geoLeftUpY { get; set; }

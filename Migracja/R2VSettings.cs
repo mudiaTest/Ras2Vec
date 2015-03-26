@@ -22,7 +22,7 @@ namespace Migracja
                 fsrcHeight = fsourceBmp.Height;
             }
         }
-        //szerokość i wysokość żródłowego obrazu (rastra) w px - upraszczają, bo nie trzeba odwoływać się przez sourceBmp
+        //szerOkość i wysOkość żródłowego obrazu (rastra) w px - upraszczają, bo nie trzeba odwoływać się przez sourceBmp
         private int fsrcWidth;
         private int fsrcHeight;
         public int srcWidth { get { return fsrcWidth; } }
@@ -66,7 +66,7 @@ namespace Migracja
         //Oblicze ile stopni zawiera jeden PX
         public void CalculateGeoPx()
         {
-            Debug.Assert(srcWidth > 0 || srcHeight > 0, "Szorokość lub wysokość obrazu żródłowgo jest zerowa: " + srcWidth.ToString() + "," + srcHeight.ToString());
+            Debug.Assert(srcWidth > 0 || srcHeight > 0, "SzorOkość lub wysOkość obrazu żródłowgo jest zerowa: " + srcWidth.ToString() + "," + srcHeight.ToString());
             xGeoPX = (geoRightDownX - geoLeftUpX) / (srcWidth + 1);
             yGeoPX = (geoLeftUpY - geoRightDownY) / (srcHeight + 1);
         }

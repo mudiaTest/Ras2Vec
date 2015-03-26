@@ -155,6 +155,9 @@
     <EmbeddedResource Include="Migracja\ColorPanel.resx">
       <DependentUpon>ColorPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migracja\GarminPalette.resx">
+      <DependentUpon>GarminPalette.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migracja\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>

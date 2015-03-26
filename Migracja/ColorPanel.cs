@@ -22,7 +22,7 @@ namespace Migracja
 
         public void Scr2Obj()
         {
-            postColorObj.gravity = Double.Parse(txtGravity.Text);
+            postColorObj.gravity = float.Parse(txtGravity.Text);
             postColorObj.garminColor = pnlGarminColor.BackColor;
             postColorObj.rasterColor = pnlRasterColor.BackColor;
         }
@@ -71,6 +71,11 @@ namespace Migracja
 
         private void pnlColor_Click(object sender, EventArgs e)
         {
+            DoPnlColor_Click(sender, e);
+        }
+
+        private void DoPnlColor_Click(object sender, EventArgs e)
+        {
             GarminPalette palette = new GarminPalette(ref postColorObj.garminColor);
             palette.ShowDialog(this);
             postColorObj.garminColor = palette.color;
@@ -115,11 +120,26 @@ namespace Migracja
 
         private void pnlRasterColor_Click(object sender, EventArgs e)
         {
+            DoPnlRasterColor_Click(sender, e);
+        }
+
+        private void DoPnlRasterColor_Click(object sender, EventArgs e)
+        {
             GarminPalette palette = new GarminPalette(ref postColorObj.rasterColor);
             palette.ShowDialog(this);
             postColorObj.rasterColor = palette.color;
             Obj2Scr();
             palette.Dispose();
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            DoPnlColor_Click(null, e);
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+            DoPnlRasterColor_Click(null, e);
         }
     }
 }

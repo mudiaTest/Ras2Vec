@@ -548,13 +548,18 @@ namespace Migracja
             /*DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);*/
         }
 
-        private void posterizeSrcImageBtn_Click(object sender, EventArgs e)
+        private void doPosterization()
         {
-            ColorChanger cc = new ColorChanger();
+            ColorChanger cc = new ColorChanger(windowSettings);
             cc.PosterizeBitmap(sourceBmp, ref posterizedBmp);
             posterizedImageCropper.srcBmp = posterizedBmp;
             /*DrawCroppedScaledImage4Col(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);*/
             DrawCroppedScaledImage(windowSettings.dpScaleVect, UpdateInfoBoxTime, windowSettings.dpScaleVect);
+        }
+
+        private void posterizeSrcImageBtn_Click(object sender, EventArgs e)
+        {
+            doPosterization();
         }
 
         private void btnAddColorPanel_Click(object sender, EventArgs e)
@@ -563,6 +568,11 @@ namespace Migracja
             ColorPanel cp = new ColorPanel(postColData);
             flpColors.Controls.Add(cp);
             windowSettings.dictColorData.Add(ExtDictionary.NextKey(windowSettings.dictColorData), postColData);
+        }
+
+        private void btnPosterize_Click(object sender, EventArgs e)
+        {
+            doPosterization();
         }
         
     }

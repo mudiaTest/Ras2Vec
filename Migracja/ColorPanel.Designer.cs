@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.pnlGarminColor = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtGravity = new System.Windows.Forms.MaskedTextBox();
             this.pnlRasterColor = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pnlGarminColor.SuspendLayout();
             this.pnlRasterColor.SuspendLayout();
@@ -45,13 +45,24 @@
             this.pnlGarminColor.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlGarminColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlGarminColor.Controls.Add(this.label1);
-            this.pnlGarminColor.Location = new System.Drawing.Point(6, 5);
+            this.pnlGarminColor.Location = new System.Drawing.Point(47, 6);
             this.pnlGarminColor.Name = "pnlGarminColor";
             this.pnlGarminColor.Padding = new System.Windows.Forms.Padding(2);
             this.pnlGarminColor.Size = new System.Drawing.Size(35, 42);
             this.pnlGarminColor.TabIndex = 0;
             this.pnlGarminColor.Click += new System.EventHandler(this.pnlColor_Click);
             this.pnlGarminColor.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlColor_Paint);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label1.Location = new System.Drawing.Point(4, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(28, 25);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "G";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label3
             // 
@@ -79,22 +90,12 @@
             this.pnlRasterColor.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlRasterColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlRasterColor.Controls.Add(this.label2);
-            this.pnlRasterColor.Location = new System.Drawing.Point(47, 5);
+            this.pnlRasterColor.Location = new System.Drawing.Point(6, 5);
             this.pnlRasterColor.Name = "pnlRasterColor";
             this.pnlRasterColor.Padding = new System.Windows.Forms.Padding(2);
             this.pnlRasterColor.Size = new System.Drawing.Size(34, 42);
             this.pnlRasterColor.TabIndex = 11;
             this.pnlRasterColor.Click += new System.EventHandler(this.pnlRasterColor_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(4, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(28, 25);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "G";
             // 
             // label2
             // 
@@ -105,6 +106,7 @@
             this.label2.Size = new System.Drawing.Size(26, 25);
             this.label2.TabIndex = 13;
             this.label2.Text = "R";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // ColorPanel
             // 
